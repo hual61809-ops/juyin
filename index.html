@@ -251,6 +251,9 @@ footer .brand{font-family:'NF',serif;color:rgba(212,164,74,0.35);font-size:12px}
 
   <div id="scoreSection"></div>
 
+  <!-- 结构记录：跨代对比 -->
+  <div id="structureHistory" style="display:none;margin-bottom:16px;padding:14px 18px;background:rgba(96,144,184,0.04);border:1px solid rgba(96,144,184,0.12);border-radius:10px"></div>
+
   <div class="header-row">
     <div class="result-title" id="dramaTitle">剧名</div>
     <div class="result-meta"><span class="badge badge-gold" id="genreBadge">类型</span><span class="badge badge-gold" id="epBadge">集数</span><span class="badge badge-green" id="consistencyBadge">🔒</span></div>
@@ -303,7 +306,7 @@ footer .brand{font-family:'NF',serif;color:rgba(212,164,74,0.35);font-size:12px}
 </div>
 
 <script>
-const SK='juyin_api_key',UK='juyin_usage',DK='juyin_data',AK='juyin_analytics',DL=5,RW=120000;
+const SK='juyin_api_key',UK='juyin_usage',DK='juyin_data',HK2='juyin_struct_hist',AK='juyin_analytics',DL=5,RW=120000;
 let cr=null,lg=null;
 
 function init(){uSI();uQH();if(!localStorage.getItem('juyin_v6')){setTimeout(()=>st('👋 输入想法，分析结构潜力'),800);localStorage.setItem('juyin_v6','1')}}
@@ -388,7 +391,7 @@ async function generate(){
     if(!r.ok){const je=await r.json().catch(()=>({}));if(r.status===401)throw new Error('API Key不对');if(r.status===402)throw new Error('余额用完');throw new Error(je.error?.message||'出错')}
     const d=await r.json();let ct=d.choices?.[0]?.message?.content;if(!ct)throw new Error('空');
     let pd;try{pd=JSON.parse(ct.replace(/```json|```/g,'').trim())}catch{const m=ct.match(/\{[\s\S]*\}/);if(m)pd=JSON.parse(m[0].replace(/,\s*}/g,'}').replace(/,\s*\]/g,']'));else throw new Error('格式')}
-    cQ();lg={desc,genre,epCount,sys,usr,time:Date.now()};sL(false);cr=pd;render(pd,genre,epCount);uQH();te('gen_ok',{genre,epCount,score:pd.score?.total||0});
+    cQ();lg={desc,genre,epCount,sys,usr,time:Date.now()};sL(false);cr=pd;saveStructureHistory(pd);render(pd,genre,epCount);uQH();te('gen_ok',{genre,epCount,score:pd.score?.total||0});
   }catch(err){clearTimeout(tid);sL(false);btn.disabled=false;document.getElementById('inputCard').style.display='block';if(err.name==='AbortError')sE('超时，试减少集数');else sE(err.message);te('gen_err',{})}
 }
 
@@ -409,6 +412,9 @@ function render(d,genre,epCount){
     <div class="score-metrics">${metrics.map(m=>`<div class="metric-item"><div class="metric-bar"><div class="metric-fill ${(m.v||0)>=8?'high':(m.v||0)>=6?'mid':'low'}" style="width:${(m.v||0)*10}%"></div></div><div class="metric-name">${m.n}</div><div class="metric-val">${(m.v||0).toFixed(1)}</div></div>`).join('')}</div>
     ${d.matchedTemplate?`<span class="template-badge">📐 ${d.matchedTemplate}</span>`:''}
   </div>`;
+
+  // 跨代对比
+  showStructureHistory(sc.total||0,d.matchedTemplate||'');
 
   document.getElementById('dramaTitle').textContent=d.title||'未命名';
   document.getElementById('genreBadge').textContent=genre;document.getElementById('epBadge').textContent=epCount+'集';
@@ -449,6 +455,27 @@ function sD(d){localStorage.setItem(DK,JSON.stringify(d))}
 function loadExistingData(title){document.getElementById('fbPlays').value='';document.getElementById('fbCompletion').value='';document.getElementById('evolutionHint').style.display='none';const db=gD();const key=btoa(encodeURIComponent(title||''));if(db[key]){document.getElementById('fbPlays').value=db[key].plays||'';document.getElementById('fbCompletion').value=db[key].completion||'';showEvo(db[key])}}
 function saveFeedback(){if(!cr)return;const p=parseInt(document.getElementById('fbPlays').value)||0,c=parseFloat(document.getElementById('fbCompletion').value)||0;if(!p){st('至少填播放量');return}const db=gD();const key=btoa(encodeURIComponent(cr.title||''));db[key]={title:cr.title,plays:p,completion:c,predictedScore:(cr.score||{}).total||0,savedAt:new Date().toISOString()};sD(db);st('数据已记录 · 感谢反馈');showEvo(db[key]);te('data_feedback',{title:cr.title,plays:p})}
 function showEvo(entry){const el=document.getElementById('evolutionHint');if(!el)return;let hint=`结构分析 ${entry.predictedScore||'—'} 分 → 实际播放 ${entry.plays}`;if(entry.plays<1000)hint+=`<br>📌 实际表现偏低，建议优化前3秒钩子设计。`;else if(entry.plays<10000)hint+=`<br>📌 表现中规中矩，可检查中段冲突密度。`;else hint+=`<br>📌 实际表现良好 🎉 此结构可复用。`;el.innerHTML=`<strong style="color:var(--blue);font-size:10px">📈 对比分析</strong><br>${hint}`;el.style.display='block';}
+
+// ========== 结构记录 & 跨代对比 ==========
+function gSH(){try{return JSON.parse(localStorage.getItem(HK2)||'[]')}catch(e){return[]}}
+function saveStructureHistory(d){
+  const h=gSH();h.unshift({title:d.title,score:d.score?.total||0,template:d.matchedTemplate||'',genre:'',createdAt:new Date().toLocaleString('zh-CN')});
+  if(h.length>10)h.length=10;localStorage.setItem(HK2,JSON.stringify(h));
+}
+function showStructureHistory(currentScore,currentTemplate){
+  const h=gSH();const el=document.getElementById('structureHistory');if(!el||h.length<2){el.style.display='none';return}
+  // 取最近2次的记录（排除当前这次），当前这次在索引0，所以取1和2
+  const prev=h.slice(1,3).filter(x=>x.title);if(!prev.length){el.style.display='none';return}
+  let tips='';
+  prev.forEach((p,i)=>{
+    const diff=(currentScore||0)-(p.score||0);
+    if(diff>5)tips+=`当前结构比「${p.title}」(${p.template})传播潜力高 ${diff} 分 → 建议按当前结构推进<br>`;
+    else if(diff<-10)tips+=`「${p.title}」(${p.template})曾获 ${p.score} 分，高于当前。建议参考其结构特征<br>`;
+    else if(Math.abs(diff)<=5)tips+=`当前与前作「${p.title}」(${p.template})结构强度接近。对比实际播放数据做最终判断<br>`;
+  });
+  if(tips)el.innerHTML=`<strong style="color:var(--blue);font-size:10px;display:block;margin-bottom:6px">🧠 跨代对比</strong><div style="font-size:10px;color:var(--gray);line-height:1.8">${tips}</div>`;else el.style.display='none';
+  el.style.display=tips?'block':'none';
+}
 
 function te(ev,data){try{const r=JSON.parse(localStorage.getItem(AK)||'[]');r.push({event:ev,data:data||{},time:new Date().toISOString()});if(r.length>500)r.splice(0,r.length-500);localStorage.setItem(AK,JSON.stringify(r))}catch(e){}}
 </script>
