@@ -3,339 +3,341 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>剧引 · AI短剧连续生产系统</title>
-<meta name="description" content="创建AI角色资产，一键生成连续剧。角色一致性锁定，第1集到第50集自动继承。">
+<title>剧引 · AI短剧发布引擎</title>
+<meta name="description" content="输入故事，3步生成可直接发布的AI短剧。镜头级拆解+即梦/可灵提示词+剪映结构+发布文案。">
 <style>
-@font-face{font-family:'Noto Serif SC';font-style:normal;font-weight:400;font-display:swap;src:local('Noto Serif SC'),local('Source Han Serif SC'),local('SimSun'),local('STSong')}
-@font-face{font-family:'Noto Serif SC';font-style:normal;font-weight:700;font-display:swap;src:local('Noto Serif SC'),local('Source Han Serif SC'),local('SimHei'),local('STHeiti')}
-@font-face{font-family:'Noto Serif SC';font-style:normal;font-weight:900;font-display:swap;src:local('Noto Serif SC'),local('Source Han Serif SC'),local('SimHei'),local('STHeiti')}
-@font-face{font-family:'Noto Sans SC';font-style:normal;font-weight:300;font-display:swap;src:local('Noto Sans SC'),local('Source Han Sans SC'),local('Microsoft YaHei'),local('PingFang SC')}
-@font-face{font-family:'Noto Sans SC';font-style:normal;font-weight:400;font-display:swap;src:local('Noto Sans SC'),local('Source Han Sans SC'),local('Microsoft YaHei'),local('PingFang SC')}
-@font-face{font-family:'Noto Sans SC';font-style:normal;font-weight:500;font-display:swap;src:local('Noto Sans SC'),local('Source Han Sans SC'),local('Microsoft YaHei'),local('PingFang SC')}
-:root{--ink:#1a1208;--gold:#c9933a;--gold-light:#e8b96a;--paper:#f5f0e8;--red:#9b2335;--smoke:#7a7060}
+@font-face{font-family:'NS';font-style:normal;font-weight:300;font-display:swap;src:local('Noto Sans SC'),local('Microsoft YaHei')}
+@font-face{font-family:'NS';font-style:normal;font-weight:400;font-display:swap;src:local('Noto Sans SC'),local('Microsoft YaHei')}
+@font-face{font-family:'NS';font-style:normal;font-weight:500;font-display:swap;src:local('Noto Sans SC'),local('Microsoft YaHei')}
+@font-face{font-family:'NF';font-style:normal;font-weight:400;font-display:swap;src:local('Noto Serif SC'),local('SimSun')}
+@font-face{font-family:'NF';font-style:normal;font-weight:700;font-display:swap;src:local('Noto Serif SC'),local('STHeiti')}
+@font-face{font-family:'NF';font-style:normal;font-weight:900;font-display:swap;src:local('Noto Serif SC'),local('STHeiti')}
+:root{--ink:#0d0a06;--gold:#d4a44a;--gl:#e8c878;--paper:#f0ebe0;--red:#a8323c;--gray:#8a8276;--bg2:rgba(255,255,255,0.03);--bd:rgba(212,164,74,0.2);--bd2:rgba(212,164,74,0.12)}
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--ink);color:var(--paper);font-family:'Noto Sans SC',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(201,147,58,0.1) 0%,transparent 60%);pointer-events:none;z-index:0}
-.container{position:relative;z-index:1}
-header{display:flex;align-items:center;justify-content:space-between;padding:22px 40px;border-bottom:1px solid rgba(201,147,58,0.18);position:relative;z-index:10}
-.logo{display:flex;align-items:baseline;gap:10px}
-.logo-zh{font-family:'Noto Serif SC',serif;font-size:26px;font-weight:900;color:var(--gold);letter-spacing:3px}
-.logo-en{font-size:10px;letter-spacing:2px;color:var(--smoke);text-transform:uppercase}
-.header-actions{display:flex;align-items:center;gap:12px}
-.nav-link{font-size:12px;letter-spacing:1px;color:var(--smoke);cursor:pointer;transition:color .2s;padding:6px 12px;border-radius:6px;border:1px solid transparent}
-.nav-link:hover{color:var(--gold)}
-.nav-link.active{color:var(--gold);border-color:rgba(201,147,58,0.3);background:rgba(201,147,58,0.08)}
-.settings-btn{width:34px;height:34px;border-radius:50%;border:1px solid rgba(201,147,58,0.25);background:transparent;color:var(--smoke);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+body{background:var(--ink);color:var(--paper);font-family:'NS',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 50% -5%,rgba(212,164,74,0.08),transparent 60%);pointer-events:none;z-index:0}
+#app{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:0 20px}
+
+/* Header */
+header{display:flex;align-items:center;justify-content:space-between;padding:20px 0;border-bottom:1px solid var(--bd2)}
+.logo{display:flex;align-items:baseline;gap:8px}
+.logo-zh{font-family:'NF',serif;font-size:24px;font-weight:900;color:var(--gold);letter-spacing:3px}
+.logo-en{font-size:10px;letter-spacing:2px;color:var(--gray);text-transform:uppercase}
+.settings-btn{width:34px;height:34px;border-radius:50%;border:1px solid rgba(212,164,74,0.25);background:transparent;color:var(--gray);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
 .settings-btn:hover,.settings-btn.has-key{border-color:var(--gold);color:var(--gold)}
-.settings-btn.has-key{background:rgba(201,147,58,0.1)}
-.hero{text-align:center;padding:50px 40px 30px}
-.hero-tag{display:inline-block;border:1px solid rgba(201,147,58,0.35);padding:6px 20px;border-radius:100px;font-size:11px;letter-spacing:3px;color:var(--gold);margin-bottom:24px;animation:fadeDown .6s ease both}
-.hero h1{font-family:'Noto Serif SC',serif;font-size:clamp(28px,5vw,50px);font-weight:900;line-height:1.2;animation:fadeDown .6s .1s ease both}
-.hero h1 .accent{color:var(--gold)}
-.hero p{margin-top:12px;color:var(--smoke);font-size:14px;line-height:1.8;animation:fadeDown .6s .2s ease both}
-@keyframes fadeDown{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:translateY(0)}}
+.settings-btn.has-key{background:rgba(212,164,74,0.1)}
 
-/* 顶部Tab */
-.top-tabs{display:flex;justify-content:center;gap:4px;margin-bottom:20px}
-.top-tab{padding:10px 24px;border-radius:8px 8px 0 0;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-bottom:none;color:var(--smoke);font-size:13px;cursor:pointer;letter-spacing:1px;transition:all .2s}
-.top-tab:hover{color:var(--gold)}
-.top-tab.active{background:rgba(201,147,58,0.06);border-color:rgba(201,147,58,0.2);color:var(--gold)}
+/* Hero */
+.hero{text-align:center;padding:40px 10px 24px}
+.hero-tag{display:inline-block;border:1px solid rgba(212,164,74,0.35);padding:5px 18px;border-radius:100px;font-size:10px;letter-spacing:3px;color:var(--gold);margin-bottom:18px}
+.hero h1{font-family:'NF',serif;font-size:clamp(24px,5vw,40px);font-weight:900;line-height:1.3}
+.hero h1 .a{color:var(--gold)}
+.hero p{margin-top:8px;font-size:13px;color:var(--gray);line-height:1.7}
 
-.panel{display:none;max-width:820px;margin:0 auto 60px;padding:0 20px}
-.panel.active{display:block}
+/* Input Card */
+.input-card{background:var(--bg2);border:1px solid var(--bd);border-radius:14px;padding:24px 26px;margin-bottom:12px}
+.input-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.input-group{display:flex;flex-direction:column;gap:5px}
+.input-group.full{grid-column:1/-1}
+.input-group label{font-size:10px;letter-spacing:2px;color:var(--gold);text-transform:uppercase}
+.input-group input,.input-group textarea,.input-group select{background:rgba(255,255,255,0.04);border:1px solid var(--bd);border-radius:8px;padding:10px 14px;color:var(--paper);font-family:'NS',sans-serif;font-size:13px;outline:none;transition:border-color .2s;width:100%;resize:none}
+.input-group textarea{min-height:64px;line-height:1.6}
+.input-group select:focus,.input-group input:focus,.input-group textarea:focus{border-color:var(--gold)}
+.input-group select option{background:#15100a}
+.input-group textarea::placeholder{color:#5a5348}
 
-/* 角色工坊 */
-.char-create-card{background:rgba(255,255,255,0.025);border:1px solid rgba(201,147,58,0.18);border-radius:12px;padding:28px}
-.char-form-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
-.char-form-group{display:flex;flex-direction:column;gap:6px}
-.char-form-group.full{grid-column:1/-1}
-.char-form-group label{font-size:11px;letter-spacing:2px;color:var(--gold)}
-.char-form-group input,.char-form-group textarea{background:rgba(255,255,255,0.04);border:1px solid rgba(201,147,58,0.2);border-radius:8px;padding:10px 14px;color:var(--paper);font-family:'Noto Sans SC',sans-serif;font-size:13px;outline:none;transition:border-color .2s;width:100%;resize:none}
-.char-form-group input:focus,.char-form-group textarea:focus{border-color:var(--gold)}
-.char-form-group textarea{min-height:60px;line-height:1.6}
-.char-create-btn{width:100%;margin-top:12px;padding:14px;background:linear-gradient(135deg,var(--gold),var(--gold-light));border:none;border-radius:8px;color:var(--ink);font-family:'Noto Serif SC',serif;font-size:14px;font-weight:700;letter-spacing:3px;cursor:pointer;transition:all .15s}
-.char-create-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(201,147,58,0.3)}
-.char-create-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+/* Viral templates */
+.template-tags{display:flex;flex-wrap:wrap;gap:6px}
+.tmpl-tag{padding:6px 14px;border-radius:100px;border:1px solid var(--bd);font-size:11px;color:var(--gray);cursor:pointer;transition:all .2s;white-space:nowrap}
+.tmpl-tag:hover{border-color:var(--gold);color:var(--gold)}
+.tmpl-tag.active{background:rgba(212,164,74,0.12);border-color:var(--gold);color:var(--gold)}
 
-/* 角色资产库 */
-.char-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-top:20px}
-.char-asset{background:rgba(255,255,255,0.03);border:1px solid rgba(201,147,58,0.15);border-radius:10px;padding:18px;position:relative;transition:all .2s}
-.char-asset:hover{border-color:rgba(201,147,58,0.35)}
-.char-asset.selected{border-color:var(--gold);background:rgba(201,147,58,0.08)}
-.char-asset-id{font-size:10px;color:rgba(201,147,58,0.4);margin-bottom:6px;letter-spacing:1px}
-.char-asset-name{font-family:'Noto Serif SC',serif;font-size:18px;font-weight:700;color:var(--gold-light);margin-bottom:4px}
-.char-asset-role{font-size:11px;color:var(--smoke);letter-spacing:1px;margin-bottom:8px}
-.char-asset-look{font-size:11px;color:rgba(245,240,232,0.5);line-height:1.6;margin-bottom:8px}
-.char-asset-behavior{font-size:11px;color:rgba(200,160,140,0.45);line-height:1.5}
-.char-asset-select{position:absolute;top:12px;right:12px;width:24px;height:24px;border-radius:50%;border:2px solid rgba(201,147,58,0.3);background:transparent;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;font-size:12px;color:transparent}
-.char-asset.selected .char-asset-select{background:var(--gold);border-color:var(--gold);color:var(--ink)}
-.char-asset-delete{position:absolute;bottom:12px;right:12px;background:transparent;border:none;color:rgba(155,35,53,0.5);font-size:11px;cursor:pointer;opacity:0;transition:opacity .2s}
-.char-asset:hover .char-asset-delete{opacity:1}
-
-.char-hint{text-align:center;padding:40px 20px;color:var(--smoke);font-size:13px;line-height:2.2}
-.char-hint strong{color:var(--gold-light)}
-.char-section-title{font-family:'Noto Serif SC',serif;font-size:13px;letter-spacing:2px;color:var(--gold);margin:24px 0 12px;display:flex;align-items:center;gap:10px}
-.char-section-title::after{content:'';flex:1;height:1px;background:rgba(201,147,58,0.15)}
-
-/* 连续剧生产面板 */
-.gen-card{background:rgba(255,255,255,0.025);border:1px solid rgba(201,147,58,0.18);border-radius:12px;padding:28px}
-.gen-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
-.gen-group{display:flex;flex-direction:column;gap:6px}
-.gen-group.full{grid-column:1/-1}
-.gen-group label{font-size:11px;letter-spacing:2px;color:var(--gold)}
-.gen-group select,.gen-group textarea{background:rgba(255,255,255,0.04);border:1px solid rgba(201,147,58,0.2);border-radius:8px;padding:10px 14px;color:var(--paper);font-family:'Noto Sans SC',sans-serif;font-size:13px;outline:none;transition:border-color .2s;width:100%;resize:none}
-.gen-group select:focus,.gen-group textarea:focus{border-color:var(--gold)}
-.gen-group select option{background:#1e1810}
-.gen-group textarea{min-height:70px;line-height:1.6}
-.locked-chars{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
-.locked-char{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:100px;background:rgba(201,147,58,0.1);border:1px solid rgba(201,147,58,0.3);font-size:12px;color:var(--gold)}
-.locked-char-remove{font-size:11px;cursor:pointer;color:rgba(155,35,53,0.6)}
-.gen-btn{width:100%;margin-top:12px;padding:16px;background:linear-gradient(135deg,var(--gold),var(--gold-light));border:none;border-radius:8px;color:var(--ink);font-family:'Noto Serif SC',serif;font-size:15px;font-weight:700;letter-spacing:3px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
-.gen-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(201,147,58,0.3)}
-.gen-btn:disabled{opacity:0.55;cursor:not-allowed;transform:none}
-.btn-shimmer{position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent);transform:translateX(-100%);animation:shimmer 2s infinite}
+/* Generate button */
+.gen-btn{width:100%;margin-top:8px;padding:16px;background:linear-gradient(135deg,var(--gold),var(--gl));border:none;border-radius:10px;color:var(--ink);font-family:'NF',serif;font-size:16px;font-weight:700;letter-spacing:4px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
+.gen-btn:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(212,164,74,0.3)}
+.gen-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+.shimmer{position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent);transform:translateX(-100%);animation:shimmer 2s infinite}
 @keyframes shimmer{100%{transform:translateX(100%)}}
-.quota-hint{text-align:center;margin-top:10px;font-size:11px;color:var(--smoke)}
-.error-box{display:none;background:rgba(155,35,53,0.08);border:1px solid rgba(155,35,53,0.25);border-radius:8px;padding:12px 16px;font-size:12px;color:#e07b8a;margin-top:12px;line-height:1.6}
+.quota-hint{text-align:center;margin-top:8px;font-size:10px;color:var(--gray)}
+.error-box{display:none;background:rgba(168,50,60,0.08);border:1px solid rgba(168,50,60,0.25);border-radius:8px;padding:10px 14px;font-size:12px;color:#e07b8a;margin-top:10px;line-height:1.5}
 .error-box.active{display:block}
 
-/* 加载 */
-.loading-state{display:none;text-align:center;padding:60px 20px}
-.loading-state.active{display:block}
-.loading-ring{width:50px;height:50px;border:2px solid rgba(201,147,58,0.18);border-top-color:var(--gold);border-radius:50%;margin:0 auto 20px;animation:spin .8s linear infinite}
+/* Loading */
+.loading{display:none;text-align:center;padding:60px 20px}
+.loading.active{display:block}
+.spinner{width:44px;height:44px;border:2px solid rgba(212,164,74,0.15);border-top-color:var(--gold);border-radius:50%;margin:0 auto 16px;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading-text{font-family:'Noto Serif SC',serif;color:var(--gold);font-size:15px;letter-spacing:2px}
-.loading-sub{margin-top:6px;font-size:12px;color:var(--smoke)}
+.loading-text{font-family:'NF',serif;color:var(--gold);font-size:14px;letter-spacing:2px}
+.loading-sub{margin-top:4px;font-size:11px;color:var(--gray)}
 
-/* 结果 */
-.result-section{display:none;max-width:880px;margin:0 auto 60px;padding:0 20px}
-.result-section.active{display:block}
-.result-actions{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
-.action-btn{padding:7px 16px;border:1px solid rgba(201,147,58,0.25);border-radius:6px;background:transparent;color:var(--gold);font-size:12px;letter-spacing:1px;cursor:pointer;transition:all .2s}
-.action-btn:hover{background:rgba(201,147,58,0.08)}
-.action-btn.copied{background:rgba(80,180,120,0.15);border-color:#50b478;color:#50b478}
-.result-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid rgba(201,147,58,0.18)}
-.result-title{font-family:'Noto Serif SC',serif;font-size:26px;font-weight:900}
-.result-meta{display:flex;gap:8px}
-.meta-badge{padding:4px 12px;border-radius:100px;background:rgba(201,147,58,0.1);border:1px solid rgba(201,147,58,0.25);font-size:10px;color:var(--gold)}
-.consistency-badge{padding:4px 12px;border-radius:100px;background:rgba(80,150,120,0.1);border:1px solid rgba(80,150,120,0.25);font-size:10px;color:#70cca0}
-.synopsis-card{background:rgba(201,147,58,0.04);border:1px solid rgba(201,147,58,0.12);border-left:3px solid var(--gold);border-radius:4px 10px 10px 4px;padding:18px 22px;margin-bottom:20px}
-.synopsis-label{font-size:10px;letter-spacing:3px;color:var(--gold);margin-bottom:8px}
-.synopsis-text{font-size:13px;line-height:1.8;color:rgba(245,240,232,0.78)}
-.section-title{font-family:'Noto Serif SC',serif;font-size:13px;letter-spacing:2px;color:var(--gold);margin:28px 0 12px;display:flex;align-items:center;gap:10px}
-.section-title::after{content:'';flex:1;height:1px;background:rgba(201,147,58,0.15)}
-.episodes-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
-.ep-tab{padding:7px 16px;border-radius:6px;border:1px solid rgba(255,255,255,0.07);font-size:12px;color:var(--smoke);cursor:pointer;transition:all .2s}
-.ep-tab:hover{border-color:rgba(201,147,58,0.25);color:var(--gold)}
-.ep-tab.active{background:rgba(201,147,58,0.12);border-color:var(--gold);color:var(--gold)}
-.episode-content{display:none}
-.episode-content.active{display:block}
-.episode-header{background:rgba(255,255,255,0.018);border:1px solid rgba(255,255,255,0.05);border-radius:10px;padding:18px;margin-bottom:14px}
-.ep-number{font-size:10px;letter-spacing:3px;color:var(--smoke);margin-bottom:4px}
-.ep-title{font-family:'Noto Serif SC',serif;font-size:18px;font-weight:700;margin-bottom:8px}
-.ep-desc{font-size:12px;color:rgba(245,240,232,0.55);line-height:1.7}
-.scenes-list{display:flex;flex-direction:column;gap:10px}
-.scene-card{background:rgba(255,255,255,0.018);border:1px solid rgba(255,255,255,0.05);border-radius:8px;padding:16px 18px;display:grid;grid-template-columns:auto 1fr;gap:0 14px}
-.scene-card:hover{border-color:rgba(201,147,58,0.15)}
-.scene-num{font-family:'Noto Serif SC',serif;font-size:20px;font-weight:900;color:rgba(201,147,58,0.18);line-height:1;padding-top:2px}
-.scene-location{font-size:10px;color:var(--red);margin-bottom:4px;letter-spacing:1px}
-.scene-duration{font-size:10px;color:rgba(201,147,58,0.35);margin-left:6px}
-.scene-camera{font-size:11px;color:rgba(160,180,200,0.55);line-height:1.5;margin-bottom:6px;padding:5px 8px;background:rgba(255,255,255,0.02);border-radius:4px;border-left:2px solid rgba(160,180,220,0.2)}
-.scene-emotion{font-size:11px;color:rgba(200,160,140,0.5);margin-bottom:8px}
-.scene-action{font-size:12px;color:rgba(245,240,232,0.65);line-height:1.7;margin-bottom:8px}
-.dialogues{display:flex;flex-direction:column;gap:4px}
-.dialogue{display:flex;gap:8px;font-size:12px;line-height:1.6}
-.dia-name{color:var(--gold-light);font-weight:500;min-width:50px;flex-shrink:0}
-.dia-text{color:rgba(245,240,232,0.75)}
-.dia-emotion{font-size:10px;color:rgba(200,160,140,0.42);font-style:italic}
-.watermark{text-align:center;padding:12px 0 0;font-size:10px;color:rgba(201,147,58,0.3);letter-spacing:1px;border-top:1px solid rgba(201,147,58,0.08)}
-#operationGuide{margin-top:20px;padding:16px 20px;background:rgba(201,147,58,0.05);border:1px solid rgba(201,147,58,0.12);border-radius:8px;display:none}
-#operationGuide div:first-child{font-family:'Noto Serif SC',serif;font-size:12px;color:var(--gold);margin-bottom:8px;letter-spacing:1px}
-#operationGuide div:last-child{font-size:11px;color:var(--smoke);line-height:2.1}
-#operationGuide a{color:var(--gold-light)}
-.inspiration-box{text-align:center;margin-top:14px;padding:8px 16px;background:rgba(201,147,58,0.04);border-radius:6px;font-size:11px;color:var(--smoke);display:none}
+/* Result */
+.result{display:none;margin-bottom:40px}
+.result.active{display:block}
+.result-top{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.btn-sm{padding:6px 14px;border:1px solid var(--bd);border-radius:6px;background:transparent;color:var(--gold);font-size:11px;letter-spacing:1px;cursor:pointer;transition:all .2s}
+.btn-sm:hover{background:rgba(212,164,74,0.08)}
+.btn-sm.copied{background:rgba(80,180,120,0.12);border-color:#50b478;color:#50b478}
+.result-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid var(--bd2);flex-wrap:wrap;gap:8px}
+.result-title{font-family:'NF',serif;font-size:24px;font-weight:900}
+.result-meta{display:flex;gap:6px;flex-wrap:wrap}
+.badge{padding:3px 10px;border-radius:100px;font-size:9px;letter-spacing:1px}
+.badge-gold{background:rgba(212,164,74,0.1);border:1px solid var(--bd);color:var(--gold)}
+.badge-green{background:rgba(80,150,120,0.1);border:1px solid rgba(80,150,120,0.3);color:#70cca0}
+.synopsis{background:rgba(212,164,74,0.04);border:1px solid var(--bd2);border-left:3px solid var(--gold);border-radius:4px 10px 10px 4px;padding:14px 18px;margin-bottom:16px;font-size:12px;line-height:1.8;color:rgba(240,235,224,0.75)}
+
+/* Output modules */
+.module-title{font-family:'NF',serif;font-size:12px;letter-spacing:2px;color:var(--gold);margin:22px 0 10px;display:flex;align-items:center;gap:8px}
+.module-title::after{content:'';flex:1;height:1px;background:var(--bd2)}
+
+/* A: Shot cards */
+.shot-list{display:flex;flex-direction:column;gap:8px}
+.shot-card{background:var(--bg2);border:1px solid rgba(255,255,255,0.05);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:1fr auto;gap:8px 14px;align-items:start}
+.shot-meta{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.shot-num{font-family:'NF',serif;font-size:18px;font-weight:900;color:rgba(212,164,74,0.2)}
+.shot-time{font-size:10px;color:var(--gray);background:rgba(255,255,255,0.03);padding:2px 8px;border-radius:4px}
+.shot-emotion{font-size:10px;color:rgba(200,160,140,0.55)}
+.shot-desc{font-size:12px;color:rgba(240,235,224,0.7);line-height:1.6;margin-bottom:6px}
+.shot-prompts{display:flex;flex-direction:column;gap:4px;margin-top:4px}
+.shot-prompt{font-size:10px;line-height:1.5;padding:5px 8px;border-radius:4px}
+.shot-prompt.jimeng{background:rgba(180,200,150,0.06);border-left:2px solid rgba(180,200,150,0.5);color:rgba(200,215,180,0.65)}
+.shot-prompt.keling{background:rgba(150,180,200,0.06);border-left:2px solid rgba(150,180,200,0.5);color:rgba(180,200,220,0.65)}
+.shot-copy{grid-column:2;grid-row:1/span 3;align-self:center}
+.shot-copy-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--bd);background:transparent;color:var(--gray);font-size:12px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.shot-copy-btn:hover{border-color:var(--gold);color:var(--gold)}
+
+/* Episode tabs */
+.ep-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.ep-tab{padding:6px 14px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);font-size:11px;color:var(--gray);cursor:pointer;transition:all .2s}
+.ep-tab:hover{border-color:var(--bd);color:var(--gold)}
+.ep-tab.active{background:rgba(212,164,74,0.1);border-color:var(--gold);color:var(--gold)}
+.ep-content{display:none}
+.ep-content.active{display:block}
+
+/* B: Character */
+.char-card{background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:14px 16px;margin-bottom:8px;display:grid;grid-template-columns:1fr 1fr;gap:8px 14px}
+.char-card-name{font-family:'NF',serif;font-size:15px;font-weight:700;color:var(--gl);grid-column:1/-1}
+.char-card-label{font-size:9px;letter-spacing:1px;color:var(--gold);opacity:0.7}
+.char-card-text{font-size:11px;color:rgba(240,235,224,0.55);line-height:1.5}
+
+/* C: Clip structure */
+.clip-structure{background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:16px 18px}
+.clip-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;font-size:11px;line-height:1.6}
+.clip-time{color:var(--gold);font-weight:500;min-width:60px;font-size:10px}
+.clip-desc{color:rgba(240,235,224,0.65)}
+.clip-bgm{margin-top:8px;padding-top:8px;border-top:1px solid var(--bd2);font-size:10px;color:var(--gray)}
+
+/* D: Publish */
+.publish-block{background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:16px 18px}
+.publish-row{margin-bottom:8px;font-size:11px;line-height:1.7}
+.publish-row strong{color:var(--gold);display:block;margin-bottom:2px;font-size:10px;letter-spacing:1px}
+.publish-row span{color:rgba(240,235,224,0.65)}
+
+/* Watermark */
+.watermark{text-align:center;margin-top:24px;padding-top:12px;border-top:1px solid var(--bd2);font-size:10px;color:rgba(212,164,74,0.3);letter-spacing:1px;line-height:1.8}
+.watermark a{color:rgba(212,164,74,0.4)}
+#retryHint{display:none;color:rgba(212,164,74,0.45)}
+
+/* Character creation modal */
+.char-section-title{font-family:'NF',serif;font-size:12px;letter-spacing:2px;color:var(--gold);margin:20px 0 10px;display:flex;align-items:center;gap:8px}
+.char-section-title::after{content:'';flex:1;height:1px;background:var(--bd2)}
+.char-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;margin-bottom:12px}
+.char-asset{background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:12px 14px;position:relative;cursor:pointer;transition:all .2s}
+.char-asset:hover{border-color:var(--bd)}
+.char-asset.selected{border-color:var(--gold);background:rgba(212,164,74,0.08)}
+.char-asset-name{font-family:'NF',serif;font-size:15px;font-weight:700;color:var(--gl);margin-bottom:2px}
+.char-asset-role{font-size:10px;color:var(--gray);margin-bottom:6px}
+.char-asset-look{font-size:10px;color:rgba(240,235,224,0.45);line-height:1.5}
+.char-asset-select{position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;border:2px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:10px;color:transparent}
+.char-asset.selected .char-asset-select{background:var(--gold);border-color:var(--gold);color:var(--ink)}
+.char-asset-delete{position:absolute;bottom:8px;right:8px;background:none;border:none;color:rgba(168,50,60,0.5);font-size:9px;cursor:pointer;opacity:0;transition:opacity .2s}
+.char-asset:hover .char-asset-delete{opacity:1}
+.char-hint{text-align:center;padding:20px;color:var(--gray);font-size:11px;line-height:2}
+.char-hint span{color:var(--gl);cursor:pointer;text-decoration:underline}
+.locked-chars-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;min-height:24px}
+.locked-char{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:100px;background:rgba(212,164,74,0.1);border:1px solid var(--bd);font-size:11px;color:var(--gold)}
+.locked-char-remove{font-size:10px;cursor:pointer;color:rgba(168,50,60,0.6)}
 
 /* Modal */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;align-items:center;justify-content:center}
 .modal-overlay.active{display:flex}
-.modal{background:#1e1810;border:1px solid rgba(201,147,58,0.25);border-radius:14px;padding:30px;max-width:440px;width:90%}
-.modal h3{font-family:'Noto Serif SC',serif;font-size:17px;font-weight:700;color:var(--gold);margin-bottom:8px}
-.modal p{font-size:12px;color:var(--smoke);line-height:1.7;margin-bottom:16px}
-.modal p a{color:var(--gold-light)}
-.modal-steps{background:rgba(201,147,58,0.06);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:11px;line-height:2}
+.modal{background:#15100a;border:1px solid var(--bd);border-radius:14px;padding:28px;max-width:420px;width:90%}
+.modal h3{font-family:'NF',serif;font-size:16px;font-weight:700;color:var(--gold);margin-bottom:6px}
+.modal p{font-size:11px;color:var(--gray);line-height:1.6;margin-bottom:14px}
+.modal p a{color:var(--gl)}
+.modal-steps{background:rgba(212,164,74,0.06);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:11px;line-height:2}
 .modal-steps span{color:var(--gold)}
-.modal-tip{background:rgba(155,35,53,0.08);border:1px solid rgba(155,35,53,0.2);border-radius:6px;padding:8px 12px;font-size:10px;color:rgba(220,140,150,0.85);line-height:1.6;margin-bottom:14px}
-.modal input[type="password"]{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(201,147,58,0.2);border-radius:6px;padding:10px 14px;color:var(--paper);font-size:13px;outline:none;margin-bottom:10px}
-.modal-actions{display:flex;gap:8px;justify-content:flex-end}
-.modal-btn{padding:8px 20px;border-radius:6px;font-size:12px;cursor:pointer;letter-spacing:1px;transition:all .2s}
+.modal-tip{background:rgba(168,50,60,0.08);border:1px solid rgba(168,50,60,0.2);border-radius:6px;padding:8px 12px;font-size:10px;color:rgba(224,140,150,0.8);line-height:1.5;margin-bottom:12px}
+.modal input[type="password"]{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--bd);border-radius:6px;padding:10px 14px;color:var(--paper);font-size:12px;outline:none;margin-bottom:8px}
+.modal-actions{display:flex;gap:6px;justify-content:flex-end}
+.modal-btn{padding:7px 18px;border-radius:6px;font-size:11px;cursor:pointer;letter-spacing:1px;transition:all .2s}
 .modal-btn.primary{background:var(--gold);border:none;color:var(--ink);font-weight:600}
-.modal-btn.primary:hover{background:var(--gold-light)}
-.modal-btn.secondary{background:transparent;border:1px solid rgba(255,255,255,0.15);color:var(--smoke)}
-.modal-btn.secondary:hover{border-color:rgba(255,255,255,0.3)}
-.modal-btn.danger{background:transparent;border:1px solid rgba(155,35,53,0.3);color:rgba(200,100,110,0.8)}
-.modal-btn.danger:hover{background:rgba(155,35,53,0.15)}
+.modal-btn.primary:hover{background:var(--gl)}
+.modal-btn.secondary{background:transparent;border:1px solid rgba(255,255,255,0.12);color:var(--gray)}
+.modal-btn.secondary:hover{border-color:rgba(255,255,255,0.25)}
+.modal-btn.danger{background:transparent;border:1px solid rgba(168,50,60,0.3);color:rgba(200,100,110,0.7)}
+.modal-btn.danger:hover{background:rgba(168,50,60,0.12)}
 
-/* History */
-.history-section{display:none;max-width:820px;margin:0 auto 60px;padding:0 20px}
-.history-section.active{display:block}
-.history-empty{text-align:center;padding:50px 20px;color:var(--smoke);font-size:13px;line-height:2.2}
-.history-list{display:flex;flex-direction:column;gap:8px}
-.history-item{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:10px;padding:16px 20px;display:grid;grid-template-columns:1fr auto;gap:12px;cursor:pointer;transition:all .2s;align-items:center}
-.history-item:hover{border-color:rgba(201,147,58,0.25);background:rgba(201,147,58,0.03)}
-.hi-title{font-family:'Noto Serif SC',serif;font-size:15px;font-weight:700;margin-bottom:3px}
-.hi-meta{font-size:10px;color:var(--smoke);letter-spacing:1px}
-.hi-delete{padding:5px 12px;border:1px solid rgba(155,35,53,0.3);border-radius:6px;background:transparent;color:rgba(200,100,110,0.7);font-size:10px;cursor:pointer}
-.hi-delete:hover{background:rgba(155,35,53,0.15)}
+/* Footer */
+footer{text-align:center;padding:30px 20px;border-top:1px solid var(--bd2);font-size:10px;color:rgba(138,130,118,0.4);letter-spacing:1px;line-height:2;margin-top:20px}
+footer .brand{font-family:'NF',serif;color:rgba(212,164,74,0.35);font-size:12px}
 
-.site-footer{text-align:center;padding:30px 20px;border-top:1px solid rgba(201,147,58,0.08);font-size:10px;color:rgba(122,112,96,0.4);letter-spacing:1px;line-height:2}
-.site-footer .brand{font-family:'Noto Serif SC',serif;color:rgba(201,147,58,0.35);font-size:12px}
+/* Toast */
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#261e10;border:1px solid var(--bd);color:var(--gold);padding:8px 20px;border-radius:50px;font-size:11px;letter-spacing:1px;z-index:200;animation:toastIn .3s,toastOut .3s 1.7s forwards;pointer-events:none}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+@keyframes toastOut{from{opacity:1;transform:translateX(-50%) translateY(0)}to{opacity:0;transform:translateX(-50%) translateY(-6px)}}
 
-.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#2a2218;border:1px solid rgba(201,147,58,0.3);color:var(--gold);padding:10px 24px;border-radius:50px;font-size:12px;letter-spacing:1px;z-index:200;animation:toastIn .3s ease,toastOut .3s 1.7s ease forwards;pointer-events:none}
-@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
-@keyframes toastOut{from{opacity:1;transform:translateX(-50%) translateY(0)}to{opacity:0;transform:translateX(-50%) translateY(-8px)}}
-
-@media(max-width:600px){header{padding:16px}.logo-en{display:none}.hero{padding:36px 16px 24px}.hero h1{font-size:24px}.hero p{font-size:12px}.char-form-row,.gen-row{grid-template-columns:1fr}.top-tab{padding:8px 16px;font-size:11px}.char-grid{grid-template-columns:1fr}}
+@media(max-width:500px){.input-row{grid-template-columns:1fr}.hero h1{font-size:22px}.char-grid{grid-template-columns:1fr}.shot-card{grid-template-columns:1fr}.shot-copy{grid-column:1;justify-self:end;margin-top:4px}}
 </style>
 </head>
 <body>
-<div class="container">
+<div id="app">
 <header>
-  <div class="logo"><span class="logo-zh">剧引</span><span class="logo-en">AI Series Studio</span></div>
-  <div class="header-actions">
-    <span class="nav-link active" data-tab="create" onclick="switchMainTab('create')">创作</span>
-    <span class="nav-link" data-tab="history" onclick="switchMainTab('history')">我的资产</span>
-    <button class="settings-btn" id="settingsBtn" onclick="openSettings()" title="API设置">&#9881;</button>
-  </div>
+  <div class="logo"><span class="logo-zh">剧引</span><span class="logo-en">AI Drama Engine</span></div>
+  <button class="settings-btn" id="settingsBtn" onclick="openSettings()" title="API Key">⚙</button>
 </header>
 
-<div id="tabCreate">
-  <section class="hero">
-    <div class="hero-tag">&#10022; AI 短剧连续生产系统</div>
-    <h1>创建角色，<span class="accent">批量出剧</span></h1>
-    <p>不是写一部剧本——是打造一套可持续生产的角色资产<br>第 1 集到第 50 集，角色永不崩脸</p>
-  </section>
+<section class="hero">
+  <div class="hero-tag">✦ AI 短剧发布引擎</div>
+  <h1>输入故事，<span class="a">3步生成</span>可发布的短剧</h1>
+  <p>镜头级拆解 + 即梦/可灵提示词 + 剪映节奏 + 发布文案<br>不写剧本，不学提示词，直接出片</p>
+</section>
 
-  <!-- 子Tab：角色工坊 | 连续剧生产 -->
-  <div class="top-tabs">
-    <div class="top-tab active" id="tabWorkshop" onclick="switchPanel('workshop')">🎨 角色工坊</div>
-    <div class="top-tab" id="tabSeries" onclick="switchPanel('series')">🎬 连续剧生产</div>
+<!-- 输入卡片 -->
+<div class="input-card" id="inputCard">
+  <div class="input-row">
+    <div class="input-group full">
+      <label>一句话故事</label>
+      <textarea id="storyInput" placeholder="如：霸总爱上灰姑娘，先婚后爱甜中带虐。或粘贴小说片段、故事梗概……"></textarea>
+    </div>
+  </div>
+  <div class="input-row">
+    <div class="input-group">
+      <label>类型</label>
+      <select id="genre">
+        <option>都市爱情</option><option>古装宫廷</option><option>玄幻仙侠</option>
+        <option>悬疑推理</option><option>都市赘婿</option><option>青春校园</option>
+        <option>商战权谋</option><option>科幻未来</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label>集数</label>
+      <select id="episodes"><option value="1" selected>1集（测试）</option><option value="3">3集</option><option value="6">6集</option><option value="10">10集</option></select>
+    </div>
+  </div>
+  <div class="input-row">
+    <div class="input-group full">
+      <label>爆款结构模板（可选）</label>
+      <div class="template-tags" id="tmplTags">
+        <span class="tmpl-tag" onclick="pickTemplate('revenge','反转复仇：弱者开局→被压制→身份反转→爆发打脸→cliffhanger')">🔄 反转复仇</span>
+        <span class="tmpl-tag" onclick="pickTemplate('conflict','高情绪冲突：关系建立→情绪压制→爆发争吵→反转认知→断点')">💥 情绪冲突</span>
+        <span class="tmpl-tag" onclick="pickTemplate('sweet','甜宠高密度：偶遇→暧昧→误会→追妻→情绪升温')">💕 甜宠</span>
+        <span class="tmpl-tag" onclick="pickTemplate('suspense','悬疑反转：事件→线索→错误推理→真相→cliffhanger')">🔍 悬疑</span>
+        <span class="tmpl-tag" onclick="pickTemplate('comeback','逆袭爽文：废材→被辱→奇遇→修炼→碾压天才')">⚡ 逆袭爽文</span>
+        <span class="tmpl-tag" onclick="pickTemplate('contract','契约婚姻：被迫结婚→斗智斗勇→日久生情→身份揭晓')">💍 契约婚姻</span>
+        <span class="tmpl-tag" onclick="pickTemplate('betrayal','替身虐恋：被当成替身→得知真相→离开→对方追悔')">💔 替身虐恋</span>
+        <span class="tmpl-tag" onclick="pickTemplate('timeloop','穿越重生：意外穿越→熟悉规则→逆天改命→两界抉择')">🌀 穿越重生</span>
+        <span class="tmpl-tag active" onclick="pickTemplate(null,null)" id="tmplNone">✕ 不限</span>
+      </div>
+    </div>
+  </div>
+  <div class="input-group full" style="margin-bottom:14px">
+    <label>角色资产（可选 · 从角色库选择）</label>
+    <div class="locked-chars-wrap" id="lockedChars"></div>
+    <div style="font-size:10px;color:var(--gray);cursor:pointer;text-decoration:underline" onclick="toggleCharPanel()" id="charToggle">展开角色库 ▼</div>
   </div>
 
-  <!-- 角色工坊面板 -->
-  <div class="panel active" id="panelWorkshop">
-    <div class="char-create-card">
-      <div class="char-form-row">
-        <div class="char-form-group"><label>角色名</label><input id="charName" placeholder="如：顾北辰"></div>
-        <div class="char-form-group"><label>角色定位</label><input id="charRole" placeholder="如：霸道总裁 / 穿越女主"></div>
-        <div class="char-form-group"><label>性别·年龄</label><input id="charAge" placeholder="如：男·28岁"></div>
-      </div>
-      <div class="char-form-row">
-        <div class="char-form-group full"><label>外貌特征（视觉锚点）</label><textarea id="charLook" placeholder="发型、脸型、穿着风格、标志配饰、身高体型。越详细越稳定。&#10;如：短发后梳露出额头，丹凤眼高鼻梁，深蓝定制西装，左腕银色百达翡丽，身高185偏瘦"></textarea></div>
-      </div>
-      <div class="char-form-row">
-        <div class="char-form-group full"><label>性格与行为习惯</label><textarea id="charBehavior" placeholder="性格关键词、说话风格、习惯动作。&#10;如：话少冷淡，说话简短不超过15字，习惯单手插兜，思考时微皱眉，从不笑"></textarea></div>
-      </div>
-      <button class="char-create-btn" onclick="createCharacter()" id="charBtn">✨ 生成角色资产</button>
-      <div class="error-box" id="charError"></div>
+  <!-- 角色库面板 -->
+  <div id="charPanel" style="display:none">
+    <div class="char-section-title">🎨 创建角色</div>
+    <div class="input-row" style="margin-bottom:8px">
+      <div class="input-group"><label>角色名</label><input id="charName" placeholder="如：顾北辰"></div>
+      <div class="input-group"><label>定位</label><input id="charRole" placeholder="如：霸道总裁"></div>
     </div>
-
-    <!-- 已创建的角色 -->
-    <div class="char-section-title">📦 我的角色资产库</div>
-    <div class="char-hint" id="charEmptyHint">
-      还没有角色。<strong>创建你的第一个角色</strong>，然后绑定到连续剧中<br>角色一旦被锁定，跨所有集保持一致外观和性格
+    <div class="input-group full" style="margin-bottom:8px">
+      <label>外貌特征（视觉锚点）</label>
+      <textarea id="charLook" style="min-height:40px" placeholder="发型、穿着、脸型、体型。如：短发后梳丹凤眼，深蓝西装，左腕银色腕表，身高185偏瘦"></textarea>
     </div>
+    <div class="input-group full" style="margin-bottom:8px">
+      <label>性格习惯（行为锚点）</label>
+      <textarea id="charBehavior" style="min-height:36px" placeholder="说话风格、习惯动作。如：话少冷淡，每句≤15字，单手插兜，从不笑"></textarea>
+    </div>
+    <button class="gen-btn" onclick="createCharacter()" style="margin-top:4px;padding:10px;font-size:13px;letter-spacing:2px">+ 创建角色</button>
+    <div class="char-section-title">📦 角色库（点击选择，最多5个）</div>
     <div class="char-grid" id="charGrid"></div>
+    <div class="char-hint" id="charEmptyHint">还没有角色。<span onclick="document.getElementById('charName').focus()">创建第一个</span></div>
   </div>
 
-  <!-- 连续剧生产面板 -->
-  <div class="panel" id="panelSeries">
-    <div class="gen-card">
-      <div class="gen-group full" style="margin-bottom:12px">
-        <label>已锁定的角色资产（从角色工坊选择）</label>
-        <div class="locked-chars" id="lockedChars"></div>
-        <div class="char-hint" id="noCharsHint" style="padding:8px 0;font-size:11px">还没有锁定角色 → 去 <strong style="color:var(--gold-light);cursor:pointer" onclick="switchPanel('workshop')">角色工坊</strong> 创建并选择角色</div>
-      </div>
-      <div class="gen-row">
-        <div class="gen-group"><label>类型风格</label>
-          <select id="genre"><option>都市爱情</option><option>古装宫廷</option><option>玄幻仙侠</option><option>悬疑推理</option><option>都市赘婿/逆袭</option><option>青春校园</option><option>商战权谋</option><option>科幻未来</option></select>
-        </div>
-        <div class="gen-group"><label>集数</label>
-          <select id="episodes"><option value="3">3集</option><option value="6" selected>6集</option><option value="10">10集</option><option value="20">20集</option></select>
-        </div>
-      </div>
-      <div class="gen-row">
-        <div class="gen-group full"><label>剧情描述</label>
-          <textarea id="extraDesc" placeholder="一句话描述你想看的故事。如：霸总爱上灰姑娘，先婚后爱甜中带虐……"></textarea></div>
-      </div>
-      <div class="gen-row">
-        <div class="gen-group full"><label>故事素材（可选）—— 粘贴小说片段或创意文本</label>
-          <textarea id="novelInput" placeholder="粘贴任何创意素材，AI自动提取核心剧情……"></textarea></div>
-      </div>
-      <button class="gen-btn" onclick="generateSeries()" id="generateBtn">
-        <span class="btn-shimmer"></span>&#10022; 生成连续剧
-      </button>
-      <div class="quota-hint" id="quotaHint">今日剩余免费次数：5 次</div>
-      <div class="error-box" id="errorBox"></div>
+  <button class="gen-btn" id="genBtnMain" onclick="generate()">
+    <span class="shimmer"></span>🚀 生成可发布短剧
+  </button>
+  <div class="quota-hint" id="quotaHint">今日剩余：5次</div>
+  <div class="error-box" id="errorBox"></div>
+</div>
+
+<!-- Loading -->
+<div class="loading" id="loadingState">
+  <div class="spinner"></div>
+  <div class="loading-text">AI 正在创作中</div>
+  <div class="loading-sub" id="loadingStep">拆解剧本结构…</div>
+</div>
+
+<!-- Result -->
+<div class="result" id="resultWrap">
+  <div class="result-top">
+    <button class="btn-sm" onclick="copyAllResult()" id="copyBtn">📋 全部复制</button>
+    <button class="btn-sm" onclick="retryGenerate()" id="retryBtn" style="display:none">🔄 不满意？免费重试</button>
+    <button class="btn-sm" onclick="resetForm()">↺ 重新创作</button>
+  </div>
+  <div class="result-header">
+    <div class="result-title" id="dramaTitle">剧名</div>
+    <div class="result-meta">
+      <span class="badge badge-gold" id="genreBadge">类型</span>
+      <span class="badge badge-gold" id="epBadge">集数</span>
+      <span class="badge badge-green" id="consistencyBadge">🔒 角色一致</span>
     </div>
   </div>
+  <div class="synopsis" id="synopsisText"></div>
 
-  <!-- Loading -->
-  <div class="loading-state" id="loadingState">
-    <div class="loading-ring"></div>
-    <div class="loading-text">AI 正在创作中</div>
-    <div class="loading-sub" id="loadingStep">锁定角色资产…</div>
+  <!-- A: 镜头级脚本 -->
+  <div id="shotOutput">
+    <div class="module-title">🎬 镜头级脚本</div>
+    <div class="ep-tabs" id="epTabs"></div>
+    <div id="epContents"></div>
   </div>
 
-  <!-- Result -->
-  <div class="result-section" id="resultSection">
-    <div class="result-actions">
-      <button class="action-btn" onclick="copyResult()" id="copyBtn">&#128203; 复制全文</button>
-      <button class="action-btn" onclick="retryGenerate()" id="retryBtn" style="display:none">🔄 不满意？免费重试</button>
-      <button class="action-btn" onclick="resetForm()">&#8634; 重新创作</button>
-    </div>
-    <div class="result-header">
-      <div class="result-title" id="dramaTitle">剧本标题</div>
-      <div class="result-meta">
-        <span class="meta-badge" id="genreBadge">都市爱情</span>
-        <span class="meta-badge" id="epBadge">6集</span>
-        <span class="consistency-badge" id="consistencyBadge">&#128274; 角色已锁定</span>
-      </div>
-    </div>
-    <div class="synopsis-card">
-      <div class="synopsis-label">故事简介</div>
-      <div class="synopsis-text" id="synopsisText"></div>
-    </div>
-    <div class="section-title">分集剧情</div>
-    <div class="episodes-tabs" id="episodesTabs"></div>
-    <div id="episodesContent"></div>
-    <div class="watermark">本内容由 AI 生成 · 由剧引提供创意工具 · 仅供娱乐参考<br><span id="retryHint" style="display:none">不满意？2 分钟内免费重试</span></div>
-    <div id="operationGuide">
-      <div>📋 接下来怎么做？</div>
-      <div><span style="color:var(--gold-light)">①</span> 复制上方各场景的提示词 <span style="color:var(--gold-light)">②</span> 打开 <a href="https://jimeng.jianying.com" target="_blank">即梦</a> 或可灵 <span style="color:var(--gold-light)">③</span> 选「文生视频」粘贴 → 生成 5 秒画面 <span style="color:var(--gold-light)">④</span> 剪映拼起来加配音 → 发布</div>
-    </div>
-    <div class="inspiration-box" id="inspirationBox"></div>
+  <!-- B: 角色卡 -->
+  <div class="module-title">👤 角色卡</div>
+  <div id="charCards"></div>
+
+  <!-- C: 剪映结构 -->
+  <div class="module-title">✂️ 剪映节奏结构</div>
+  <div id="clipStructure"></div>
+
+  <!-- D: 发布模板 -->
+  <div class="module-title">📱 发布模板</div>
+  <div id="publishBlock"></div>
+
+  <div class="watermark" id="watermarkArea">
+    由剧引AI生成 · 仅供娱乐参考<br>
+    <span id="retryHint">不满意？2分钟内可免费重试</span><br>
+    打开 <a href="https://jimeng.jianying.com" target="_blank">即梦</a> 或 <a href="https://kling.kuaishou.com" target="_blank">可灵</a> 粘贴提示词 → 生成视频 → <a href="https://www.capcut.cn" target="_blank">剪映</a> 合成 → 发布
   </div>
 </div>
 
-<!-- 我的资产（历史） -->
-<div class="history-section" id="tabHistory">
-  <div class="section-title" style="margin-top:30px">创作历史</div>
-  <div class="history-empty" id="historyEmpty">还没有创作过剧本<br>去角色工坊创建你的第一个角色吧</div>
-  <div class="history-list" id="historyList"></div>
+<footer><span class="brand">剧引</span> · AI短剧发布引擎 · 从想法到可发布视频，3步完成<br>本平台生成内容由AI自动产生，仅供娱乐参考</footer>
 </div>
 
 <!-- 设置弹窗 -->
 <div class="modal-overlay" id="settingsModal">
   <div class="modal">
-    <h3>&#9881; 设置 API Key</h3>
-    <p>剧引用 <strong>DeepSeek</strong> 做 AI 引擎。生成一次只需 <strong style="color:var(--gold)">1-5 分钱</strong>。Key 存在你的浏览器中。</p>
+    <h3>⚙ 设置 API Key</h3>
+    <p>用 DeepSeek 引擎，生成一次只要 <strong style="color:var(--gl)">1-5分钱</strong>。Key 只存你浏览器里。</p>
     <div class="modal-steps">
-      <span>①</span> 打开 <a href="https://platform.deepseek.com/api_keys" target="_blank" style="color:var(--gold-light)">platform.deepseek.com</a> 注册<br>
+      <span>①</span> 打开 <a href="https://platform.deepseek.com/api_keys" target="_blank" style="color:var(--gl)">platform.deepseek.com</a>，注册<br>
       <span>②</span> 点「创建 API Key」→ 复制<br>
-      <span>③</span> 粘贴到下面 → 保存
+      <span>③</span> 贴到下面
     </div>
-    <div class="modal-tip">💡 充 10 块钱能用上千次。每月花不到一杯奶茶钱。</div>
-    <label style="font-size:11px;letter-spacing:2px;color:var(--gold);display:block;margin-bottom:6px">API KEY</label>
+    <div class="modal-tip">💡 充10块钱能用上千次。每月不到一杯奶茶钱。</div>
     <input type="password" id="apiKeyInput" placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxx">
     <div class="modal-actions">
       <button class="modal-btn danger" onclick="clearApiKey()">清除</button>
@@ -345,256 +347,235 @@ header{display:flex;align-items:center;justify-content:space-between;padding:22p
   </div>
 </div>
 
-<footer class="site-footer"><span class="brand">剧引</span> · AI 短剧连续生产系统 · 角色资产一旦锁定，跨集一致<br>本平台生成内容由 AI 自动产生，仅供娱乐参考</footer>
-</div>
-
 <script>
-// ==================== 常量 ====================
-const STORAGE_KEY='juyin_api_key',USAGE_KEY='juyin_daily_usage',HISTORY_KEY='juyin_history',CHAR_KEY='juyin_characters';
+// ==================== State ====================
+const STORAGE_KEY='juyin_api_key',USAGE_KEY='juyin_usage',HISTORY_KEY='juyin_history',CHAR_KEY='juyin_chars',ANALYTICS_KEY='juyin_analytics';
 const DAILY_LIMIT=5,RETRY_WINDOW=120000;
-let currentPanel='workshop',currentResult=null,lastGenParams=null,selectedChars=[]
-let mainTab='create';
+let currentResult=null,lastGenParams=null,selectedChars=[],activeTemplate=null,activeTemplateText='',charPanelOpen=false;
 
-// ==================== 初始化 ====================
-function init(){updateSettingsIcon();updateQuotaHint();renderCharGrid();loadHistoryTab();if(!localStorage.getItem('juyin_welcomed')){setTimeout(()=>showToast('👋 先创建角色，再生成连续剧'),800);localStorage.setItem('juyin_welcomed','1')}}
+// ==================== Init ====================
+function init(){updateSettingsIcon();updateQuotaHint();renderCharGrid();updateLockedDisplay();if(!localStorage.getItem('juyin_v4_welcomed')){setTimeout(()=>showToast('👋 输入一句话故事，点生成即可'),800);localStorage.setItem('juyin_v4_welcomed','1')}}
 init();
-
-function switchMainTab(tab){mainTab=tab;document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));document.querySelector(`[data-tab="${tab}"]`).classList.add('active');document.getElementById('tabCreate').style.display=tab==='create'?'block':'none';document.getElementById('tabHistory').classList.toggle('active',tab==='history');if(tab==='history')loadHistoryTab()}
-function switchPanel(p){currentPanel=p;document.getElementById('tabWorkshop').classList.toggle('active',p==='workshop');document.getElementById('tabSeries').classList.toggle('active',p==='series');document.getElementById('panelWorkshop').classList.toggle('active',p==='workshop');document.getElementById('panelSeries').classList.toggle('active',p==='series');if(p==='series')updateLockedDisplay()}
 
 // ==================== API Key ====================
 function getApiKey(){return localStorage.getItem(STORAGE_KEY)||''}
-function hasApiKey(){return !!getApiKey()}
-function updateSettingsIcon(){const b=document.getElementById('settingsBtn');b.classList.toggle('has-key',hasApiKey())}
+function updateSettingsIcon(){document.getElementById('settingsBtn').classList.toggle('has-key',!!getApiKey())}
 function openSettings(){document.getElementById('apiKeyInput').value=getApiKey();document.getElementById('settingsModal').classList.add('active')}
 function closeSettings(){document.getElementById('settingsModal').classList.remove('active')}
-function saveApiKey(){const k=document.getElementById('apiKeyInput').value.trim();if(!k){showToast('请输入 API Key');return}if(!k.startsWith('sk-')){showToast('Key格式不对，应以 sk- 开头');return}localStorage.setItem(STORAGE_KEY,k);updateSettingsIcon();closeSettings();showToast('API Key 已保存 ✓')}
+function saveApiKey(){const k=document.getElementById('apiKeyInput').value.trim();if(!k||!k.startsWith('sk-')){showToast('Key格式不对，应以 sk- 开头');return}localStorage.setItem(STORAGE_KEY,k);updateSettingsIcon();closeSettings();showToast('已保存 ✓')}
 function clearApiKey(){if(!confirm('确定清除?'))return;localStorage.removeItem(STORAGE_KEY);document.getElementById('apiKeyInput').value='';updateSettingsIcon();showToast('已清除')}
 document.getElementById('settingsModal').addEventListener('click',function(e){if(e.target===this)closeSettings()});
 
-// ==================== 配额 ====================
-function getUsageData(){const r=localStorage.getItem(USAGE_KEY);if(!r)return{date:'',count:0};try{return JSON.parse(r)}catch(e){return{date:'',count:0}}}
-function saveUsageData(d){localStorage.setItem(USAGE_KEY,JSON.stringify(d))}
-function getToday(){return new Date().toISOString().slice(0,10)}
-function getRemainingQuota(){const u=getUsageData();if(u.date!==getToday())return DAILY_LIMIT;return Math.max(0,DAILY_LIMIT-u.count)}
-function consumeQuota(){let u=getUsageData();if(u.date!==getToday())u={date:getToday(),count:0};u.count+=1;saveUsageData(u)}
-function updateQuotaHint(){document.getElementById('quotaHint').textContent='今日剩余免费次数：'+getRemainingQuota()+' 次'}
+// ==================== Quota ====================
+function getUsage(){try{const r=JSON.parse(localStorage.getItem(USAGE_KEY)||'{}');if(r.date!==new Date().toISOString().slice(0,10))return{date:new Date().toISOString().slice(0,10),count:0};return r}catch(e){return{date:new Date().toISOString().slice(0,10),count:0}}}
+function saveUsage(u){localStorage.setItem(USAGE_KEY,JSON.stringify(u))}
+function remaining(){const u=getUsage();return Math.max(0,DAILY_LIMIT-u.count)}
+function consumeQuota(){let u=getUsage();u.count++;saveUsage(u)}
+function updateQuotaHint(){document.getElementById('quotaHint').textContent='今日剩余：'+remaining()+'次'}
 
-// ==================== 角色工坊 ====================
+// ==================== Toast ====================
+function showToast(m){const ex=document.querySelector('.toast');if(ex)ex.remove();const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2000)}
+
+// ==================== Templates ====================
+function pickTemplate(id,text){
+  activeTemplate=id;activeTemplateText=text||'';
+  document.querySelectorAll('.tmpl-tag').forEach(t=>t.classList.remove('active'));
+  if(id){const t=document.querySelector(`.tmpl-tag:not(#tmplNone)`);document.getElementById('tmplNone').classList.remove('active');const tags=document.querySelectorAll('.tmpl-tag');tags.forEach(t=>{if(t.onclick&&t.onclick.toString().includes(id))t.classList.add('active')})}
+  else{document.getElementById('tmplNone').classList.add('active')}
+}
+
+// ==================== Character ====================
 function getCharacters(){try{return JSON.parse(localStorage.getItem(CHAR_KEY)||'[]')}catch(e){return[]}}
-function saveCharacters(chars){localStorage.setItem(CHAR_KEY,JSON.stringify(chars))}
-
+function saveCharacters(c){localStorage.setItem(CHAR_KEY,JSON.stringify(c))}
 function createCharacter(){
-  const n=document.getElementById('charName').value.trim();
-  const r=document.getElementById('charRole').value.trim();
-  const a=document.getElementById('charAge').value.trim();
-  const l=document.getElementById('charLook').value.trim();
-  const b=document.getElementById('charBehavior').value.trim();
-  if(!n){showCharError('至少填一个角色名');return}
-  if(!l){showCharError('外貌特征是视觉锚点，不填会崩脸');return}
-  const chars=getCharacters();
-  chars.push({id:'R-'+String(chars.length+1).padStart(3,'0'),name:n,role:r,age:a,look:l,behavior:b,createdAt:new Date().toLocaleString('zh-CN')});
-  saveCharacters(chars);
-  document.getElementById('charName').value='';document.getElementById('charRole').value='';document.getElementById('charAge').value='';
-  document.getElementById('charLook').value='';document.getElementById('charBehavior').value='';hideCharError();
-  renderCharGrid();showToast('角色「'+n+'」已创建 ✓');
-  trackEvent('create_character',{name:n,role:r});
+  const n=document.getElementById('charName').value.trim(),r=document.getElementById('charRole').value.trim(),l=document.getElementById('charLook').value.trim(),b=document.getElementById('charBehavior').value.trim();
+  if(!n)return showToast('至少填角色名');
+  if(!l)return showToast('外貌锚点是锁一致性的关键');
+  const cs=getCharacters();cs.push({id:'R-'+String(cs.length+1).padStart(3,'0'),name:n,role:r,look:l,behavior:b,createdAt:new Date().toLocaleString('zh-CN')});
+  saveCharacters(cs);['charName','charRole','charLook','charBehavior'].forEach(id=>document.getElementById(id).value='');
+  renderCharGrid();showToast('角色「'+n+'」已创建');
+  trackEvent('create_char',{name:n});
 }
-
-function showCharError(m){const e=document.getElementById('charError');e.innerHTML=m;e.classList.add('active')}
-function hideCharError(){document.getElementById('charError').classList.remove('active')}
-
 function renderCharGrid(){
-  const chars=getCharacters();const g=document.getElementById('charGrid');const hint=document.getElementById('charEmptyHint');
-  hint.style.display=chars.length===0?'block':'none';
-  g.innerHTML=chars.map((c,i)=>{
-    const sel=selectedChars.some(sc=>sc.id===c.id);
-    return `<div class="char-asset${sel?' selected':''}" onclick="toggleCharSelect('${c.id}')">
-      <div class="char-asset-select">✓</div>
-      <div class="char-asset-id">${c.id}</div>
-      <div class="char-asset-name">${c.name}</div>
-      <div class="char-asset-role">${c.role||''} · ${c.age||''}</div>
-      <div class="char-asset-look">🎨 ${c.look}</div>
-      <div class="char-asset-behavior">💬 ${c.behavior||'未设置行为锚点'}</div>
-      <div class="char-asset-delete" onclick="event.stopPropagation();deleteChar('${c.id}')">删除</div>
-    </div>`
+  const cs=getCharacters();document.getElementById('charEmptyHint').style.display=cs.length?'none':'block';
+  document.getElementById('charGrid').innerHTML=cs.map(c=>{
+    const sel=selectedChars.some(x=>x.id===c.id);
+    return `<div class="char-asset${sel?' selected':''}" onclick="toggleChar('${c.id}')"><div class="char-asset-select">✓</div><div class="char-asset-name">${c.name}</div><div class="char-asset-role">${c.role||'未设定位'}</div><div class="char-asset-look">🎨 ${c.look.slice(0,60)}${c.look.length>60?'…':''}</div><div class="char-asset-delete" onclick="event.stopPropagation();deleteChar('${c.id}')">删除</div></div>`
   }).join('');
-  updateLockedDisplay();
 }
-
-function toggleCharSelect(id){
-  const chars=getCharacters();const c=chars.find(x=>x.id===id);if(!c)return;
-  const idx=selectedChars.findIndex(sc=>sc.id===id);
-  if(idx>=0){selectedChars.splice(idx,1)}else{if(selectedChars.length>=5){showToast('最多锁定5个角色');return}selectedChars.push(c)}
-  renderCharGrid();updateLockedDisplay();trackEvent('toggle_char',{id,name:c.name,count:selectedChars.length});
+function toggleChar(id){
+  const cs=getCharacters();const c=cs.find(x=>x.id===id);if(!c)return;const idx=selectedChars.findIndex(x=>x.id===id);
+  if(idx>=0){selectedChars.splice(idx,1)}else{if(selectedChars.length>=5){showToast('最多5个');return}selectedChars.push(c)}
+  renderCharGrid();updateLockedDisplay();
 }
-
-function deleteChar(id){
-  if(!confirm('删除这个角色资产？'))return;
-  let chars=getCharacters();chars=chars.filter(c=>c.id!==id);saveCharacters(chars);
-  selectedChars=selectedChars.filter(sc=>sc.id!==id);
-  renderCharGrid();showToast('已删除');
-}
-
+function deleteChar(id){if(!confirm('删除？'))return;let cs=getCharacters();cs=cs.filter(c=>c.id!==id);saveCharacters(cs);selectedChars=selectedChars.filter(x=>x.id!==id);renderCharGrid();updateLockedDisplay();showToast('已删除')}
+function toggleCharPanel(){charPanelOpen=!charPanelOpen;document.getElementById('charPanel').style.display=charPanelOpen?'block':'none';document.getElementById('charToggle').textContent=charPanelOpen?'收起角色库 ▲':'展开角色库 ▼'}
 function updateLockedDisplay(){
-  const el=document.getElementById('lockedChars');const hint=document.getElementById('noCharsHint');
-  hint.style.display=selectedChars.length===0?'block':'none';
-  el.innerHTML=selectedChars.map(c=>`<span class="locked-char">${c.name} <span class="locked-char-remove" onclick="event.stopPropagation();removeLocked('${c.id}')">×</span></span>`).join('');
+  document.getElementById('lockedChars').innerHTML=selectedChars.map(c=>`<span class="locked-char">${c.name}<span class="locked-char-remove" onclick="event.stopPropagation();unlockChar('${c.id}')">×</span></span>`).join('');
 }
+function unlockChar(id){selectedChars=selectedChars.filter(c=>c.id!==id);renderCharGrid();updateLockedDisplay()}
 
-function removeLocked(id){selectedChars=selectedChars.filter(c=>c.id!==id);renderCharGrid();updateLockedDisplay()}
-
-// ==================== 连续剧生成 ====================
-const loadingSteps=['锁定角色资产…','构建角色关系网…','生成剧情大纲…','编写分集脚本…','注入角色一致性检查…','即将完成…'];
+// ==================== Generate ====================
+const LOADING_STEPS=['拆解剧本结构…','注入角色锚点…','生成镜头脚本…','设计剪映节奏…','输出发布模板…','即将完成…'];
 let loadingInterval;
-
-function showLoading(s){document.getElementById('loadingState').classList.toggle('active',s);if(s){let i=0;const el=document.getElementById('loadingStep');el.textContent=loadingSteps[0];loadingInterval=setInterval(()=>{i=(i+1)%loadingSteps.length;el.textContent=loadingSteps[i]},1600)}else{clearInterval(loadingInterval)}}
+function showLoading(s){document.getElementById('loadingState').classList.toggle('active',s);if(s){let i=0;document.getElementById('loadingStep').textContent=LOADING_STEPS[0];loadingInterval=setInterval(()=>{i=(i+1)%LOADING_STEPS.length;document.getElementById('loadingStep').textContent=LOADING_STEPS[i]},1400)}else{clearInterval(loadingInterval)}}
 function showError(m){const e=document.getElementById('errorBox');e.innerHTML=m;e.classList.add('active')}
 function hideError(){document.getElementById('errorBox').classList.remove('active')}
-function showToast(m){const ex=document.querySelector('.toast');if(ex)ex.remove();const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2200)}
 
-async function generateSeries(){
+async function generate(){
   hideError();
-  const apiKey=getApiKey();if(!apiKey){showError('请先点击右上角齿轮设置 API Key');openSettings();return}
-  if(getRemainingQuota()<=0){showError('今日免费次数已用完，明天再来吧！');return}
-  if(selectedChars.length===0){showError('请先在「角色工坊」创建并选择角色（点击角色卡片即可选择）');switchPanel('workshop');return}
+  const apiKey=getApiKey();if(!apiKey){showError('请先点右上角齿轮设置API Key');openSettings();return}
+  if(remaining()<=0){showError('今日免费次数用完，明天再来');return}
+  const desc=document.getElementById('storyInput').value.trim();if(!desc){showError('至少写一句话故事');return}
+  const genre=document.getElementById('genre').value,epCount=parseInt(document.getElementById('episodes').value);
+  const shotsPerEp=epCount<=3?8:epCount<=6?6:4;
 
-  const genre=document.getElementById('genre').value;const epCount=parseInt(document.getElementById('episodes').value);
-  const extra=document.getElementById('extraDesc').value.trim();const novel=document.getElementById('novelInput').value.trim();
-  const scenesPerEp=epCount<=3?5:epCount<=6?4:3;
-  const btn=document.getElementById('generateBtn');btn.disabled=true;
-  document.getElementById('panelSeries').style.display='none';
-  document.querySelector('.top-tabs').style.display='none';
-  document.getElementById('resultSection').classList.remove('active');
-  showLoading(true);
+  // 角色锚点
+  let charLock='';selectedChars.forEach((c,i)=>{charLock+=`\n角色「${c.name}」(${c.role||''})：视觉=(${c.look})；行为=(${c.behavior||'无特殊要求'})——所有镜头中绝对不变`;});
+  if(!charLock)charLock='无预设角色，自行创建。但仍需确保跨镜头角色外貌一致。';
 
-  // 构建角色资产锁定文本
-  let charLock='';
-  selectedChars.forEach((c,i)=>{
-    charLock+=`\n角色${i+1}：${c.name}（${c.role||''}，${c.age||''}）。\n  【视觉锚点-绝对不变】${c.look}\n  【行为锚点-绝对不变】${c.behavior||'无特殊要求'}`;
-  });
+  const tmpl=activeTemplateText?'\n爆款结构模板（严格遵循此节奏构建剧情）：'+activeTemplateText:'';
 
-  const systemPrompt=`你是一位AI短剧连续生产导演。用户提供了一组角色资产（包含视觉锚点和行为锚点），你的任务是生成一部多集连续剧。
+  const sys=`你是AI短剧导演+运营一体机。你的任务是：根据用户输入的一句话故事和角色锚点，直接输出『可发布的视频结构』。
 
 铁律：
-1. 每个角色的视觉锚点（外貌/穿着/体型）在所有集、所有场景中绝对不变。生成场景描述时必须精确复用视觉锚点，不能自行想象。
-2. 每个角色的行为锚点（说话风格/习惯动作）在所有对白和动作描述中保持一致。
-3. 每集必须有冲突或反转。每集结尾留悬念钩子。
-4. 对白口语化、简短（每句≤20字），带情绪标注。
+1. 每个「镜头」含：画面描述 + 即梦prompt + 可灵prompt。不是场景描述，是镜头级拆解。
+2. 每个角色必须复用角色锚点——外貌/穿着/体型在所有镜头中不变。
+3. 同时输出：剪映节奏结构（每段时长+情绪+用途）+ 发布文案（3个标题+5个标签+1条文案）。
+4. 对白简短（≤20字/句），带情绪标注。
 5. 内容健康，不涉政涉黄涉暴。`;
 
-  const userPrompt=`根据以下角色资产和剧情需求，生成一部${epCount}集连续剧（每集${scenesPerEp}个场景）：
+  const usr=`用户故事：${desc}
+类型：${genre} · 共${epCount}集 · 每集约${shotsPerEp}个镜头
 
-类型：${genre}
-剧情需求：${extra||'请自由发挥创意'}
-故事素材：${novel||'无'}
+=== 角色锚点（绝对不变） ===${charLock}
+${tmpl}
 
-=== 锁定的角色资产（跨集一致） ===${charLock}
-
-严格按JSON格式输出，不要markdown：
+以JSON输出（不要markdown）：
 {
-  "title":"剧名",
-  "synopsis":"简介（100-150字）",
-  "visualStyle":"视觉风格（15字内）",
+  "title":"剧名（5-12字，网感强）",
+  "synopsis":"一句话简介",
+  "visualStyle":"视觉风格（10字内）",
   "episodes":[
-    {
-      "ep":1,"title":"集名","summary":"梗概（30字）","cliffhanger":"结尾钩子",
-      "scenes":[
-        {"location":"地点","duration":"约XX秒","emotion":"情绪基调","camera":"镜头描述","action":"场景描述（复用角色视觉锚点）",
-         "dialogues":[{"name":"角色名","emotion":"情绪","text":"对白"}]}
-      ]
+    {"ep":1,"title":"集名","cliffhanger":"结尾钩子（15字内）",
+     "shots":[
+       {"time":"0-3秒","emotion":"情绪（2-4字）","desc":"画面描述（含角色锚点）",
+        "prompt_jimeng":"即梦提示词（中文，镜头+场景+人物+光线+画质，≤50字）",
+        "prompt_keling":"可灵提示词（中文，突出画面动态感，≤50字）",
+        "dialogues":[{"name":"角色名","emotion":"情绪","text":"对白（≤20字）"}]}
+     ]
     }
-  ]
-}
-要求：episodes包含全部${epCount}集，每集${scenesPerEp}个场景，每场景2-3句对白`;
+  ],
+  "clipStructure":{"timeline":[{"time":"如0-3秒","label":"用途（爆点/冲突/反转/钩子）","desc":"此段要做什么","bgm":"bgm建议"}],"overallBgm":"全剧bgm建议"},
+  "publish":{"titles":["标题1","标题2","标题3"],"tags":["标签1","标签2","标签3","标签4","标签5"],"copy":"发布文案（30-50字）"},
+  "characters":[{"name":"角色名","role":"定位","visualAnchor":"视觉锚点","behaviorAnchor":"行为锚点","forbidden":"不可变项（如发型/脸型/服饰色系）"}]
+}`;
 
-  let timeoutId;
+  const btn=document.getElementById('genBtnMain');btn.disabled=true;
+  document.getElementById('inputCard').style.display='none';
+  document.getElementById('resultWrap').classList.remove('active');
+  showLoading(true);
+
+  let tid;
   try{
-    const controller=new AbortController();timeoutId=setTimeout(()=>controller.abort(),90000);
-    const resp=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},body:JSON.stringify({model:'deepseek-v4-pro',messages:[{role:'system',content:systemPrompt},{role:'user',content:userPrompt}],max_tokens:16384,temperature:0.85,response_format:{type:'json_object'}}),signal:controller.signal});
-    clearTimeout(timeoutId);
-    if(!resp.ok){const e=await resp.json().catch(()=>({}));if(resp.status===401)throw new Error('API Key不太对，重新设置一下？');if(resp.status===402)throw new Error('余额用完，去充个值');if(resp.status>=500)throw new Error('AI引擎忙，稍后再试');throw new Error('出了点问题，刷新试试');}
-    const data=await resp.json();const content=data.choices?.[0]?.message?.content;if(!content)throw new Error('AI返回为空');
-    let parsed;try{parsed=JSON.parse(content.replace(/```json|```/g,'').trim())}catch{const m=content.match(/\{[\s\S]*\}/);if(m){try{parsed=JSON.parse(m[0])}catch{const f=m[0].replace(/,\s*}/g,'}').replace(/,\s*\]/g,']');parsed=JSON.parse(f)}}else throw new Error('格式异常')}
-    consumeQuota();lastGenParams={genre,epCount,extra,novel,selectedChars,systemPrompt,userPrompt,time:Date.now()};
-    showLoading(false);currentResult={data:parsed,genre,epCount};
-    renderResult(parsed,genre,epCount);
-    saveToHistory(parsed,genre,epCount);
-    updateQuotaHint();trackEvent('generate_success',{genre,epCount,chars:selectedChars.length});
+    const ctrl=new AbortController();tid=setTimeout(()=>ctrl.abort(),90000);
+    const resp=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},body:JSON.stringify({model:'deepseek-v4-pro',messages:[{role:'system',content:sys},{role:'user',content:usr}],max_tokens:16384,temperature:0.85,response_format:{type:'json_object'}}),signal:ctrl.signal});
+    clearTimeout(tid);
+    if(!resp.ok){const je=await resp.json().catch(()=>({}));if(resp.status===401)throw new Error('API Key不对，重新设置一下？');if(resp.status===402)throw new Error('余额用完了');throw new Error(je.error?.message||'出了点问题')}
+    const data=await resp.json();let content=data.choices?.[0]?.message?.content;if(!content)throw new Error('AI返回为空');
+    let d;try{d=JSON.parse(content.replace(/```json|```/g,'').trim())}catch{const m=content.match(/\{[\s\S]*\}/);if(m)d=JSON.parse(m[0].replace(/,\s*}/g,'}').replace(/,\s*\]/g,']'));else throw new Error('格式异常')}
+    consumeQuota();lastGenParams={desc,genre,epCount,selectedChars,sys,usr,time:Date.now()};
+    showLoading(false);currentResult=d;renderResult(d,genre,epCount);updateQuotaHint();
+    trackEvent('gen_success',{genre,epCount,chars:selectedChars.length,template:activeTemplate||'none'});
   }catch(err){
-    clearTimeout(timeoutId);showLoading(false);btn.disabled=false;
-    document.getElementById('panelSeries').style.display='block';
-    document.querySelector('.top-tabs').style.display='flex';
-    if(err.name==='AbortError')showError('太久了…试试减少集数');
-    else showError(err.message);trackEvent('generate_error',{genre,error:err.message});
+    clearTimeout(tid);showLoading(false);btn.disabled=false;document.getElementById('inputCard').style.display='block';
+    if(err.name==='AbortError')showError('超时了，试试减少集数');
+    else showError(err.message);trackEvent('gen_error',{error:err.message});
   }
 }
 
-function renderResult(data,genre,epCount){
-  document.getElementById('dramaTitle').textContent=data.title||'未命名';
+// ==================== Render ====================
+function renderResult(d,genre,epCount){
+  document.getElementById('dramaTitle').textContent=d.title||'未命名';
   document.getElementById('genreBadge').textContent=genre;
   document.getElementById('epBadge').textContent=epCount+'集';
-  document.getElementById('synopsisText').textContent=(data.synopsis||'')+(data.visualStyle?'\n\n【视觉风格】'+data.visualStyle:'');
-  const tabs=document.getElementById('episodesTabs'),content=document.getElementById('episodesContent');
-  tabs.innerHTML='';content.innerHTML='';
-  (data.episodes||[]).forEach((ep,i)=>{
+  document.getElementById('synopsisText').textContent=(d.synopsis||'')+(d.visualStyle?' · '+d.visualStyle:'');
+
+  // A: Shots
+  const tabs=document.getElementById('epTabs'),contents=document.getElementById('epContents');
+  tabs.innerHTML='';contents.innerHTML='';
+  (d.episodes||[]).forEach((ep,i)=>{
     const tab=document.createElement('div');tab.className='ep-tab'+(i===0?' active':'');tab.textContent='第'+ep.ep+'集';tab.onclick=()=>switchEp(i);tabs.appendChild(tab);
-    const div=document.createElement('div');div.className='episode-content'+(i===0?' active':'');div.id='ep-'+i;
-    div.innerHTML=`<div class="episode-header"><div class="ep-number">第 ${ep.ep} 集</div><div class="ep-title">《${ep.title}》</div><div class="ep-desc">${ep.summary||''}${ep.cliffhanger?`<br><br>🎬 钩子：${ep.cliffhanger}`:''}</div></div><div class="scenes-list">${(ep.scenes||[]).map((s,si)=>`<div class="scene-card"><div class="scene-num">${String(si+1).padStart(2,'0')}</div><div class="scene-body"><div class="scene-location">【${s.location}】${s.duration?`<span class="scene-duration">${s.duration}</span>`:''}</div>${s.camera?`<div class="scene-camera">🎥 ${s.camera}</div>`:''}${s.emotion?`<div class="scene-emotion">💭 ${s.emotion}</div>`:''}${s.action?`<div class="scene-action">${s.action}</div>`:''}<div class="dialogues">${(s.dialogues||[]).map(d=>`<div class="dialogue"><span class="dia-name">${d.name}：</span><span class="dia-text">"${d.text}"${d.emotion?` <span class="dia-emotion">(${d.emotion})</span>`:''}</span></div>`).join('')}</div></div></div>`).join('')}</div>`;
-    content.appendChild(div);
+    const wrap=document.createElement('div');wrap.className='ep-content'+(i===0?' active':'');wrap.id='ep-'+i;
+    if(ep.cliffhanger)wrap.innerHTML+=`<div style="font-size:12px;color:var(--gl);margin-bottom:10px;padding:6px 10px;background:rgba(212,164,74,0.05);border-radius:6px">🎬 钩子：${ep.cliffhanger}</div>`;
+    wrap.innerHTML+=`<div class="shot-list">${(ep.shots||[]).map((sh,si)=>`<div class="shot-card"><div><div class="shot-meta"><span class="shot-num">${String(si+1).padStart(2,'0')}</span><span class="shot-time">${sh.time||''}</span><span class="shot-emotion">${sh.emotion||''}</span></div><div class="shot-desc">${sh.desc||''}</div><div class="shot-prompts">${sh.prompt_jimeng?`<div class="shot-prompt jimeng">🎬 即梦：${sh.prompt_jimeng}</div>`:''}${sh.prompt_keling?`<div class="shot-prompt keling">🌊 可灵：${sh.prompt_keling}</div>`:''}</div>${(sh.dialogues||[]).length?`<div style="margin-top:6px;font-size:11px;color:rgba(240,235,224,0.5);line-height:1.6">${sh.dialogues.map(dl=>`${dl.name}(${dl.emotion||''})："${dl.text}"`).join(' · ')}</div>`:''}</div><div class="shot-copy"><button class="shot-copy-btn" onclick="copyShot(this,${ep.ep},${si+1})" title="复制此镜头">📋</button></div></div>`).join('')}</div>`;
+    contents.appendChild(wrap);
   });
+
+  // B: Characters
+  const cc=document.getElementById('charCards');
+  cc.innerHTML=(d.characters||[]).map(c=>`<div class="char-card"><div class="char-card-name">${c.name}（${c.role||''}）</div><div><div class="char-card-label">视觉锚点</div><div class="char-card-text">${c.visualAnchor||'—'}</div></div><div><div class="char-card-label">行为锚点</div><div class="char-card-text">${c.behaviorAnchor||'—'}</div></div><div><div class="char-card-label">不可变项</div><div class="char-card-text" style="color:var(--red)">${c.forbidden||'发型/脸型/服饰色系'}</div></div></div>`).join('');
+
+  // C: Clip
+  const cs=d.clipStructure||{};const cl=document.getElementById('clipStructure');
+  cl.innerHTML=`<div class="clip-structure">${(cs.timeline||[]).map(t=>`<div class="clip-row"><span class="clip-time">${t.time||''}</span><span class="clip-desc"><strong>${t.label||''}</strong>：${t.desc||''}</span></div>`).join('')}<div class="clip-bgm">🎵 推荐BGM：${cs.overallBgm||'根据情绪自动匹配'}</div></div>`;
+
+  // D: Publish
+  const pb=d.publish||{};document.getElementById('publishBlock').innerHTML=`<div class="publish-block">${(pb.titles||[]).length?`<div class="publish-row"><strong>📝 标题方案</strong>${pb.titles.map((t,i)=>`<span>${i+1}) `+t+`</span><br>`).join('')}</div>`:''}<div class="publish-row"><strong>🏷 标签</strong><span>${(pb.tags||[]).join(' · ')}</span></div><div class="publish-row"><strong>📱 发布文案</strong><span>${pb.copy||'根据剧情自由发挥'}</span></div></div>`;
+
+  // Watermark
   const canRetry=lastGenParams&&(Date.now()-lastGenParams.time<RETRY_WINDOW);
   document.getElementById('retryBtn').style.display=canRetry?'inline-flex':'none';
   document.getElementById('retryHint').style.display=canRetry?'block':'none';
-  document.getElementById('operationGuide').style.display='block';
-  showInspiration();
-  document.getElementById('resultSection').classList.add('active');
-  document.getElementById('generateBtn').disabled=false;
-  document.getElementById('panelSeries').style.display='block';
-  document.querySelector('.top-tabs').style.display='flex';
-  document.getElementById('resultSection').scrollIntoView({behavior:'smooth'});
+
+  document.getElementById('resultWrap').classList.add('active');
+  document.getElementById('genBtnMain').disabled=false;document.getElementById('inputCard').style.display='block';
+  document.getElementById('resultWrap').scrollIntoView({behavior:'smooth'});
 }
 
-function switchEp(i){document.querySelectorAll('.ep-tab').forEach((t,idx)=>t.classList.toggle('active',idx===i));document.querySelectorAll('.episode-content').forEach((c,idx)=>c.classList.toggle('active',idx===i))}
-function resetForm(){document.getElementById('resultSection').classList.remove('active');document.getElementById('generateBtn').disabled=false;document.getElementById('operationGuide').style.display='none';hideInspiration()}
-
-// ==================== 免费重试 ====================
-async function retryGenerate(){
-  if(!lastGenParams||Date.now()-lastGenParams.time>RETRY_WINDOW){showToast('免费重试已过期（2分钟内）');return}
-  const p=lastGenParams;const apiKey=getApiKey();if(!apiKey){showError('请设置 API Key');return}
-  const btn=document.getElementById('retryBtn');btn.disabled=true;btn.textContent='⏳ 重新生成...';
-  document.getElementById('resultSection').classList.remove('active');showLoading(true);
-  const retryTemp=0.85+Math.random()*0.1;let timeoutId;
-  try{const c=new AbortController();timeoutId=setTimeout(()=>c.abort(),90000);const r=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},body:JSON.stringify({model:'deepseek-v4-pro',messages:[{role:'system',content:p.systemPrompt},{role:'user',content:p.userPrompt}],max_tokens:16384,temperature:retryTemp,response_format:{type:'json_object'}}),signal:c.signal});clearTimeout(timeoutId);if(!r.ok)throw new Error('重试失败');const d=await r.json(),ct=d.choices?.[0]?.message?.content;if(!ct)throw new Error('空');let pd;try{pd=JSON.parse(ct.replace(/```json|```/g,'').trim())}catch{const m=ct.match(/\{[\s\S]*\}/);if(m){try{pd=JSON.parse(m[0])}catch{pd=JSON.parse(m[0].replace(/,\s*}/g,'}').replace(/,\s*\]/g,']'))}}else throw new Error('格式')}
-    lastGenParams.time=Date.now();showLoading(false);currentResult={data:pd,genre:p.genre,epCount:p.epCount};renderResult(pd,p.genre,p.epCount);saveToHistory(pd,p.genre,p.epCount);trackEvent('retry_success',{genre:p.genre});
-  }catch(e){clearTimeout(timeoutId);showLoading(false);btn.disabled=false;showError('重试失败：'+(e.message||'未知'));trackEvent('retry_error',{error:e.message})}
+function switchEp(i){
+  document.querySelectorAll('#epTabs .ep-tab').forEach((t,idx)=>t.classList.toggle('active',idx===i));
+  document.querySelectorAll('#epContents .ep-content').forEach((c,idx)=>c.classList.toggle('active',idx===i));
 }
+function resetForm(){document.getElementById('resultWrap').classList.remove('active');document.getElementById('genBtnMain').disabled=false;window.scrollTo({top:0,behavior:'smooth'})}
 
-// ==================== 灵感 ====================
-const inspirations=[{genre:'都市爱情',desc:'契约婚姻+先婚后爱'},{genre:'古装宫廷',desc:'女主智斗群臣'},{genre:'玄幻仙侠',desc:'废材逆袭+上古传承'},{genre:'悬疑推理',desc:'每集一个反转'},{genre:'都市赘婿/逆袭',desc:'隐藏身份+打脸名场面'},{genre:'青春校园',desc:'暗恋+双向奔赴'},{genre:'科幻未来',desc:'末世+人性考验'}];
-function showInspiration(){const i=inspirations[Math.floor(Math.random()*inspirations.length)];const el=document.getElementById('inspirationBox');if(!el)return;el.innerHTML=`💡 下一个试试？<span style="color:var(--gold-light);cursor:pointer;text-decoration:underline" onclick="document.getElementById('genre').value='${i.genre}';document.getElementById('extraDesc').value='${i.desc}';switchPanel('series');showToast('已填入，直接点生成 ✨')">${i.genre} · ${i.desc}</span>`;el.style.display='block'}
-function hideInspiration(){const el=document.getElementById('inspirationBox');if(el)el.style.display='none'}
-
-// ==================== 复制 ====================
-function copyResult(){
-  if(!currentResult)return;const d=currentResult.data,genre=currentResult.genre,epCount=currentResult.epCount;
-  let t=`《${d.title}》\n类型：${genre} | ${epCount}集 | 角色已锁定\n\n【简介】${d.synopsis}\n`;
-  (d.episodes||[]).forEach(ep=>{t+=`\n第${ep.ep}集《${ep.title}》\n${ep.summary||''}\n`;(ep.scenes||[]).forEach((s,si)=>{t+=`\n场景${si+1}：【${s.location}】${s.duration||''}\n`;if(s.camera)t+=`镜头：${s.camera}\n`;if(s.emotion)t+=`情绪：${s.emotion}\n`;if(s.action)t+=`${s.action}\n`;(s.dialogues||[]).forEach(d=>{t+=`${d.name}（${d.emotion||''}）：${d.text}\n`})})});
+// ==================== Copy ====================
+function copyShot(btn,ep,shot){
+  const card=btn.closest('.shot-card');const prompts=card.querySelectorAll('.shot-prompt');const desc=card.querySelector('.shot-desc');const dialogues=card.querySelectorAll('[style*="margin-top:6px"]');
+  let t=`第${ep}集 · 镜头${shot}\n${desc?desc.textContent:''}\n`;
+  prompts.forEach(p=>{t+=p.textContent+'\n'});
+  dialogues.forEach(d=>{t+=d.textContent+'\n'});
+  navigator.clipboard.writeText(t).then(()=>{btn.textContent='✓';setTimeout(()=>btn.textContent='📋',1500);showToast('已复制镜头'+shot)});
+}
+function copyAllResult(){
+  if(!currentResult)return;const d=currentResult;
+  let t=`【${d.title}】\n${d.synopsis||''}\n\n`;
+  (d.episodes||[]).forEach(ep=>{t+=`\n第${ep.ep}集《${ep.title}》\n`;(ep.shots||[]).forEach((sh,si)=>{t+=`\n镜头${si+1}(${sh.time||''}):${sh.emotion||''}\n${sh.desc||''}\n即梦：${sh.prompt_jimeng||''}\n可灵：${sh.prompt_keling||''}\n`;(sh.dialogues||[]).forEach(dl=>{t+=`${dl.name}(${dl.emotion||''})："${dl.text}"\n`})})});
+  const pb=d.publish||{};
+  t+=`\n--- 发布模板 ---\n标题：${(pb.titles||[]).join(' / ')}\n标签：${(pb.tags||[]).join(' ')}\n文案：${pb.copy||''}\n`;
   t+='\n—— 由剧引AI生成 ——';
-  navigator.clipboard.writeText(t).then(()=>{const b=document.getElementById('copyBtn');b.textContent='✓ 已复制';b.classList.add('copied');setTimeout(()=>{b.textContent='📋 复制全文';b.classList.remove('copied')},2000);showToast('已复制 ✓')}).catch(()=>showToast('复制失败'))
+  navigator.clipboard.writeText(t).then(()=>{const b=document.getElementById('copyBtn');b.textContent='✓ 已复制';b.classList.add('copied');setTimeout(()=>{b.textContent='📋 全部复制';b.classList.remove('copied')},1500);showToast('已复制到剪贴板')});
 }
 
-// ==================== 历史 ====================
-function getHistory(){try{return JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]')}catch(e){return[]}}
-function saveToHistory(data,genre,epCount){const h=getHistory();h.unshift({id:Date.now(),title:data.title,genre,epCount,synopsis:data.synopsis,data,createdAt:new Date().toLocaleString('zh-CN')});if(h.length>20)h.length=20;localStorage.setItem(HISTORY_KEY,JSON.stringify(h))}
-function loadHistoryTab(){const h=getHistory();document.getElementById('historyEmpty').style.display=h.length===0?'block':'none';document.getElementById('historyList').innerHTML=h.map(i=>`<div class="history-item" onclick="viewHistoryItem(${i.id})"><div><div class="hi-title">《${i.title}》</div><div class="hi-meta">${i.genre} · ${i.epCount}集 · ${i.createdAt}</div></div><button class="hi-delete" onclick="event.stopPropagation();deleteHistoryItem(${i.id})">删除</button></div>`).join('')}
-function viewHistoryItem(id){const h=getHistory(),item=h.find(i=>i.id===id);if(!item)return;currentResult={data:item.data,genre:item.genre,epCount:item.epCount};renderResult(item.data,item.genre,item.epCount);switchMainTab('create');switchPanel('series')}
-function deleteHistoryItem(id){if(!confirm('确定删除？'))return;let h=getHistory();h=h.filter(i=>i.id!==id);localStorage.setItem(HISTORY_KEY,JSON.stringify(h));loadHistoryTab();showToast('已删除')}
+// ==================== Retry ====================
+async function retryGenerate(){
+  if(!lastGenParams||Date.now()-lastGenParams.time>RETRY_WINDOW){showToast('免费重试已过期');return}
+  const p=lastGenParams,apiKey=getApiKey();if(!apiKey){showError('请设置API Key');return}
+  const btn=document.getElementById('retryBtn');btn.disabled=true;btn.textContent='⏳';
+  document.getElementById('resultWrap').classList.remove('active');showLoading(true);
+  let tid;
+  try{
+    const ctrl=new AbortController();tid=setTimeout(()=>ctrl.abort(),90000);
+    const resp=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},body:JSON.stringify({model:'deepseek-v4-pro',messages:[{role:'system',content:p.sys},{role:'user',content:p.usr}],max_tokens:16384,temperature:0.85+Math.random()*0.1,response_format:{type:'json_object'}}),signal:ctrl.signal});
+    clearTimeout(tid);if(!resp.ok)throw new Error('重试失败');
+    const data=await resp.json();let ct=data.choices?.[0]?.message?.content;if(!ct)throw new Error('空');
+    let d;try{d=JSON.parse(ct.replace(/```json|```/g,'').trim())}catch{const m=ct.match(/\{[\s\S]*\}/);if(m)d=JSON.parse(m[0].replace(/,\s*}/g,'}').replace(/,\s*\]/g,']'));else throw new Error('格式')}
+    lastGenParams.time=Date.now();showLoading(false);currentResult=d;renderResult(d,p.genre,p.epCount);trackEvent('retry_success',{});
+  }catch(e){clearTimeout(tid);showLoading(false);btn.disabled=false;showError('重试失败：'+(e.message||'未知'))}
+}
 
-// ==================== 埋点 ====================
-const ANALYTICS_KEY='juyin_analytics';
-function trackEvent(event,data){try{const r=JSON.parse(localStorage.getItem(ANALYTICS_KEY)||'[]');r.push({event,data:data||{},time:new Date().toISOString()});if(r.length>500)r.splice(0,r.length-500);localStorage.setItem(ANALYTICS_KEY,JSON.stringify(r));console.log('[剧引]',event,data)}catch(e){}}
-window.showAnalytics=function(){const r=JSON.parse(localStorage.getItem(ANALYTICS_KEY)||'[]');if(r.length===0){console.log('暂无数据');return}console.table(r.slice(-50));const ev={},td=new Date().toISOString().slice(0,10),tr=r.filter(x=>x.time.startsWith(td));r.forEach(x=>{ev[x.event]=(ev[x.event]||0)+1});console.log('全量:',ev,'今日:',tr.length);const g={};r.filter(x=>x.event==='create_character').forEach(x=>{g[x.data.name]=(g[x.data.name]||0)+1});console.log('角色创建:',g);const s=r.filter(x=>x.event==='generate_success').length,e=r.filter(x=>x.event==='generate_error').length;console.log('成功率:',s+e>0?Math.round(s/(s+e)*100)+'%':'暂无')};
+// ==================== Tracking ====================
+function trackEvent(ev,data){try{const r=JSON.parse(localStorage.getItem(ANALYTICS_KEY)||'[]');r.push({event:ev,data:data||{},time:new Date().toISOString()});if(r.length>500)r.splice(0,r.length-500);localStorage.setItem(ANALYTICS_KEY,JSON.stringify(r))}catch(e){}}
 </script>
 </body>
 </html>
