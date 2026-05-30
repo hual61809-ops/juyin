@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>剧引 · AI短剧内容结构分析与制作辅助</title>
-<meta name="description" content="帮用户判断一个短剧想法值不值得做，并自动生成可直接用于拍摄与发布的完整结构。">
+<title>剧引 · 短剧内容结构决策系统</title>
+<meta name="description" content="帮助短剧创作者判断内容结构优劣，生成可执行制作方案，记录并优化创作能力。">
 <style>
 @font-face{font-family:'NS';font-style:normal;font-weight:300;font-display:swap;src:local('Noto Sans SC'),local('Microsoft YaHei')}
 @font-face{font-family:'NS';font-style:normal;font-weight:400;font-display:swap;src:local('Noto Sans SC'),local('Microsoft YaHei')}
@@ -26,11 +26,16 @@ header{display:flex;align-items:center;justify-content:space-between;padding:20p
 .settings-btn:hover,.settings-btn.has-key{border-color:var(--gold);color:var(--gold)}
 .settings-btn.has-key{background:rgba(212,164,74,0.1)}
 
-.hero{text-align:center;padding:50px 10px 28px}
+.hero{text-align:center;padding:46px 10px 24px}
 .hero-tag{display:inline-block;border:1px solid rgba(212,164,74,0.3);padding:5px 18px;border-radius:100px;font-size:10px;letter-spacing:2px;color:var(--gold);margin-bottom:16px}
-.hero h1{font-family:'NF',serif;font-size:clamp(20px,5vw,34px);font-weight:900;line-height:1.4}
+.hero h1{font-family:'NF',serif;font-size:clamp(20px,5vw,32px);font-weight:900;line-height:1.45}
 .hero h1 .a{color:var(--gold)}
 .hero p{margin-top:10px;font-size:12px;color:var(--gray);line-height:1.7}
+
+/* Three modules */
+.modules-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 18px;font-size:10px;color:var(--gray);text-align:center}
+.module-chip{padding:8px 4px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;line-height:1.6}
+.module-chip strong{display:block;color:var(--gold);font-size:11px;margin-bottom:3px}
 
 .input-card{background:var(--bg2);border:1px solid var(--bd);border-radius:14px;padding:24px 26px;margin-bottom:12px}
 .input-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
@@ -61,7 +66,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:20p
 
 .result{display:none;margin-bottom:40px}
 .result.active{display:block}
-.result-top{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.result-top{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
 .btn-sm{padding:6px 14px;border:1px solid var(--bd);border-radius:6px;background:transparent;color:var(--gold);font-size:11px;letter-spacing:1px;cursor:pointer;transition:all .2s}
 .btn-sm:hover{background:rgba(212,164,74,0.08)}
 .btn-sm.copied{background:rgba(80,180,120,0.12);border-color:#50b478;color:#50b478}
@@ -81,16 +86,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:20p
 .score-title.mid{color:var(--gold)}
 .score-title.low{color:var(--red)}
 .score-conf{font-size:10px;color:var(--gray);margin-bottom:8px}
-.score-detail{font-size:11px;color:var(--gray);line-height:1.6}
-
-.score-why{background:rgba(96,144,184,0.06);border:1px solid rgba(96,144,184,0.15);border-radius:8px;padding:12px 14px;margin-bottom:10px;display:none}
-.score-why strong{color:var(--blue);display:block;margin-bottom:4px;font-size:10px;letter-spacing:1px}
-.score-why span{font-size:10px;color:var(--gray);line-height:1.8}
-
-.score-risk{background:rgba(184,64,74,0.04);border:1px solid rgba(184,64,74,0.12);border-radius:8px;padding:10px 14px;margin-bottom:10px;display:none}
-.score-risk strong{color:var(--red);display:block;margin-bottom:3px;font-size:10px;letter-spacing:1px}
-.score-risk span{font-size:10px;color:var(--gray)}
-
 .score-metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
 .metric-item{text-align:center}
 .metric-bar{height:4px;border-radius:2px;background:rgba(255,255,255,0.06);margin-bottom:4px;overflow:hidden}
@@ -100,12 +95,35 @@ header{display:flex;align-items:center;justify-content:space-between;padding:20p
 .metric-fill.low{background:var(--red)}
 .metric-name{font-size:8px;color:var(--gray);letter-spacing:1px}
 .metric-val{font-size:10px;font-weight:500}
-
+.score-why{background:rgba(96,144,184,0.06);border:1px solid rgba(96,144,184,0.15);border-radius:8px;padding:12px 14px;margin-bottom:10px;display:none}
+.score-why strong{color:var(--blue);display:block;margin-bottom:4px;font-size:10px}
+.score-why span{font-size:10px;color:var(--gray);line-height:1.8}
+.score-improve{background:rgba(184,64,74,0.04);border:1px solid rgba(184,64,74,0.12);border-radius:8px;padding:10px 14px;margin-bottom:10px;display:none}
+.score-improve strong{color:var(--red);display:block;margin-bottom:3px;font-size:10px}
+.score-improve span{font-size:10px;color:var(--gray)}
 .template-badge{display:inline-block;margin-top:10px;padding:5px 14px;border-radius:100px;background:rgba(212,164,74,0.08);border:1px solid var(--bd);font-size:10px;color:var(--gold);letter-spacing:1px}
+
+/* Structure history */
+.struct-history{display:none;margin-bottom:16px;padding:14px 18px;background:rgba(96,144,184,0.04);border:1px solid rgba(96,144,184,0.12);border-radius:10px}
+
+/* Paywall */
+.paywall{margin:16px 0;padding:28px 22px;background:rgba(212,164,74,0.05);border:2px dashed rgba(212,164,74,0.3);border-radius:14px;text-align:center;display:none}
+.paywall.active{display:block}
+.paywall-title{font-family:'NF',serif;font-size:15px;color:var(--gold);margin-bottom:6px;letter-spacing:1px}
+.paywall-desc{font-size:11px;color:var(--gray);margin-bottom:14px;line-height:1.7}
+.paywall-price{font-size:28px;font-family:'NF',serif;font-weight:900;color:var(--gold);margin-bottom:2px}
+.paywall-unit{font-size:10px;color:var(--gray);margin-bottom:14px}
+.paywall-unlock{padding:10px 28px;background:var(--gold);border:none;border-radius:8px;color:var(--ink);font-family:'NF',serif;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer;transition:all .2s}
+.paywall-unlock:hover{background:var(--gl);transform:translateY(-1px)}
+.paywall-unlock:disabled{opacity:0.6}
+
+/* Production content */
+.production-content{display:none}
+.production-content.active{display:block}
 
 .header-row{display:flex;align-items:flex-end;justify-content:space-between;margin:22px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--bd2)}
 .result-title{font-family:'NF',serif;font-size:22px;font-weight:900}
-.result-meta{display:flex;gap:6px}
+.result-meta{display:flex;gap:6px;flex-wrap:wrap}
 .badge{padding:3px 10px;border-radius:100px;font-size:9px;letter-spacing:1px}
 .badge-gold{background:rgba(212,164,74,0.1);border:1px solid var(--bd);color:var(--gold)}
 .badge-green{background:rgba(92,184,120,0.1);border:1px solid rgba(92,184,120,0.3);color:var(--green)}
@@ -151,7 +169,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:20p
 .pub-row strong{display:block;color:var(--gold);font-size:10px;letter-spacing:1px;margin-bottom:2px}
 .pub-row span{color:rgba(240,235,224,0.6)}
 
-/* Feedback */
 .data-feedback{background:rgba(96,144,184,0.06);border:1px solid rgba(96,144,184,0.2);border-radius:10px;padding:16px 18px;margin-top:14px}
 .data-feedback strong{color:var(--blue);font-size:11px;display:block;margin-bottom:8px}
 .data-feedback p{font-size:10px;color:var(--gray);margin-bottom:10px;line-height:1.6}
@@ -164,14 +181,16 @@ header{display:flex;align-items:center;justify-content:space-between;padding:20p
 .evolution-hint{display:none;margin-top:10px;padding:10px 14px;background:rgba(96,144,184,0.04);border-radius:8px;font-size:10px;color:var(--gray);line-height:1.7}
 
 /* Pricing */
-.pricing-row{display:flex;gap:10px;margin:16px 0;flex-wrap:wrap;justify-content:center}
-.pricing-card{flex:1;min-width:140px;text-align:center;padding:14px 12px;border-radius:10px;border:1px solid var(--bd2);background:var(--bg2);transition:border-color .2s}
+.pricing-row{display:flex;gap:10px;margin:10px 0 16px;flex-wrap:wrap;justify-content:center}
+.pricing-card{flex:1;min-width:120px;text-align:center;padding:14px 10px;border-radius:10px;border:1px solid var(--bd2);background:var(--bg2);transition:border-color .2s}
 .pricing-card:hover{border-color:var(--bd)}
 .pricing-card.pro{border-color:rgba(212,164,74,0.3);background:rgba(212,164,74,0.04)}
+.pricing-card.highlight{border-color:rgba(92,184,120,0.25);background:rgba(92,184,120,0.03)}
 .pricing-name{font-size:10px;letter-spacing:1px;color:var(--gray);margin-bottom:4px}
 .pricing-price{font-size:20px;font-weight:900;font-family:'NF',serif;color:var(--gold)}
 .pricing-unit{font-size:9px;color:var(--gray)}
 .pricing-desc{font-size:9px;color:var(--gray);margin-top:4px;line-height:1.5}
+.pricing-desc span{display:block}
 
 .watermark{text-align:center;margin-top:24px;padding-top:12px;border-top:1px solid var(--bd2);font-size:10px;color:rgba(212,164,74,0.3);letter-spacing:1px;line-height:1.8}
 .watermark a{color:rgba(212,164,74,0.4)}
@@ -201,21 +220,27 @@ footer .brand{font-family:'NF',serif;color:rgba(212,164,74,0.35);font-size:12px}
 @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 @keyframes toastOut{from{opacity:1;transform:translateX(-50%) translateY(0)}to{opacity:0;transform:translateX(-50%) translateY(-6px)}}
 
-@media(max-width:500px){.inline-row{grid-template-columns:1fr}.hero h1{font-size:20px}.score-metrics{grid-template-columns:repeat(3,1fr)}.shot-card{grid-template-columns:1fr}.fb-row{flex-direction:column;align-items:flex-start}.pricing-card{min-width:100px}}
+@media(max-width:500px){.inline-row{grid-template-columns:1fr}.hero h1{font-size:19px}.modules-row{grid-template-columns:1fr;gap:4px}.score-metrics{grid-template-columns:repeat(3,1fr)}.shot-card{grid-template-columns:1fr}.fb-row{flex-direction:column;align-items:flex-start}.pricing-card{min-width:80px}}
 </style>
 </head>
 <body>
 <div id="app">
 <header>
-  <div class="logo"><span class="logo-zh">剧引</span><span class="logo-en">Structure Studio</span></div>
+  <div class="logo"><span class="logo-zh">剧引</span><span class="logo-en">Decision OS</span></div>
   <button class="settings-btn" id="settingsBtn" onclick="openSettings()" title="API Key">⚙</button>
 </header>
 
 <section class="hero">
-  <div class="hero-tag">✦ AI 短剧内容结构分析与制作辅助</div>
-  <h1>不是在预测爆款。<br>是在<span class="a">分析一个故事的结构强度</span>。</h1>
-  <p>输入你的想法 → 系统评估结构潜力 → 匹配参考模板 → 生成完整制作方案<br>不承诺结果。只提供参考。决策权在你手里。</p>
+  <div class="hero-tag">✦ 短剧内容结构决策系统</div>
+  <h1>不是在预测爆款。是在<span class="a">分析结构、辅助决策、记录进步</span>。</h1>
+  <p>输入你的想法 → 系统评估结构潜力 → 生成可执行制作方案 → 记录每一次创作</p>
 </section>
+
+<div class="modules-row">
+  <div class="module-chip"><strong>🧠 结构分析</strong>情绪张力 · 冲突密度<br>反转设计 · 制作可行性</div>
+  <div class="module-chip"><strong>💰 制作方案</strong>镜头拆解 · 即梦/可灵prompt<br>剪映结构 · 发布辅助</div>
+  <div class="module-chip"><strong>📈 进化记录</strong>跨次对比 · 趋势变化<br>重复回来 · 越用越准</div>
+</div>
 
 <div class="input-card" id="inputCard">
   <div class="input-group"><label>输入你的短剧创意</label><textarea id="storyInput" placeholder="一句话就够了。如：霸总爱上灰姑娘，先婚后爱甜中带虐。&#10;也可以粘贴小说片段、故事梗概……"></textarea></div>
@@ -223,75 +248,86 @@ footer .brand{font-family:'NF',serif;color:rgba(212,164,74,0.35);font-size:12px}
     <div class="input-group"><label>类型</label><select id="genre"><option>都市爱情</option><option>古装宫廷</option><option>玄幻仙侠</option><option>悬疑推理</option><option>都市赘婿</option><option>青春校园</option><option>商战权谋</option><option>科幻未来</option></select></div>
     <div class="input-group"><label>集数</label><select id="episodes"><option value="1" selected>1集（测试）</option><option value="3">3集</option><option value="6">6集</option><option value="10">10集</option></select></div>
   </div>
-  <button class="gen-btn" id="genBtnMain" onclick="generate()"><span class="shimmer"></span>🚀 生成短剧制作方案</button>
-  <div class="quota-hint" id="quotaHint">今日剩余：5次（免费）</div>
+  <button class="gen-btn" id="genBtnMain" onclick="generate()"><span class="shimmer"></span>🚀 生成内容结构分析</button>
+  <div class="quota-hint" id="quotaHint">今日免费：5次</div>
   <div class="error-box" id="errorBox"></div>
 </div>
 
-<!-- Pricing -->
-<div class="pricing-row" style="margin-top:6px">
-  <div class="pricing-card"><div class="pricing-name">免费版</div><div class="pricing-price" style="font-size:18px">¥0</div><div class="pricing-desc">剧本生成<br>基础结构分析</div></div>
-  <div class="pricing-card"><div class="pricing-name">单次解锁</div><div class="pricing-price">¥6</div><div class="pricing-unit">/次</div><div class="pricing-desc">完整结构分析<br>制作方案</div></div>
-  <div class="pricing-card pro"><div class="pricing-name">标准版 Pro</div><div class="pricing-price">¥39</div><div class="pricing-unit">/月</div><div class="pricing-desc">镜头级生成<br>即梦/可灵prompt<br>剪映结构·发布辅助</div></div>
-  <div class="pricing-card"><div class="pricing-name">专业版</div><div class="pricing-price">¥99</div><div class="pricing-unit">/月</div><div class="pricing-desc">连续剧系统<br>批量生成·数据优化</div></div>
+<div class="pricing-row">
+  <div class="pricing-card"><div class="pricing-name">免费</div><div class="pricing-price" style="font-size:17px">¥0</div><div class="pricing-desc"><span>结构分析</span><span>基础建议</span></div></div>
+  <div class="pricing-card highlight"><div class="pricing-name">单次解锁 ⭐</div><div class="pricing-price">¥6</div><div class="pricing-unit">/次</div><div class="pricing-desc"><span>完整制作方案</span><span>prompt·剪映·发布</span></div></div>
+  <div class="pricing-card pro"><div class="pricing-name">标准版</div><div class="pricing-price">¥39</div><div class="pricing-unit">/月</div><div class="pricing-desc"><span>无限生成</span><span>对比·模板库</span></div></div>
+  <div class="pricing-card"><div class="pricing-name">专业版</div><div class="pricing-price">¥99</div><div class="pricing-unit">/月</div><div class="pricing-desc"><span>连续剧优化</span><span>批量·趋势分析</span></div></div>
 </div>
 
 <div class="loading" id="loadingState">
   <div class="spinner"></div>
-  <div class="loading-text">AI 正在分析故事结构</div>
+  <div class="loading-text">正在分析内容结构</div>
   <div class="loading-sub" id="loadingStep">解析叙事框架…</div>
 </div>
 
 <div class="result" id="resultWrap">
   <div class="result-top">
-    <button class="btn-sm" onclick="copyAllResult()" id="copyBtn">📋 全部复制</button>
-    <button class="btn-sm" onclick="retryGenerate()" id="retryBtn" style="display:none">🔄 不满意？免费重试</button>
-    <button class="btn-sm" onclick="resetForm()">↺ 重新创作</button>
+    <button class="btn-sm" onclick="copyAllResult()" id="copyBtn">📋 复制结果</button>
+    <button class="btn-sm" onclick="retryGenerate()" id="retryBtn" style="display:none">🔄 免费重试</button>
+    <button class="btn-sm" onclick="resetForm()">↺ 重新分析</button>
   </div>
 
+  <!-- 1. 结构分析（免费层） -->
   <div id="scoreSection"></div>
+  <div id="structureHistory" class="struct-history"></div>
 
-  <!-- 结构记录：跨代对比 -->
-  <div id="structureHistory" style="display:none;margin-bottom:16px;padding:14px 18px;background:rgba(96,144,184,0.04);border:1px solid rgba(96,144,184,0.12);border-radius:10px"></div>
-
-  <div class="header-row">
-    <div class="result-title" id="dramaTitle">剧名</div>
-    <div class="result-meta"><span class="badge badge-gold" id="genreBadge">类型</span><span class="badge badge-gold" id="epBadge">集数</span><span class="badge badge-green" id="consistencyBadge">🔒</span></div>
+  <!-- 2. 付费解锁 -->
+  <div class="paywall" id="paywall">
+    <div class="paywall-title">🔒 完整制作方案</div>
+    <div class="paywall-desc">镜头级脚本 · 即梦/可灵提示词 · 剪映剪辑结构 · 发布模板</div>
+    <div class="paywall-price">¥6</div>
+    <div class="paywall-unit">单次解锁</div>
+    <button class="paywall-unlock" onclick="unlockProduction()" id="unlockBtn">解锁完整方案</button>
   </div>
-  <div class="synopsis" id="synopsisText"></div>
 
-  <div class="module-title">🎬 镜头级生成</div>
-  <div class="ep-tabs" id="epTabs"></div>
-  <div id="epContents"></div>
-
-  <div class="module-title">👤 角色卡（系统生成）</div>
-  <div id="charCards"></div>
-
-  <div class="module-title">✂️ 剪映结构</div>
-  <div id="clipStructure"></div>
-
-  <div class="module-title">📱 发布辅助</div>
-  <div id="publishBlock"></div>
-
-  <div class="data-feedback" id="dataFeedback">
-    <strong>📊 数据反哺 · 帮助系统优化（实际发布后填写）</strong>
-    <p>记录真实数据，系统会对比结构分析与实际表现，持续校准。你的每一次反馈都在让下一次更准。</p>
-    <div class="fb-row">
-      <input class="fb-input" id="fbPlays" placeholder="播放量" type="number"><span class="fb-unit">播放</span>
-      <input class="fb-input" id="fbCompletion" placeholder="完播率" type="number" step="0.1"><span class="fb-unit">%</span>
-      <button class="fb-save" onclick="saveFeedback()">记录数据</button>
+  <!-- 3. 制作方案内容（付费层） -->
+  <div class="production-content" id="productionContent">
+    <div class="header-row">
+      <div class="result-title" id="dramaTitle">剧名</div>
+      <div class="result-meta"><span class="badge badge-gold" id="genreBadge">类型</span><span class="badge badge-gold" id="epBadge">集数</span><span class="badge badge-green" id="consistencyBadge">🔒</span></div>
     </div>
-    <div class="evolution-hint" id="evolutionHint"></div>
+    <div class="synopsis" id="synopsisText"></div>
+
+    <div class="module-title">🎬 镜头级生成</div>
+    <div class="ep-tabs" id="epTabs"></div>
+    <div id="epContents"></div>
+
+    <div class="module-title">👤 角色卡</div>
+    <div id="charCards"></div>
+
+    <div class="module-title">✂️ 剪映结构</div>
+    <div id="clipStructure"></div>
+
+    <div class="module-title">📱 发布辅助</div>
+    <div id="publishBlock"></div>
+
+    <!-- 4. 数据反哺 & 进化记录 -->
+    <div class="data-feedback" id="dataFeedback">
+      <strong>📊 数据反哺（发布后填写）</strong>
+      <p>记录真实数据，系统会校准分析模型。你的每一次反馈都在让系统更准。</p>
+      <div class="fb-row">
+        <input class="fb-input" id="fbPlays" placeholder="播放量" type="number"><span class="fb-unit">播放</span>
+        <input class="fb-input" id="fbCompletion" placeholder="完播率" type="number" step="0.1"><span class="fb-unit">%</span>
+        <button class="fb-save" onclick="saveFeedback()">记录</button>
+      </div>
+      <div class="evolution-hint" id="evolutionHint"></div>
+    </div>
   </div>
 
   <div class="watermark">
-    由剧引AI生成 · 本结果为结构分析参考，不构成爆款保证 · 仅供娱乐参考<br>
+    由剧引AI生成 · 本结果为结构分析参考，不构成爆款保证<br>
     <span id="retryHint">不满意？2分钟内可免费重试</span><br>
-    打开 <a href="https://jimeng.jianying.com" target="_blank">即梦</a> / <a href="https://kling.kuaishou.com" target="_blank">可灵</a> 粘贴 → <a href="https://www.capcut.cn" target="_blank">剪映</a> 合成 → 发布 → 回来填数据
+    打开 <a href="https://jimeng.jianying.com" target="_blank">即梦</a> / <a href="https://kling.kuaishou.com" target="_blank">可灵</a> → <a href="https://www.capcut.cn" target="_blank">剪映</a> 合成 → 发布 → 回来填数据
   </div>
 </div>
 
-<footer><span class="brand">剧引</span> · 内容结构分析 + 自动制作辅助 · 不承诺爆款，只提供参考<br>AI只做辅助，决策权在你手里。本平台内容由AI自动产生，仅供娱乐参考</footer>
+<footer><span class="brand">剧引</span> · 内容结构决策系统 · 分析结构 · 辅助决策 · 记录进步<br>AI提供参考分析，最终判断权在你手里</footer>
 </div>
 
 <div class="modal-overlay" id="settingsModal">
@@ -307,9 +343,9 @@ footer .brand{font-family:'NF',serif;color:rgba(212,164,74,0.35);font-size:12px}
 
 <script>
 const SK='juyin_api_key',UK='juyin_usage',DK='juyin_data',HK2='juyin_struct_hist',AK='juyin_analytics',DL=5,RW=120000;
-let cr=null,lg=null;
+let cr=null,lg=null,unlocked=false;
 
-function init(){uSI();uQH();if(!localStorage.getItem('juyin_v6')){setTimeout(()=>st('👋 输入想法，分析结构潜力'),800);localStorage.setItem('juyin_v6','1')}}
+function init(){uSI();uQH();if(!localStorage.getItem('juyin_vfinal')){setTimeout(()=>st('👋 输入想法，分析结构潜力'),800);localStorage.setItem('juyin_vfinal','1')}}
 init();
 
 function gK(){return localStorage.getItem(SK)||''}
@@ -324,51 +360,49 @@ function gU(){try{const r=JSON.parse(localStorage.getItem(UK)||'{}');return r.da
 function sU(u){localStorage.setItem(UK,JSON.stringify(u))}
 function rm(){return Math.max(0,DL-gU().count)}
 function cQ(){let u=gU();u.count++;sU(u)}
-function uQH(){document.getElementById('quotaHint').textContent='今日剩余：'+rm()+'次（免费）'}
+function uQH(){document.getElementById('quotaHint').textContent='今日免费：'+rm()+'次'}
 
 function st(m){const ex=document.querySelector('.toast');if(ex)ex.remove();const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2000)}
 function sE(m){const e=document.getElementById('errorBox');e.innerHTML=m;e.classList.add('active')}
 function hE(){document.getElementById('errorBox').classList.remove('active')}
 
-const LS=['解析叙事框架…','评估情绪张力…','分析冲突密度…','检查反转设计…','评估短视频适配…','匹配参考结构…','生成镜头脚本…','输出制作方案…'];
+const LS=['解析叙事框架…','评估情绪张力…','分析冲突密度…','检查反转设计…','评估制作可行性…','匹配参考结构…','生成分析报告…'];
 let li;
-function sL(s){document.getElementById('loadingState').classList.toggle('active',s);if(s){let i=0;document.getElementById('loadingStep').textContent=LS[0];li=setInterval(()=>{i=(i+1)%LS.length;document.getElementById('loadingStep').textContent=LS[i]},1100)}else{clearInterval(li)}}
+function sL(s){document.getElementById('loadingState').classList.toggle('active',s);if(s){let i=0;document.getElementById('loadingStep').textContent=LS[0];li=setInterval(()=>{i=(i+1)%LS.length;document.getElementById('loadingStep').textContent=LS[i]},1200)}else{clearInterval(li)}}
 
 async function generate(){
   hE();const k=gK();if(!k){sE('请先点⚙设置API Key');oS();return}if(rm()<=0){sE('今日免费次数用完');return}
   const desc=document.getElementById('storyInput').value.trim();if(!desc){sE('至少写一句话故事');return}
   const genre=document.getElementById('genre').value,epCount=parseInt(document.getElementById('episodes').value);
   const shotsPerEp=epCount<=3?8:epCount<=6?6:4;
-  const btn=document.getElementById('genBtnMain');btn.disabled=true;
-  document.getElementById('inputCard').style.display='none';document.getElementById('resultWrap').classList.remove('active');sL(true);
+  const btn=document.getElementById('genBtnMain');btn.disabled=true;unlocked=false;
+  document.getElementById('inputCard').style.display='none';document.getElementById('resultWrap').classList.remove('active');
+  document.getElementById('productionContent').classList.remove('active');
+  document.getElementById('paywall').classList.remove('active');sL(true);
 
-  const sys=`你是AI短剧内容结构分析系统。你的任务不是"预测爆款"，而是从叙事结构角度提供客观分析。
+  const sys=`你是AI短剧内容结构分析系统。你的任务不是预测爆款，而是从叙事结构角度提供客观分析参考。
 
-第一步：五维结构评估（0-10分）- 注意措辞客观，不夸大
-- 情绪张力：故事中的情绪强度、情感冲突、关系张力
+第一步：五维评估（0-10）
+- 情绪张力：情感冲突强度、关系张力
 - 冲突密度：冲突点分布、对抗持续度
-- 反转设计：身份反转/信息反转/认知反转的力度
-- 传播适配：3秒钩子设计、碎片化观看适配度
-- 制作可行性：从结构看是否具备制作条件
+- 反转设计：身份反转/信息反转/认知反转
+- 传播适配：钩子设计、碎片化观看适配
+- 制作可行性：结构完整度、拍摄可执行度
 
-第二步：输出结构分析
-- 传播潜力总分（加权：情绪×0.3+冲突×0.25+反转×0.2+传播×0.15+制作×0.1）
-- 列出结构优势（3-5条，客观描述，不夸大）
-- 列出可优化项（1-2条，如实）
+第二步：输出分析
+- 传播潜力总分（公式：情绪×0.3+冲突×0.25+反转×0.2+传播×0.15+制作×0.1）
+- 结构优势（3-5条客观描述）
+- 可优化项（1-2条）
+- verdict只用"适合制作"/"可尝试"/"建议优化结构"
 
-第三步：自动匹配参考模板（8种结构之一）
+第三步：匹配参考模板（8种之一）
 
-第四步：生成完整制作方案
+第四步：生成完整产出包
 
-铁律：
-- verdict只用"适合短剧制作"/"可尝试"/"需优化结构"，不说"强烈推荐"/"必火"
-- 每个镜头含即梦prompt+可灵prompt（≤50字/条）
-- 角色保持外貌一致性
-- 对白≤20字，带情绪
-- 健康内容`;
+铁律：每个镜头含即梦/可灵prompt；角色一致；对白≤20字带情绪；健康`;
 
-  const usr=`故事：${desc}\n类型：${genre} · ${epCount}集 · 每集约${shotsPerEp}个镜头\n\nJSON：{
-  "score":{"total":76,"level":"high","verdict":"适合短剧制作",
+  const usr=`故事：${desc}\n类型：${genre} · ${epCount}集 · 每集约${shotsPerEp}镜头\n\nJSON：{
+  "score":{"total":76,"level":"high","verdict":"适合制作",
     "advantages":["优势1","优势2","优势3"],
     "improvements":["可优化项1"],
     "metrics":[{"n":"情绪张力","v":7.8},{"n":"冲突密度","v":7.5},{"n":"反转设计","v":8.2},{"n":"传播适配","v":7.0},{"n":"制作可行性","v":7.5}]
@@ -380,7 +414,7 @@ async function generate(){
       "dialogues":[{"name":"角色","emotion":"情绪","text":"对白"}]}]
   }],
   "characters":[{"name":"","role":"","visualAnchor":"外貌","behaviorAnchor":"行为","forbidden":"不可变"}],
-  "clipStructure":{"timeline":[{"time":"0-3秒","label":"冲突钩子","desc":"","bgm":""},{"time":"3-6秒","label":"剧情推进","desc":"","bgm":""},{"time":"6-9秒","label":"反转","desc":"","bgm":""},{"time":"9-12秒","label":"悬念","desc":"","bgm":""}],"overallBgm":"BGM建议"},
+  "clipStructure":{"timeline":[{"time":"0-3秒","label":"冲突钩子","desc":"","bgm":""},{"time":"3-6秒","label":"推进","desc":"","bgm":""},{"time":"6-9秒","label":"反转","desc":"","bgm":""},{"time":"9-12秒","label":"悬念","desc":"","bgm":""}],"overallBgm":"BGM"},
   "publish":{"titles":["3标题"],"tags":["5标签"],"copy":"文案","platform":"推荐平台+时长"}
 }`;
 
@@ -391,11 +425,12 @@ async function generate(){
     if(!r.ok){const je=await r.json().catch(()=>({}));if(r.status===401)throw new Error('API Key不对');if(r.status===402)throw new Error('余额用完');throw new Error(je.error?.message||'出错')}
     const d=await r.json();let ct=d.choices?.[0]?.message?.content;if(!ct)throw new Error('空');
     let pd;try{pd=JSON.parse(ct.replace(/```json|```/g,'').trim())}catch{const m=ct.match(/\{[\s\S]*\}/);if(m)pd=JSON.parse(m[0].replace(/,\s*}/g,'}').replace(/,\s*\]/g,']'));else throw new Error('格式')}
-    cQ();lg={desc,genre,epCount,sys,usr,time:Date.now()};sL(false);cr=pd;saveStructureHistory(pd);render(pd,genre,epCount);uQH();te('gen_ok',{genre,epCount,score:pd.score?.total||0});
+    cQ();lg={desc,genre,epCount,sys,usr,time:Date.now()};sL(false);cr=pd;saveStructureHistory(pd);renderAnalysis(pd);uQH();te('gen_ok',{genre,epCount,score:pd.score?.total||0});
   }catch(err){clearTimeout(tid);sL(false);btn.disabled=false;document.getElementById('inputCard').style.display='block';if(err.name==='AbortError')sE('超时，试减少集数');else sE(err.message);te('gen_err',{})}
 }
 
-function render(d,genre,epCount){
+// ===== 渲染：先显示免费层（结构分析），再显示付费入口 =====
+function renderAnalysis(d){
   const sc=d.score||{},lvl=sc.level||'mid',metrics=sc.metrics||[{n:'情绪张力',v:5},{n:'冲突密度',v:5},{n:'反转设计',v:5},{n:'传播适配',v:5},{n:'制作可行性',v:5}];
   const adv=sc.advantages||[],imp=sc.improvements||[];
   document.getElementById('scoreSection').innerHTML=`<div class="score-card">
@@ -403,21 +438,43 @@ function render(d,genre,epCount){
       <div class="score-circle ${lvl}"><div class="score-num">${sc.total||'—'}</div><div class="score-label">传播潜力</div></div>
       <div class="score-info">
         <div class="score-title ${lvl}">${sc.verdict||'分析完成'}</div>
-        <div class="score-conf">参考分析 · AI只做辅助，决策权在你</div>
-        <div class="score-detail">${sc.detail||''}</div>
+        <div class="score-conf">AI 结构分析 · 决策权在你</div>
       </div>
     </div>
     ${adv.length?`<div class="score-why" style="display:block"><strong>📊 结构优势</strong><span>${adv.map(w=>'· '+w).join('<br>')}</span></div>`:''}
-    ${imp.length?`<div class="score-risk" style="display:block"><strong>💡 可优化项</strong><span>${imp.map(w=>'· '+w).join('<br>')}</span></div>`:''}
+    ${imp.length?`<div class="score-improve" style="display:block"><strong>💡 可优化</strong><span>${imp.map(w=>'· '+w).join('<br>')}</span></div>`:''}
     <div class="score-metrics">${metrics.map(m=>`<div class="metric-item"><div class="metric-bar"><div class="metric-fill ${(m.v||0)>=8?'high':(m.v||0)>=6?'mid':'low'}" style="width:${(m.v||0)*10}%"></div></div><div class="metric-name">${m.n}</div><div class="metric-val">${(m.v||0).toFixed(1)}</div></div>`).join('')}</div>
     ${d.matchedTemplate?`<span class="template-badge">📐 ${d.matchedTemplate}</span>`:''}
   </div>`;
 
-  // 跨代对比
   showStructureHistory(sc.total||0,d.matchedTemplate||'');
 
+  // 显示付费入口
+  document.getElementById('paywall').classList.add('active');
+  document.getElementById('productionContent').classList.remove('active');
+  document.getElementById('resultWrap').classList.add('active');
+  document.getElementById('genBtnMain').disabled=false;document.getElementById('inputCard').style.display='block';
+  document.getElementById('resultWrap').scrollIntoView({behavior:'smooth'});
+}
+
+// ===== 解锁制作方案（模拟付费） =====
+function unlockProduction(){
+  if(!cr)return;
+  // 模拟：实际应接入支付SDK。此处直接解锁。
+  const btn=document.getElementById('unlockBtn');btn.disabled=true;btn.textContent='处理中…';
+  setTimeout(()=>{
+    unlocked=true;btn.textContent='已解锁 ✓';btn.style.background='var(--green)';
+    document.getElementById('paywall').classList.remove('active');
+    renderProduction(cr);te('pay_unlock',{title:cr.title,score:cr.score?.total||0});
+    st('已解锁完整方案 ✓');
+  },600);
+}
+
+function renderProduction(d){
+  const sc=d.score||{};
   document.getElementById('dramaTitle').textContent=d.title||'未命名';
-  document.getElementById('genreBadge').textContent=genre;document.getElementById('epBadge').textContent=epCount+'集';
+  document.getElementById('genreBadge').textContent='解锁版';
+  document.getElementById('epBadge').textContent='';
   document.getElementById('synopsisText').textContent=(d.synopsis||'')+(d.visualStyle?' · '+d.visualStyle:'');
 
   const tabs=document.getElementById('epTabs'),contents=document.getElementById('epContents');tabs.innerHTML='';contents.innerHTML='';
@@ -428,54 +485,30 @@ function render(d,genre,epCount){
     w.innerHTML+=`<div class="shot-list">${(ep.shots||[]).map((sh,si)=>`<div class="shot-card"><div><div class="shot-meta"><span class="shot-num">${String(si+1).padStart(2,'0')}</span><span class="shot-time">${sh.time||''}</span><span class="shot-emotion">${sh.emotion||''}</span></div><div class="shot-desc">${sh.desc||''}</div><div class="shot-prompts">${sh.prompt_jimeng?`<div class="shot-prompt jimeng">🎬 即梦：${sh.prompt_jimeng}</div>`:''}${sh.prompt_keling?`<div class="shot-prompt keling">🌊 可灵：${sh.prompt_keling}</div>`:''}</div>${(sh.dialogues||[]).length?`<div style="margin-top:4px;font-size:10px;color:rgba(240,235,224,0.45)">${sh.dialogues.map(dl=>`${dl.name}(${dl.emotion||''})："${dl.text}"`).join(' · ')}</div>`:''}</div><button class="shot-copy-btn" onclick="cpS(this,${ep.ep},${si+1})">📋</button></div>`).join('')}</div>`;
     contents.appendChild(w);
   });
-
-  document.getElementById('charCards').innerHTML=(d.characters||[]).map(c=>`<div class="char-card"><div class="char-card-name">${c.name}（${c.role||''}）</div><div><div class="char-label">视觉锚点</div><div class="char-text">${c.visualAnchor||'—'}</div></div><div><div class="char-label">行为锚点</div><div class="char-text">${c.behaviorAnchor||'—'}</div></div><div><div class="char-label">不可变项</div><div class="char-text" style="color:var(--red)">${c.forbidden||'发型/脸型/服饰色系'}</div></div></div>`).join('');
-
-  const cs=d.clipStructure||{};document.getElementById('clipStructure').innerHTML=`<div class="clip-structure">${(cs.timeline||[]).map(t=>`<div class="clip-row"><span class="clip-time">${t.time||''}</span><span class="clip-desc"><strong>${t.label||''}</strong>：${t.desc||''}</span></div>`).join('')}<div class="clip-bgm">🎵 BGM：${cs.overallBgm||'自动匹配'}</div></div>`;
-
+  document.getElementById('charCards').innerHTML=(d.characters||[]).map(c=>`<div class="char-card"><div class="char-card-name">${c.name}（${c.role||''}）</div><div><div class="char-label">视觉锚点</div><div class="char-text">${c.visualAnchor||'—'}</div></div><div><div class="char-label">行为锚点</div><div class="char-text">${c.behaviorAnchor||'—'}</div></div><div><div class="char-label">不可变</div><div class="char-text" style="color:var(--red)">${c.forbidden||'发型/脸型/服饰色系'}</div></div></div>`).join('');
+  const cs=d.clipStructure||{};document.getElementById('clipStructure').innerHTML=`<div class="clip-structure">${(cs.timeline||[]).map(t=>`<div class="clip-row"><span class="clip-time">${t.time||''}</span><span class="clip-desc"><strong>${t.label||''}</strong>：${t.desc||''}</span></div>`).join('')}<div class="clip-bgm">🎵 BGM：${cs.overallBgm||'自动'}</div></div>`;
   const pb=d.publish||{};document.getElementById('publishBlock').innerHTML=`<div class="publish-block">${(pb.titles||[]).length?`<div class="pub-row"><strong>📝 标题</strong>${pb.titles.map((t,i)=>`<span>${i+1}) ${t}</span><br>`).join('')}</div>`:''}<div class="pub-row"><strong>🏷 标签</strong><span>${(pb.tags||[]).join(' · ')}</span></div><div class="pub-row"><strong>📱 文案</strong><span>${pb.copy||'—'}</span></div>${pb.platform?`<div style="padding:6px 10px;background:rgba(96,144,184,0.06);border-radius:6px;font-size:10px;color:var(--blue);margin-top:6px">📌 ${pb.platform}</div>`:''}</div>`;
-
   loadExistingData(d.title);
-  const canRetry=lg&&(Date.now()-lg.time<RW);
-  document.getElementById('retryBtn').style.display=canRetry?'inline-flex':'none';
-  document.getElementById('retryHint').style.display=canRetry?'block':'none';
-  document.getElementById('resultWrap').classList.add('active');
-  document.getElementById('genBtnMain').disabled=false;document.getElementById('inputCard').style.display='block';
-  document.getElementById('resultWrap').scrollIntoView({behavior:'smooth'});
+  document.getElementById('productionContent').classList.add('active');
 }
 
 function swEp(i){document.querySelectorAll('#epTabs .ep-tab').forEach((t,idx)=>t.classList.toggle('active',idx===i));document.querySelectorAll('#epContents .ep-content').forEach((c,idx)=>c.classList.toggle('active',idx===i))}
-function resetForm(){document.getElementById('resultWrap').classList.remove('active');document.getElementById('genBtnMain').disabled=false;window.scrollTo({top:0,behavior:'smooth'})}
-function cpS(btn,ep,shot){const c=btn.closest('.shot-card');let t=`第${ep}集·镜头${shot}\n${c.querySelector('.shot-desc')?.textContent||''}\n`;c.querySelectorAll('.shot-prompt').forEach(p=>{t+=p.textContent+'\n'});navigator.clipboard.writeText(t).then(()=>{btn.textContent='✓';setTimeout(()=>btn.textContent='📋',1200);st('已复制')})}
-function copyAllResult(){if(!cr)return;const d=cr;let t=`【${d.title}】传播潜力：${(d.score||{}).total||'—'}/100（参考分析）\n${(d.score||{}).verdict||''}\n${d.synopsis||''}\n\n`;(d.episodes||[]).forEach(ep=>{t+=`\n第${ep.ep}集《${ep.title}》\n`;(ep.shots||[]).forEach((sh,si)=>{t+=`\n镜头${si+1}(${sh.time||''})：${sh.emotion||''}\n${sh.desc||''}\n即梦：${sh.prompt_jimeng||''}\n可灵：${sh.prompt_keling||''}\n`})});const pb=d.publish||{};t+=`\n--- 发布辅助 ---\n标题：${(pb.titles||[]).join(' / ')}\n标签：${(pb.tags||[]).join(' ')}\n文案：${pb.copy||''}\n`;t+='\n—— 剧引 · 内容结构分析 · 不构成爆款保证 ——';navigator.clipboard.writeText(t).then(()=>{const b=document.getElementById('copyBtn');b.textContent='✓';b.classList.add('copied');setTimeout(()=>{b.textContent='📋 全部复制';b.classList.remove('copied')},1500);st('已复制')})}
-async function retryGenerate(){if(!lg||Date.now()-lg.time>RW){st('已过期');return}const p=lg,k=gK();if(!k){sE('请设Key');return}const b=document.getElementById('retryBtn');b.disabled=true;b.textContent='⏳';document.getElementById('resultWrap').classList.remove('active');sL(true);let tid;try{const ctrl=new AbortController();tid=setTimeout(()=>ctrl.abort(),90000);const r=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+k},body:JSON.stringify({model:'deepseek-v4-pro',messages:[{role:'system',content:p.sys},{role:'user',content:p.usr}],max_tokens:16384,temperature:0.85+Math.random()*0.1,response_format:{type:'json_object'}}),signal:ctrl.signal});clearTimeout(tid);if(!r.ok)throw new Error('失败');const d=await r.json();let ct=d.choices?.[0]?.message?.content;if(!ct)throw new Error('空');let pd;try{pd=JSON.parse(ct.replace(/```json|```/g,'').trim())}catch{const m=ct.match(/\{[\s\S]*\}/);if(m)pd=JSON.parse(m[0].replace(/,\s*}/g,'}').replace(/,\s*\]/g,']'));else throw new Error('格式')}lg.time=Date.now();sL(false);cr=pd;render(pd,p.genre,p.epCount);te('retry_ok',{})}catch(e){clearTimeout(tid);sL(false);b.disabled=false;sE('重试失败')}}
+function resetForm(){document.getElementById('resultWrap').classList.remove('active');document.getElementById('productionContent').classList.remove('active');document.getElementById('paywall').classList.remove('active');document.getElementById('genBtnMain').disabled=false;unlocked=false;window.scrollTo({top:0,behavior:'smooth'})}
+function cpS(btn,ep,shot){const c=btn.closest('.shot-card');let t=`第${ep}集·镜头${shot}\n${c.querySelector('.shot-desc')?.textContent||''}\n`;c.querySelectorAll('.shot-prompt').forEach(p=>{t+=p.textContent+'\n'});navigator.clipboard.writeText(t).then(()=>{btn.textContent='✓';setTimeout(()=>btn.textContent='📋',1200);st('复制镜头')})}
+function copyAllResult(){if(!cr)return;const d=cr;let t=`【${d.title}】传播潜力：${(d.score||{}).total||'—'}/100（参考）\n${(d.score||{}).verdict||''}\n${d.synopsis||''}\n\n`;(d.episodes||[]).forEach(ep=>{t+=`\n第${ep.ep}集《${ep.title}》\n`;(ep.shots||[]).forEach((sh,si)=>{t+=`\n镜头${si+1}(${sh.time||''})：${sh.emotion||''}\n${sh.desc||''}\n即梦：${sh.prompt_jimeng||''}\n可灵：${sh.prompt_keling||''}\n`})});const pb=d.publish||{};t+=`\n--- 发布 ---\n标题：${(pb.titles||[]).join(' / ')}\n标签：${(pb.tags||[]).join(' ')}\n文案：${pb.copy||''}\n`;t+='\n—— 剧引 · 不构成爆款保证 ——';navigator.clipboard.writeText(t).then(()=>{const b=document.getElementById('copyBtn');b.textContent='✓';b.classList.add('copied');setTimeout(()=>{b.textContent='📋 复制结果';b.classList.remove('copied')},1500);st('已复制')})}
+async function retryGenerate(){if(!lg||Date.now()-lg.time>RW){st('已过期');return}const p=lg,k=gK();if(!k){sE('请设Key');return}const b=document.getElementById('retryBtn');b.disabled=true;b.textContent='⏳';unlocked=false;document.getElementById('productionContent').classList.remove('active');document.getElementById('paywall').classList.remove('active');sL(true);let tid;try{const ctrl=new AbortController();tid=setTimeout(()=>ctrl.abort(),90000);const r=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+k},body:JSON.stringify({model:'deepseek-v4-pro',messages:[{role:'system',content:p.sys},{role:'user',content:p.usr}],max_tokens:16384,temperature:0.85+Math.random()*0.1,response_format:{type:'json_object'}}),signal:ctrl.signal});clearTimeout(tid);if(!r.ok)throw new Error('失败');const d=await r.json();let ct=d.choices?.[0]?.message?.content;if(!ct)throw new Error('空');let pd;try{pd=JSON.parse(ct.replace(/```json|```/g,'').trim())}catch{const m=ct.match(/\{[\s\S]*\}/);if(m)pd=JSON.parse(m[0].replace(/,\s*}/g,'}').replace(/,\s*\]/g,']'));else throw new Error('格式')}lg.time=Date.now();sL(false);cr=pd;saveStructureHistory(pd);renderAnalysis(pd);te('retry_ok',{})}catch(e){clearTimeout(tid);sL(false);b.disabled=false;sE('重试失败')}}
 
+// ===== 数据反馈 =====
 function gD(){try{return JSON.parse(localStorage.getItem(DK)||'{}')}catch(e){return{}}}
 function sD(d){localStorage.setItem(DK,JSON.stringify(d))}
 function loadExistingData(title){document.getElementById('fbPlays').value='';document.getElementById('fbCompletion').value='';document.getElementById('evolutionHint').style.display='none';const db=gD();const key=btoa(encodeURIComponent(title||''));if(db[key]){document.getElementById('fbPlays').value=db[key].plays||'';document.getElementById('fbCompletion').value=db[key].completion||'';showEvo(db[key])}}
 function saveFeedback(){if(!cr)return;const p=parseInt(document.getElementById('fbPlays').value)||0,c=parseFloat(document.getElementById('fbCompletion').value)||0;if(!p){st('至少填播放量');return}const db=gD();const key=btoa(encodeURIComponent(cr.title||''));db[key]={title:cr.title,plays:p,completion:c,predictedScore:(cr.score||{}).total||0,savedAt:new Date().toISOString()};sD(db);st('数据已记录 · 感谢反馈');showEvo(db[key]);te('data_feedback',{title:cr.title,plays:p})}
-function showEvo(entry){const el=document.getElementById('evolutionHint');if(!el)return;let hint=`结构分析 ${entry.predictedScore||'—'} 分 → 实际播放 ${entry.plays}`;if(entry.plays<1000)hint+=`<br>📌 实际表现偏低，建议优化前3秒钩子设计。`;else if(entry.plays<10000)hint+=`<br>📌 表现中规中矩，可检查中段冲突密度。`;else hint+=`<br>📌 实际表现良好 🎉 此结构可复用。`;el.innerHTML=`<strong style="color:var(--blue);font-size:10px">📈 对比分析</strong><br>${hint}`;el.style.display='block';}
+function showEvo(entry){const el=document.getElementById('evolutionHint');if(!el)return;let hint=`分析 ${entry.predictedScore||'—'} 分 → 实际 ${entry.plays} 播放`;if(entry.plays<1000)hint+=`<br>📌 偏低，建议强化前3秒钩子。`;else if(entry.plays<10000)hint+=`<br>📌 中等，检查中段冲突密度。`;else hint+=`<br>📌 表现良好 🎉 此结构可复用。`;el.innerHTML=`<strong style="color:var(--blue);font-size:10px">📈 对比</strong><br>${hint}`;el.style.display='block';}
 
-// ========== 结构记录 & 跨代对比 ==========
+// ===== 结构记录 & 跨代对比 =====
 function gSH(){try{return JSON.parse(localStorage.getItem(HK2)||'[]')}catch(e){return[]}}
-function saveStructureHistory(d){
-  const h=gSH();h.unshift({title:d.title,score:d.score?.total||0,template:d.matchedTemplate||'',genre:'',createdAt:new Date().toLocaleString('zh-CN')});
-  if(h.length>10)h.length=10;localStorage.setItem(HK2,JSON.stringify(h));
-}
-function showStructureHistory(currentScore,currentTemplate){
-  const h=gSH();const el=document.getElementById('structureHistory');if(!el||h.length<2){el.style.display='none';return}
-  // 取最近2次的记录（排除当前这次），当前这次在索引0，所以取1和2
-  const prev=h.slice(1,3).filter(x=>x.title);if(!prev.length){el.style.display='none';return}
-  let tips='';
-  prev.forEach((p,i)=>{
-    const diff=(currentScore||0)-(p.score||0);
-    if(diff>5)tips+=`当前结构比「${p.title}」(${p.template})传播潜力高 ${diff} 分 → 建议按当前结构推进<br>`;
-    else if(diff<-10)tips+=`「${p.title}」(${p.template})曾获 ${p.score} 分，高于当前。建议参考其结构特征<br>`;
-    else if(Math.abs(diff)<=5)tips+=`当前与前作「${p.title}」(${p.template})结构强度接近。对比实际播放数据做最终判断<br>`;
-  });
-  if(tips)el.innerHTML=`<strong style="color:var(--blue);font-size:10px;display:block;margin-bottom:6px">🧠 跨代对比</strong><div style="font-size:10px;color:var(--gray);line-height:1.8">${tips}</div>`;else el.style.display='none';
-  el.style.display=tips?'block':'none';
-}
+function saveStructureHistory(d){const h=gSH();h.unshift({title:d.title,score:d.score?.total||0,template:d.matchedTemplate||'',createdAt:new Date().toLocaleString('zh-CN')});if(h.length>10)h.length=10;localStorage.setItem(HK2,JSON.stringify(h))}
+function showStructureHistory(cs,ct){const h=gSH(),el=document.getElementById('structureHistory');if(!el||h.length<2){el.style.display='none';return}const prev=h.slice(1,3).filter(x=>x.title);if(!prev.length){el.style.display='none';return}let tips='';prev.forEach(p=>{const diff=(cs||0)-(p.score||0);if(diff>5)tips+=`比「${p.title}」(${p.template})高 ${diff} 分 → 当前结构更优<br>`;else if(diff<-10)tips+=`「${p.title}」(${p.template})曾获 ${p.score} 分，高于当前 → 建议参考其结构<br>`;else if(Math.abs(diff)<=5)tips+=`与「${p.title}」(${p.template})接近 → 对比实际数据判断<br>`;});if(tips){el.innerHTML=`<strong style="color:var(--blue);font-size:10px;display:block;margin-bottom:6px">🧠 跨次对比</strong><div style="font-size:10px;color:var(--gray);line-height:1.8">${tips}</div>`;el.style.display='block'}else el.style.display='none';}
 
 function te(ev,data){try{const r=JSON.parse(localStorage.getItem(AK)||'[]');r.push({event:ev,data:data||{},time:new Date().toISOString()});if(r.length>500)r.splice(0,r.length-500);localStorage.setItem(AK,JSON.stringify(r))}catch(e){}}
 </script>
