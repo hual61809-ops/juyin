@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>剧引 · AI短剧发布引擎</title>
-<meta name="description" content="输入故事，3步生成可直接发布的AI短剧。镜头级拆解+即梦/可灵提示词+剪映结构+发布文案。">
+<title>剧引 · AI短剧爆款决策引擎</title>
+<meta name="description" content="输入故事，AI判断值不值得做。自动匹配爆款结构，输出可发布的视频素材包。">
 <style>
 @font-face{font-family:'NS';font-style:normal;font-weight:300;font-display:swap;src:local('Noto Sans SC'),local('Microsoft YaHei')}
 @font-face{font-family:'NS';font-style:normal;font-weight:400;font-display:swap;src:local('Noto Sans SC'),local('Microsoft YaHei')}
@@ -12,13 +12,12 @@
 @font-face{font-family:'NF';font-style:normal;font-weight:400;font-display:swap;src:local('Noto Serif SC'),local('SimSun')}
 @font-face{font-family:'NF';font-style:normal;font-weight:700;font-display:swap;src:local('Noto Serif SC'),local('STHeiti')}
 @font-face{font-family:'NF';font-style:normal;font-weight:900;font-display:swap;src:local('Noto Serif SC'),local('STHeiti')}
-:root{--ink:#0d0a06;--gold:#d4a44a;--gl:#e8c878;--paper:#f0ebe0;--red:#a8323c;--gray:#8a8276;--bg2:rgba(255,255,255,0.03);--bd:rgba(212,164,74,0.2);--bd2:rgba(212,164,74,0.12)}
+:root{--ink:#0d0a06;--gold:#d4a44a;--gl:#e8c878;--paper:#f0ebe0;--red:#a8323c;--green:#5cb878;--gray:#8a8276;--bg2:rgba(255,255,255,0.03);--bd:rgba(212,164,74,0.2);--bd2:rgba(212,164,74,0.12)}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--ink);color:var(--paper);font-family:'NS',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 50% -5%,rgba(212,164,74,0.08),transparent 60%);pointer-events:none;z-index:0}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 50% -5%,rgba(212,164,74,0.07),transparent 60%);pointer-events:none;z-index:0}
 #app{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:0 20px}
 
-/* Header */
 header{display:flex;align-items:center;justify-content:space-between;padding:20px 0;border-bottom:1px solid var(--bd2)}
 .logo{display:flex;align-items:baseline;gap:8px}
 .logo-zh{font-family:'NF',serif;font-size:24px;font-weight:900;color:var(--gold);letter-spacing:3px}
@@ -27,32 +26,24 @@ header{display:flex;align-items:center;justify-content:space-between;padding:20p
 .settings-btn:hover,.settings-btn.has-key{border-color:var(--gold);color:var(--gold)}
 .settings-btn.has-key{background:rgba(212,164,74,0.1)}
 
-/* Hero */
-.hero{text-align:center;padding:40px 10px 24px}
+.hero{text-align:center;padding:42px 10px 26px}
 .hero-tag{display:inline-block;border:1px solid rgba(212,164,74,0.35);padding:5px 18px;border-radius:100px;font-size:10px;letter-spacing:3px;color:var(--gold);margin-bottom:18px}
-.hero h1{font-family:'NF',serif;font-size:clamp(24px,5vw,40px);font-weight:900;line-height:1.3}
+.hero h1{font-family:'NF',serif;font-size:clamp(22px,5vw,38px);font-weight:900;line-height:1.3}
 .hero h1 .a{color:var(--gold)}
+.hero .sub{display:inline-block;margin-top:4px;padding:3px 10px;border-radius:4px;background:rgba(92,184,120,0.1);font-size:11px;color:var(--green);letter-spacing:1px}
 .hero p{margin-top:8px;font-size:13px;color:var(--gray);line-height:1.7}
 
-/* Input Card */
 .input-card{background:var(--bg2);border:1px solid var(--bd);border-radius:14px;padding:24px 26px;margin-bottom:12px}
 .input-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
 .input-group{display:flex;flex-direction:column;gap:5px}
 .input-group.full{grid-column:1/-1}
 .input-group label{font-size:10px;letter-spacing:2px;color:var(--gold);text-transform:uppercase}
-.input-group input,.input-group textarea,.input-group select{background:rgba(255,255,255,0.04);border:1px solid var(--bd);border-radius:8px;padding:10px 14px;color:var(--paper);font-family:'NS',sans-serif;font-size:13px;outline:none;transition:border-color .2s;width:100%;resize:none}
-.input-group textarea{min-height:64px;line-height:1.6}
-.input-group select:focus,.input-group input:focus,.input-group textarea:focus{border-color:var(--gold)}
+.input-group textarea,.input-group select{background:rgba(255,255,255,0.04);border:1px solid var(--bd);border-radius:8px;padding:10px 14px;color:var(--paper);font-family:'NS',sans-serif;font-size:13px;outline:none;transition:border-color .2s;width:100%;resize:none}
+.input-group textarea{min-height:72px;line-height:1.6}
+.input-group select:focus,.input-group textarea:focus{border-color:var(--gold)}
 .input-group select option{background:#15100a}
 .input-group textarea::placeholder{color:#5a5348}
 
-/* Viral templates */
-.template-tags{display:flex;flex-wrap:wrap;gap:6px}
-.tmpl-tag{padding:6px 14px;border-radius:100px;border:1px solid var(--bd);font-size:11px;color:var(--gray);cursor:pointer;transition:all .2s;white-space:nowrap}
-.tmpl-tag:hover{border-color:var(--gold);color:var(--gold)}
-.tmpl-tag.active{background:rgba(212,164,74,0.12);border-color:var(--gold);color:var(--gold)}
-
-/* Generate button */
 .gen-btn{width:100%;margin-top:8px;padding:16px;background:linear-gradient(135deg,var(--gold),var(--gl));border:none;border-radius:10px;color:var(--ink);font-family:'NF',serif;font-size:16px;font-weight:700;letter-spacing:4px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
 .gen-btn:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(212,164,74,0.3)}
 .gen-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
@@ -62,7 +53,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:20p
 .error-box{display:none;background:rgba(168,50,60,0.08);border:1px solid rgba(168,50,60,0.25);border-radius:8px;padding:10px 14px;font-size:12px;color:#e07b8a;margin-top:10px;line-height:1.5}
 .error-box.active{display:block}
 
-/* Loading */
 .loading{display:none;text-align:center;padding:60px 20px}
 .loading.active{display:block}
 .spinner{width:44px;height:44px;border:2px solid rgba(212,164,74,0.15);border-top-color:var(--gold);border-radius:50%;margin:0 auto 16px;animation:spin .8s linear infinite}
@@ -70,42 +60,67 @@ header{display:flex;align-items:center;justify-content:space-between;padding:20p
 .loading-text{font-family:'NF',serif;color:var(--gold);font-size:14px;letter-spacing:2px}
 .loading-sub{margin-top:4px;font-size:11px;color:var(--gray)}
 
-/* Result */
 .result{display:none;margin-bottom:40px}
 .result.active{display:block}
-.result-top{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.result-top{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
 .btn-sm{padding:6px 14px;border:1px solid var(--bd);border-radius:6px;background:transparent;color:var(--gold);font-size:11px;letter-spacing:1px;cursor:pointer;transition:all .2s}
 .btn-sm:hover{background:rgba(212,164,74,0.08)}
 .btn-sm.copied{background:rgba(80,180,120,0.12);border-color:#50b478;color:#50b478}
-.result-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid var(--bd2);flex-wrap:wrap;gap:8px}
-.result-title{font-family:'NF',serif;font-size:24px;font-weight:900}
-.result-meta{display:flex;gap:6px;flex-wrap:wrap}
+
+/* Score card */
+.score-card{margin-bottom:18px;padding:22px 24px;background:linear-gradient(135deg,rgba(212,164,74,0.06),rgba(212,164,74,0.02));border:1px solid var(--bd);border-radius:14px}
+.score-main{display:flex;align-items:center;gap:18px;margin-bottom:14px}
+.score-circle{width:74px;height:74px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'NF',serif;font-weight:900;position:relative}
+.score-circle.high{background:linear-gradient(135deg,rgba(92,184,120,0.2),rgba(80,180,120,0.1));border:3px solid rgba(92,184,120,0.5)}
+.score-circle.mid{background:linear-gradient(135deg,rgba(212,164,74,0.2),rgba(212,164,74,0.1));border:3px solid rgba(212,164,74,0.5)}
+.score-circle.low{background:linear-gradient(135deg,rgba(168,50,60,0.15),rgba(168,50,60,0.08));border:3px solid rgba(168,50,60,0.4)}
+.score-num{font-size:30px;color:var(--paper)}
+.score-label{font-size:9px;letter-spacing:1px;color:var(--gray)}
+.score-verdict{flex:1}
+.score-verdict-title{font-size:15px;font-weight:700;margin-bottom:4px}
+.score-verdict-title.high{color:var(--green)}
+.score-verdict-title.mid{color:var(--gold)}
+.score-verdict-title.low{color:var(--red)}
+.score-verdict-desc{font-size:11px;color:var(--gray);line-height:1.6}
+.score-metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.metric-item{text-align:center}
+.metric-bar{height:4px;border-radius:2px;background:rgba(255,255,255,0.06);margin-bottom:4px;overflow:hidden}
+.metric-fill{height:100%;border-radius:2px;transition:width .6s}
+.metric-fill.high{background:var(--green)}
+.metric-fill.mid{background:var(--gold)}
+.metric-fill.low{background:var(--red)}
+.metric-name{font-size:8px;letter-spacing:1px;color:var(--gray)}
+.metric-val{font-size:10px;font-weight:500}
+
+/* Template match */
+.template-match{margin-top:10px;padding:10px 14px;background:rgba(212,164,74,0.05);border-radius:8px;font-size:11px;color:var(--gray);line-height:1.6;display:none}
+.template-match strong{color:var(--gold)}
+
+.header-row{display:flex;align-items:flex-end;justify-content:space-between;margin:22px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--bd2)}
+.result-title{font-family:'NF',serif;font-size:22px;font-weight:900}
+.result-meta{display:flex;gap:6px}
 .badge{padding:3px 10px;border-radius:100px;font-size:9px;letter-spacing:1px}
 .badge-gold{background:rgba(212,164,74,0.1);border:1px solid var(--bd);color:var(--gold)}
-.badge-green{background:rgba(80,150,120,0.1);border:1px solid rgba(80,150,120,0.3);color:#70cca0}
-.synopsis{background:rgba(212,164,74,0.04);border:1px solid var(--bd2);border-left:3px solid var(--gold);border-radius:4px 10px 10px 4px;padding:14px 18px;margin-bottom:16px;font-size:12px;line-height:1.8;color:rgba(240,235,224,0.75)}
+.badge-green{background:rgba(92,184,120,0.1);border:1px solid rgba(92,184,120,0.3);color:var(--green)}
+.synopsis{background:rgba(212,164,74,0.04);border:1px solid var(--bd2);border-left:3px solid var(--gold);border-radius:4px 10px 10px 4px;padding:14px 18px;margin-bottom:16px;font-size:12px;line-height:1.8;color:rgba(240,235,224,0.7)}
 
-/* Output modules */
 .module-title{font-family:'NF',serif;font-size:12px;letter-spacing:2px;color:var(--gold);margin:22px 0 10px;display:flex;align-items:center;gap:8px}
 .module-title::after{content:'';flex:1;height:1px;background:var(--bd2)}
 
-/* A: Shot cards */
 .shot-list{display:flex;flex-direction:column;gap:8px}
-.shot-card{background:var(--bg2);border:1px solid rgba(255,255,255,0.05);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:1fr auto;gap:8px 14px;align-items:start}
+.shot-card{background:var(--bg2);border:1px solid rgba(255,255,255,0.05);border-radius:10px;padding:14px 16px;display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:start}
 .shot-meta{display:flex;align-items:center;gap:8px;margin-bottom:4px}
-.shot-num{font-family:'NF',serif;font-size:18px;font-weight:900;color:rgba(212,164,74,0.2)}
+.shot-num{font-family:'NF',serif;font-size:16px;font-weight:900;color:rgba(212,164,74,0.18)}
 .shot-time{font-size:10px;color:var(--gray);background:rgba(255,255,255,0.03);padding:2px 8px;border-radius:4px}
-.shot-emotion{font-size:10px;color:rgba(200,160,140,0.55)}
-.shot-desc{font-size:12px;color:rgba(240,235,224,0.7);line-height:1.6;margin-bottom:6px}
-.shot-prompts{display:flex;flex-direction:column;gap:4px;margin-top:4px}
+.shot-emotion{font-size:10px;color:rgba(200,160,140,0.5)}
+.shot-desc{font-size:12px;color:rgba(240,235,224,0.65);line-height:1.6;margin-bottom:4px}
+.shot-prompts{display:flex;flex-direction:column;gap:3px;margin-top:4px}
 .shot-prompt{font-size:10px;line-height:1.5;padding:5px 8px;border-radius:4px}
-.shot-prompt.jimeng{background:rgba(180,200,150,0.06);border-left:2px solid rgba(180,200,150,0.5);color:rgba(200,215,180,0.65)}
-.shot-prompt.keling{background:rgba(150,180,200,0.06);border-left:2px solid rgba(150,180,200,0.5);color:rgba(180,200,220,0.65)}
-.shot-copy{grid-column:2;grid-row:1/span 3;align-self:center}
-.shot-copy-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--bd);background:transparent;color:var(--gray);font-size:12px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.shot-prompt.jimeng{background:rgba(180,200,150,0.06);border-left:2px solid rgba(180,200,150,0.5);color:rgba(200,215,180,0.6)}
+.shot-prompt.keling{background:rgba(150,180,200,0.06);border-left:2px solid rgba(150,180,200,0.5);color:rgba(180,200,220,0.6)}
+.shot-copy-btn{width:26px;height:26px;border-radius:6px;border:1px solid var(--bd);background:transparent;color:var(--gray);font-size:11px;cursor:pointer;transition:all .2s}
 .shot-copy-btn:hover{border-color:var(--gold);color:var(--gold)}
 
-/* Episode tabs */
 .ep-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
 .ep-tab{padding:6px 14px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);font-size:11px;color:var(--gray);cursor:pointer;transition:all .2s}
 .ep-tab:hover{border-color:var(--bd);color:var(--gold)}
@@ -113,51 +128,28 @@ header{display:flex;align-items:center;justify-content:space-between;padding:20p
 .ep-content{display:none}
 .ep-content.active{display:block}
 
-/* B: Character */
-.char-card{background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:14px 16px;margin-bottom:8px;display:grid;grid-template-columns:1fr 1fr;gap:8px 14px}
-.char-card-name{font-family:'NF',serif;font-size:15px;font-weight:700;color:var(--gl);grid-column:1/-1}
+.char-card{background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:14px 16px;margin-bottom:8px;display:grid;grid-template-columns:1fr 1fr;gap:6px 12px}
+.char-card-name{font-family:'NF',serif;font-size:14px;font-weight:700;color:var(--gl);grid-column:1/-1}
 .char-card-label{font-size:9px;letter-spacing:1px;color:var(--gold);opacity:0.7}
-.char-card-text{font-size:11px;color:rgba(240,235,224,0.55);line-height:1.5}
+.char-card-text{font-size:11px;color:rgba(240,235,224,0.5);line-height:1.5}
 
-/* C: Clip structure */
-.clip-structure{background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:16px 18px}
-.clip-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;font-size:11px;line-height:1.6}
-.clip-time{color:var(--gold);font-weight:500;min-width:60px;font-size:10px}
-.clip-desc{color:rgba(240,235,224,0.65)}
+.clip-structure{background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:14px 16px}
+.clip-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:6px;font-size:11px;line-height:1.6}
+.clip-time{color:var(--gold);font-weight:500;min-width:55px;font-size:10px}
+.clip-desc{color:rgba(240,235,224,0.6)}
 .clip-bgm{margin-top:8px;padding-top:8px;border-top:1px solid var(--bd2);font-size:10px;color:var(--gray)}
 
-/* D: Publish */
-.publish-block{background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:16px 18px}
-.publish-row{margin-bottom:8px;font-size:11px;line-height:1.7}
-.publish-row strong{color:var(--gold);display:block;margin-bottom:2px;font-size:10px;letter-spacing:1px}
-.publish-row span{color:rgba(240,235,224,0.65)}
+.publish-block{background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:14px 16px}
+.publish-row{margin-bottom:6px;font-size:11px;line-height:1.7}
+.publish-row strong{display:block;color:var(--gold);font-size:10px;letter-spacing:1px;margin-bottom:2px}
+.publish-row span{color:rgba(240,235,224,0.6)}
+.publish-platform{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.platform-tip{font-size:9px;padding:3px 10px;border-radius:100px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);color:var(--gray)}
 
-/* Watermark */
 .watermark{text-align:center;margin-top:24px;padding-top:12px;border-top:1px solid var(--bd2);font-size:10px;color:rgba(212,164,74,0.3);letter-spacing:1px;line-height:1.8}
 .watermark a{color:rgba(212,164,74,0.4)}
 #retryHint{display:none;color:rgba(212,164,74,0.45)}
 
-/* Character creation modal */
-.char-section-title{font-family:'NF',serif;font-size:12px;letter-spacing:2px;color:var(--gold);margin:20px 0 10px;display:flex;align-items:center;gap:8px}
-.char-section-title::after{content:'';flex:1;height:1px;background:var(--bd2)}
-.char-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;margin-bottom:12px}
-.char-asset{background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:12px 14px;position:relative;cursor:pointer;transition:all .2s}
-.char-asset:hover{border-color:var(--bd)}
-.char-asset.selected{border-color:var(--gold);background:rgba(212,164,74,0.08)}
-.char-asset-name{font-family:'NF',serif;font-size:15px;font-weight:700;color:var(--gl);margin-bottom:2px}
-.char-asset-role{font-size:10px;color:var(--gray);margin-bottom:6px}
-.char-asset-look{font-size:10px;color:rgba(240,235,224,0.45);line-height:1.5}
-.char-asset-select{position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;border:2px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:10px;color:transparent}
-.char-asset.selected .char-asset-select{background:var(--gold);border-color:var(--gold);color:var(--ink)}
-.char-asset-delete{position:absolute;bottom:8px;right:8px;background:none;border:none;color:rgba(168,50,60,0.5);font-size:9px;cursor:pointer;opacity:0;transition:opacity .2s}
-.char-asset:hover .char-asset-delete{opacity:1}
-.char-hint{text-align:center;padding:20px;color:var(--gray);font-size:11px;line-height:2}
-.char-hint span{color:var(--gl);cursor:pointer;text-decoration:underline}
-.locked-chars-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;min-height:24px}
-.locked-char{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:100px;background:rgba(212,164,74,0.1);border:1px solid var(--bd);font-size:11px;color:var(--gold)}
-.locked-char-remove{font-size:10px;cursor:pointer;color:rgba(168,50,60,0.6)}
-
-/* Modal */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;align-items:center;justify-content:center}
 .modal-overlay.active{display:flex}
 .modal{background:#15100a;border:1px solid var(--bd);border-radius:14px;padding:28px;max-width:420px;width:90%}
@@ -175,407 +167,268 @@ header{display:flex;align-items:center;justify-content:space-between;padding:20p
 .modal-btn.secondary{background:transparent;border:1px solid rgba(255,255,255,0.12);color:var(--gray)}
 .modal-btn.secondary:hover{border-color:rgba(255,255,255,0.25)}
 .modal-btn.danger{background:transparent;border:1px solid rgba(168,50,60,0.3);color:rgba(200,100,110,0.7)}
-.modal-btn.danger:hover{background:rgba(168,50,60,0.12)}
 
-/* Footer */
 footer{text-align:center;padding:30px 20px;border-top:1px solid var(--bd2);font-size:10px;color:rgba(138,130,118,0.4);letter-spacing:1px;line-height:2;margin-top:20px}
 footer .brand{font-family:'NF',serif;color:rgba(212,164,74,0.35);font-size:12px}
 
-/* Toast */
 .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#261e10;border:1px solid var(--bd);color:var(--gold);padding:8px 20px;border-radius:50px;font-size:11px;letter-spacing:1px;z-index:200;animation:toastIn .3s,toastOut .3s 1.7s forwards;pointer-events:none}
 @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 @keyframes toastOut{from{opacity:1;transform:translateX(-50%) translateY(0)}to{opacity:0;transform:translateX(-50%) translateY(-6px)}}
 
-@media(max-width:500px){.input-row{grid-template-columns:1fr}.hero h1{font-size:22px}.char-grid{grid-template-columns:1fr}.shot-card{grid-template-columns:1fr}.shot-copy{grid-column:1;justify-self:end;margin-top:4px}}
+@media(max-width:500px){.input-row{grid-template-columns:1fr}.hero h1{font-size:22px}.score-metrics{grid-template-columns:repeat(3,1fr)}.shot-card{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <div id="app">
 <header>
-  <div class="logo"><span class="logo-zh">剧引</span><span class="logo-en">AI Drama Engine</span></div>
+  <div class="logo"><span class="logo-zh">剧引</span><span class="logo-en">AI Hit Engine</span></div>
   <button class="settings-btn" id="settingsBtn" onclick="openSettings()" title="API Key">⚙</button>
 </header>
 
 <section class="hero">
-  <div class="hero-tag">✦ AI 短剧发布引擎</div>
-  <h1>输入故事，<span class="a">3步生成</span>可发布的短剧</h1>
-  <p>镜头级拆解 + 即梦/可灵提示词 + 剪映节奏 + 发布文案<br>不写剧本，不学提示词，直接出片</p>
+  <div class="hero-tag">✦ AI 短剧爆款决策引擎</div>
+  <h1>不是一个剧本生成器。是一台<span class="a">爆款概率计算机</span>。</h1>
+  <p>输入你的想法 → AI判断值不值得做 → 自动匹配最佳结构 → 输出完整视频素材包<br><span class="sub">不是帮你"做短剧"，是帮你"做能火的短剧"</span></p>
 </section>
 
-<!-- 输入卡片 -->
 <div class="input-card" id="inputCard">
   <div class="input-row">
     <div class="input-group full">
-      <label>一句话故事</label>
-      <textarea id="storyInput" placeholder="如：霸总爱上灰姑娘，先婚后爱甜中带虐。或粘贴小说片段、故事梗概……"></textarea>
+      <label>输入你的故事</label>
+      <textarea id="storyInput" placeholder="一句话就够了。如：霸总爱上灰姑娘，先婚后爱甜中带虐。也可以粘贴小说片段……"></textarea>
     </div>
   </div>
   <div class="input-row">
-    <div class="input-group">
-      <label>类型</label>
-      <select id="genre">
-        <option>都市爱情</option><option>古装宫廷</option><option>玄幻仙侠</option>
-        <option>悬疑推理</option><option>都市赘婿</option><option>青春校园</option>
-        <option>商战权谋</option><option>科幻未来</option>
-      </select>
-    </div>
-    <div class="input-group">
-      <label>集数</label>
-      <select id="episodes"><option value="1" selected>1集（测试）</option><option value="3">3集</option><option value="6">6集</option><option value="10">10集</option></select>
-    </div>
+    <div class="input-group"><label>类型</label><select id="genre"><option>都市爱情</option><option>古装宫廷</option><option>玄幻仙侠</option><option>悬疑推理</option><option>都市赘婿</option><option>青春校园</option><option>商战权谋</option><option>科幻未来</option></select></div>
+    <div class="input-group"><label>集数</label><select id="episodes"><option value="1" selected>1集（测试）</option><option value="3">3集</option><option value="6">6集</option><option value="10">10集</option></select></div>
   </div>
-  <div class="input-row">
-    <div class="input-group full">
-      <label>爆款结构模板（可选）</label>
-      <div class="template-tags" id="tmplTags">
-        <span class="tmpl-tag" onclick="pickTemplate('revenge','反转复仇：弱者开局→被压制→身份反转→爆发打脸→cliffhanger')">🔄 反转复仇</span>
-        <span class="tmpl-tag" onclick="pickTemplate('conflict','高情绪冲突：关系建立→情绪压制→爆发争吵→反转认知→断点')">💥 情绪冲突</span>
-        <span class="tmpl-tag" onclick="pickTemplate('sweet','甜宠高密度：偶遇→暧昧→误会→追妻→情绪升温')">💕 甜宠</span>
-        <span class="tmpl-tag" onclick="pickTemplate('suspense','悬疑反转：事件→线索→错误推理→真相→cliffhanger')">🔍 悬疑</span>
-        <span class="tmpl-tag" onclick="pickTemplate('comeback','逆袭爽文：废材→被辱→奇遇→修炼→碾压天才')">⚡ 逆袭爽文</span>
-        <span class="tmpl-tag" onclick="pickTemplate('contract','契约婚姻：被迫结婚→斗智斗勇→日久生情→身份揭晓')">💍 契约婚姻</span>
-        <span class="tmpl-tag" onclick="pickTemplate('betrayal','替身虐恋：被当成替身→得知真相→离开→对方追悔')">💔 替身虐恋</span>
-        <span class="tmpl-tag" onclick="pickTemplate('timeloop','穿越重生：意外穿越→熟悉规则→逆天改命→两界抉择')">🌀 穿越重生</span>
-        <span class="tmpl-tag active" onclick="pickTemplate(null,null)" id="tmplNone">✕ 不限</span>
-      </div>
-    </div>
-  </div>
-  <div class="input-group full" style="margin-bottom:14px">
-    <label>角色资产（可选 · 从角色库选择）</label>
-    <div class="locked-chars-wrap" id="lockedChars"></div>
-    <div style="font-size:10px;color:var(--gray);cursor:pointer;text-decoration:underline" onclick="toggleCharPanel()" id="charToggle">展开角色库 ▼</div>
-  </div>
-
-  <!-- 角色库面板 -->
-  <div id="charPanel" style="display:none">
-    <div class="char-section-title">🎨 创建角色</div>
-    <div class="input-row" style="margin-bottom:8px">
-      <div class="input-group"><label>角色名</label><input id="charName" placeholder="如：顾北辰"></div>
-      <div class="input-group"><label>定位</label><input id="charRole" placeholder="如：霸道总裁"></div>
-    </div>
-    <div class="input-group full" style="margin-bottom:8px">
-      <label>外貌特征（视觉锚点）</label>
-      <textarea id="charLook" style="min-height:40px" placeholder="发型、穿着、脸型、体型。如：短发后梳丹凤眼，深蓝西装，左腕银色腕表，身高185偏瘦"></textarea>
-    </div>
-    <div class="input-group full" style="margin-bottom:8px">
-      <label>性格习惯（行为锚点）</label>
-      <textarea id="charBehavior" style="min-height:36px" placeholder="说话风格、习惯动作。如：话少冷淡，每句≤15字，单手插兜，从不笑"></textarea>
-    </div>
-    <button class="gen-btn" onclick="createCharacter()" style="margin-top:4px;padding:10px;font-size:13px;letter-spacing:2px">+ 创建角色</button>
-    <div class="char-section-title">📦 角色库（点击选择，最多5个）</div>
-    <div class="char-grid" id="charGrid"></div>
-    <div class="char-hint" id="charEmptyHint">还没有角色。<span onclick="document.getElementById('charName').focus()">创建第一个</span></div>
-  </div>
-
-  <button class="gen-btn" id="genBtnMain" onclick="generate()">
-    <span class="shimmer"></span>🚀 生成可发布短剧
-  </button>
+  <button class="gen-btn" id="genBtnMain" onclick="generate()"><span class="shimmer"></span>🚀 生成并评估爆款指数</button>
   <div class="quota-hint" id="quotaHint">今日剩余：5次</div>
   <div class="error-box" id="errorBox"></div>
 </div>
 
-<!-- Loading -->
 <div class="loading" id="loadingState">
   <div class="spinner"></div>
-  <div class="loading-text">AI 正在创作中</div>
-  <div class="loading-sub" id="loadingStep">拆解剧本结构…</div>
+  <div class="loading-text">AI 正在分析你的故事</div>
+  <div class="loading-sub" id="loadingStep">计算情绪强度…</div>
 </div>
 
-<!-- Result -->
 <div class="result" id="resultWrap">
   <div class="result-top">
     <button class="btn-sm" onclick="copyAllResult()" id="copyBtn">📋 全部复制</button>
     <button class="btn-sm" onclick="retryGenerate()" id="retryBtn" style="display:none">🔄 不满意？免费重试</button>
     <button class="btn-sm" onclick="resetForm()">↺ 重新创作</button>
   </div>
-  <div class="result-header">
+
+  <!-- 爆款评分 -->
+  <div id="scoreSection"></div>
+
+  <!-- 简介 -->
+  <div class="header-row">
     <div class="result-title" id="dramaTitle">剧名</div>
-    <div class="result-meta">
-      <span class="badge badge-gold" id="genreBadge">类型</span>
-      <span class="badge badge-gold" id="epBadge">集数</span>
-      <span class="badge badge-green" id="consistencyBadge">🔒 角色一致</span>
-    </div>
+    <div class="result-meta"><span class="badge badge-gold" id="genreBadge">类型</span><span class="badge badge-gold" id="epBadge">集数</span><span class="badge badge-green" id="consistencyBadge">🔒 一致性</span></div>
   </div>
   <div class="synopsis" id="synopsisText"></div>
 
-  <!-- A: 镜头级脚本 -->
-  <div id="shotOutput">
-    <div class="module-title">🎬 镜头级脚本</div>
-    <div class="ep-tabs" id="epTabs"></div>
-    <div id="epContents"></div>
-  </div>
+  <!-- A. 镜头脚本 -->
+  <div class="module-title">🎬 镜头级脚本</div>
+  <div class="ep-tabs" id="epTabs"></div>
+  <div id="epContents"></div>
 
-  <!-- B: 角色卡 -->
-  <div class="module-title">👤 角色卡</div>
+  <!-- B. 角色卡 -->
+  <div class="module-title">👤 角色卡（AI自动生成）</div>
   <div id="charCards"></div>
 
-  <!-- C: 剪映结构 -->
+  <!-- C. 剪映结构 -->
   <div class="module-title">✂️ 剪映节奏结构</div>
   <div id="clipStructure"></div>
 
-  <!-- D: 发布模板 -->
+  <!-- D. 发布模板 -->
   <div class="module-title">📱 发布模板</div>
   <div id="publishBlock"></div>
 
-  <div class="watermark" id="watermarkArea">
+  <div class="watermark">
     由剧引AI生成 · 仅供娱乐参考<br>
     <span id="retryHint">不满意？2分钟内可免费重试</span><br>
-    打开 <a href="https://jimeng.jianying.com" target="_blank">即梦</a> 或 <a href="https://kling.kuaishou.com" target="_blank">可灵</a> 粘贴提示词 → 生成视频 → <a href="https://www.capcut.cn" target="_blank">剪映</a> 合成 → 发布
+    打开 <a href="https://jimeng.jianying.com" target="_blank">即梦</a> / <a href="https://kling.kuaishou.com" target="_blank">可灵</a> 粘贴生成 → <a href="https://www.capcut.cn" target="_blank">剪映</a> 合成 → 发布
   </div>
 </div>
 
-<footer><span class="brand">剧引</span> · AI短剧发布引擎 · 从想法到可发布视频，3步完成<br>本平台生成内容由AI自动产生，仅供娱乐参考</footer>
+<footer><span class="brand">剧引</span> · AI短剧爆款决策引擎 · 不是帮你生成，是帮你降低失败概率<br>本平台生成内容由AI自动产生，仅供娱乐参考</footer>
 </div>
 
-<!-- 设置弹窗 -->
 <div class="modal-overlay" id="settingsModal">
   <div class="modal">
     <h3>⚙ 设置 API Key</h3>
-    <p>用 DeepSeek 引擎，生成一次只要 <strong style="color:var(--gl)">1-5分钱</strong>。Key 只存你浏览器里。</p>
-    <div class="modal-steps">
-      <span>①</span> 打开 <a href="https://platform.deepseek.com/api_keys" target="_blank" style="color:var(--gl)">platform.deepseek.com</a>，注册<br>
-      <span>②</span> 点「创建 API Key」→ 复制<br>
-      <span>③</span> 贴到下面
-    </div>
-    <div class="modal-tip">💡 充10块钱能用上千次。每月不到一杯奶茶钱。</div>
+    <p>用 DeepSeek 引擎，生成一次 <strong style="color:var(--gl)">1-5分钱</strong>。Key只存浏览器。</p>
+    <div class="modal-steps"><span>①</span> 打开 <a href="https://platform.deepseek.com/api_keys" target="_blank" style="color:var(--gl)">platform.deepseek.com</a> 注册<br><span>②</span> 创建API Key → 复制<br><span>③</span> 贴到下面</div>
+    <div class="modal-tip">💡 充10块用上千次。比一杯奶茶便宜。</div>
     <input type="password" id="apiKeyInput" placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxx">
-    <div class="modal-actions">
-      <button class="modal-btn danger" onclick="clearApiKey()">清除</button>
-      <button class="modal-btn secondary" onclick="closeSettings()">取消</button>
-      <button class="modal-btn primary" onclick="saveApiKey()">保存</button>
-    </div>
+    <div class="modal-actions"><button class="modal-btn danger" onclick="clearApiKey()">清除</button><button class="modal-btn secondary" onclick="closeSettings()">取消</button><button class="modal-btn primary" onclick="saveApiKey()">保存</button></div>
   </div>
 </div>
 
 <script>
 // ==================== State ====================
-const STORAGE_KEY='juyin_api_key',USAGE_KEY='juyin_usage',HISTORY_KEY='juyin_history',CHAR_KEY='juyin_chars',ANALYTICS_KEY='juyin_analytics';
-const DAILY_LIMIT=5,RETRY_WINDOW=120000;
-let currentResult=null,lastGenParams=null,selectedChars=[],activeTemplate=null,activeTemplateText='',charPanelOpen=false;
+const SK='juyin_api_key',UK='juyin_usage',HK='juyin_history',AK='juyin_analytics',DL=5,RW=120000;
+let cr=null,lg=null;
 
-// ==================== Init ====================
-function init(){updateSettingsIcon();updateQuotaHint();renderCharGrid();updateLockedDisplay();if(!localStorage.getItem('juyin_v4_welcomed')){setTimeout(()=>showToast('👋 输入一句话故事，点生成即可'),800);localStorage.setItem('juyin_v4_welcomed','1')}}
+function init(){uSI();uQH();if(!localStorage.getItem('juyin_v41')){setTimeout(()=>st('👋 输入故事，AI帮你判断值不值得做'),800);localStorage.setItem('juyin_v41','1')}}
 init();
 
 // ==================== API Key ====================
-function getApiKey(){return localStorage.getItem(STORAGE_KEY)||''}
-function updateSettingsIcon(){document.getElementById('settingsBtn').classList.toggle('has-key',!!getApiKey())}
-function openSettings(){document.getElementById('apiKeyInput').value=getApiKey();document.getElementById('settingsModal').classList.add('active')}
-function closeSettings(){document.getElementById('settingsModal').classList.remove('active')}
-function saveApiKey(){const k=document.getElementById('apiKeyInput').value.trim();if(!k||!k.startsWith('sk-')){showToast('Key格式不对，应以 sk- 开头');return}localStorage.setItem(STORAGE_KEY,k);updateSettingsIcon();closeSettings();showToast('已保存 ✓')}
-function clearApiKey(){if(!confirm('确定清除?'))return;localStorage.removeItem(STORAGE_KEY);document.getElementById('apiKeyInput').value='';updateSettingsIcon();showToast('已清除')}
-document.getElementById('settingsModal').addEventListener('click',function(e){if(e.target===this)closeSettings()});
+function gK(){return localStorage.getItem(SK)||''}
+function uSI(){document.getElementById('settingsBtn').classList.toggle('has-key',!!gK())}
+function oS(){document.getElementById('apiKeyInput').value=gK();document.getElementById('settingsModal').classList.add('active')}
+function cS(){document.getElementById('settingsModal').classList.remove('active')}
+function sK(){const k=document.getElementById('apiKeyInput').value.trim();if(!k||!k.startsWith('sk-')){st('Key格式不对，应以 sk- 开头');return}localStorage.setItem(SK,k);uSI();cS();st('已保存 ✓')}
+function clK(){if(!confirm('确定清除?'))return;localStorage.removeItem(SK);document.getElementById('apiKeyInput').value='';uSI();st('已清除')}
+document.getElementById('settingsModal').addEventListener('click',function(e){if(e.target===this)cS()});
 
 // ==================== Quota ====================
-function getUsage(){try{const r=JSON.parse(localStorage.getItem(USAGE_KEY)||'{}');if(r.date!==new Date().toISOString().slice(0,10))return{date:new Date().toISOString().slice(0,10),count:0};return r}catch(e){return{date:new Date().toISOString().slice(0,10),count:0}}}
-function saveUsage(u){localStorage.setItem(USAGE_KEY,JSON.stringify(u))}
-function remaining(){const u=getUsage();return Math.max(0,DAILY_LIMIT-u.count)}
-function consumeQuota(){let u=getUsage();u.count++;saveUsage(u)}
-function updateQuotaHint(){document.getElementById('quotaHint').textContent='今日剩余：'+remaining()+'次'}
+function gU(){try{const r=JSON.parse(localStorage.getItem(UK)||'{}');if(r.date!==new Date().toISOString().slice(0,10))return{date:new Date().toISOString().slice(0,10),count:0};return r}catch(e){return{date:new Date().toISOString().slice(0,10),count:0}}}
+function sU(u){localStorage.setItem(UK,JSON.stringify(u))}
+function rm(){const u=gU();return Math.max(0,DL-u.count)}
+function cQ(){let u=gU();u.count++;sU(u)}
+function uQH(){document.getElementById('quotaHint').textContent='今日剩余：'+rm()+'次'}
 
-// ==================== Toast ====================
-function showToast(m){const ex=document.querySelector('.toast');if(ex)ex.remove();const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2000)}
-
-// ==================== Templates ====================
-function pickTemplate(id,text){
-  activeTemplate=id;activeTemplateText=text||'';
-  document.querySelectorAll('.tmpl-tag').forEach(t=>t.classList.remove('active'));
-  if(id){const t=document.querySelector(`.tmpl-tag:not(#tmplNone)`);document.getElementById('tmplNone').classList.remove('active');const tags=document.querySelectorAll('.tmpl-tag');tags.forEach(t=>{if(t.onclick&&t.onclick.toString().includes(id))t.classList.add('active')})}
-  else{document.getElementById('tmplNone').classList.add('active')}
-}
-
-// ==================== Character ====================
-function getCharacters(){try{return JSON.parse(localStorage.getItem(CHAR_KEY)||'[]')}catch(e){return[]}}
-function saveCharacters(c){localStorage.setItem(CHAR_KEY,JSON.stringify(c))}
-function createCharacter(){
-  const n=document.getElementById('charName').value.trim(),r=document.getElementById('charRole').value.trim(),l=document.getElementById('charLook').value.trim(),b=document.getElementById('charBehavior').value.trim();
-  if(!n)return showToast('至少填角色名');
-  if(!l)return showToast('外貌锚点是锁一致性的关键');
-  const cs=getCharacters();cs.push({id:'R-'+String(cs.length+1).padStart(3,'0'),name:n,role:r,look:l,behavior:b,createdAt:new Date().toLocaleString('zh-CN')});
-  saveCharacters(cs);['charName','charRole','charLook','charBehavior'].forEach(id=>document.getElementById(id).value='');
-  renderCharGrid();showToast('角色「'+n+'」已创建');
-  trackEvent('create_char',{name:n});
-}
-function renderCharGrid(){
-  const cs=getCharacters();document.getElementById('charEmptyHint').style.display=cs.length?'none':'block';
-  document.getElementById('charGrid').innerHTML=cs.map(c=>{
-    const sel=selectedChars.some(x=>x.id===c.id);
-    return `<div class="char-asset${sel?' selected':''}" onclick="toggleChar('${c.id}')"><div class="char-asset-select">✓</div><div class="char-asset-name">${c.name}</div><div class="char-asset-role">${c.role||'未设定位'}</div><div class="char-asset-look">🎨 ${c.look.slice(0,60)}${c.look.length>60?'…':''}</div><div class="char-asset-delete" onclick="event.stopPropagation();deleteChar('${c.id}')">删除</div></div>`
-  }).join('');
-}
-function toggleChar(id){
-  const cs=getCharacters();const c=cs.find(x=>x.id===id);if(!c)return;const idx=selectedChars.findIndex(x=>x.id===id);
-  if(idx>=0){selectedChars.splice(idx,1)}else{if(selectedChars.length>=5){showToast('最多5个');return}selectedChars.push(c)}
-  renderCharGrid();updateLockedDisplay();
-}
-function deleteChar(id){if(!confirm('删除？'))return;let cs=getCharacters();cs=cs.filter(c=>c.id!==id);saveCharacters(cs);selectedChars=selectedChars.filter(x=>x.id!==id);renderCharGrid();updateLockedDisplay();showToast('已删除')}
-function toggleCharPanel(){charPanelOpen=!charPanelOpen;document.getElementById('charPanel').style.display=charPanelOpen?'block':'none';document.getElementById('charToggle').textContent=charPanelOpen?'收起角色库 ▲':'展开角色库 ▼'}
-function updateLockedDisplay(){
-  document.getElementById('lockedChars').innerHTML=selectedChars.map(c=>`<span class="locked-char">${c.name}<span class="locked-char-remove" onclick="event.stopPropagation();unlockChar('${c.id}')">×</span></span>`).join('');
-}
-function unlockChar(id){selectedChars=selectedChars.filter(c=>c.id!==id);renderCharGrid();updateLockedDisplay()}
+function st(m){const ex=document.querySelector('.toast');if(ex)ex.remove();const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2000)}
+function sE(m){const e=document.getElementById('errorBox');e.innerHTML=m;e.classList.add('active')}
+function hE(){document.getElementById('errorBox').classList.remove('active')}
 
 // ==================== Generate ====================
-const LOADING_STEPS=['拆解剧本结构…','注入角色锚点…','生成镜头脚本…','设计剪映节奏…','输出发布模板…','即将完成…'];
-let loadingInterval;
-function showLoading(s){document.getElementById('loadingState').classList.toggle('active',s);if(s){let i=0;document.getElementById('loadingStep').textContent=LOADING_STEPS[0];loadingInterval=setInterval(()=>{i=(i+1)%LOADING_STEPS.length;document.getElementById('loadingStep').textContent=LOADING_STEPS[i]},1400)}else{clearInterval(loadingInterval)}}
-function showError(m){const e=document.getElementById('errorBox');e.innerHTML=m;e.classList.add('active')}
-function hideError(){document.getElementById('errorBox').classList.remove('active')}
+const LS=['分析故事结构…','计算情绪强度…','评估冲突密度…','判定反转强度…','预测传播潜力…','自动匹配模板…','生成镜头脚本…','输出发布方案…'];
+let li;
+function sL(s){document.getElementById('loadingState').classList.toggle('active',s);if(s){let i=0;document.getElementById('loadingStep').textContent=LS[0];li=setInterval(()=>{i=(i+1)%LS.length;document.getElementById('loadingStep').textContent=LS[i]},1200)}else{clearInterval(li)}}
 
 async function generate(){
-  hideError();
-  const apiKey=getApiKey();if(!apiKey){showError('请先点右上角齿轮设置API Key');openSettings();return}
-  if(remaining()<=0){showError('今日免费次数用完，明天再来');return}
-  const desc=document.getElementById('storyInput').value.trim();if(!desc){showError('至少写一句话故事');return}
+  hE();const apiKey=gK();if(!apiKey){sE('请先点右上角齿轮设置API Key');oS();return}
+  if(rm()<=0){sE('今日免费次数用完');return}
+  const desc=document.getElementById('storyInput').value.trim();if(!desc){sE('至少写一句话故事');return}
   const genre=document.getElementById('genre').value,epCount=parseInt(document.getElementById('episodes').value);
   const shotsPerEp=epCount<=3?8:epCount<=6?6:4;
+  const btn=document.getElementById('genBtnMain');btn.disabled=true;
+  document.getElementById('inputCard').style.display='none';
+  document.getElementById('resultWrap').classList.remove('active');sL(true);
 
-  // 角色锚点
-  let charLock='';selectedChars.forEach((c,i)=>{charLock+=`\n角色「${c.name}」(${c.role||''})：视觉=(${c.look})；行为=(${c.behavior||'无特殊要求'})——所有镜头中绝对不变`;});
-  if(!charLock)charLock='无预设角色，自行创建。但仍需确保跨镜头角色外貌一致。';
+  const sys=`你是AI短剧爆款评估系统。你的任务是：
 
-  const tmpl=activeTemplateText?'\n爆款结构模板（严格遵循此节奏构建剧情）：'+activeTemplateText:'';
+第一步：评估这个故事成为爆款的概率。按以下5个维度评分（0-10）：
+1. 情绪强度：是否有强情绪词（恨/爱/背叛/复仇）、人物冲突、关系变化
+2. 冲突密度：每集冲突点数量、对话vs动作比例、持续对抗程度
+3. 反转强度：身份反转、信息反转、关系反转的力度
+4. 传播潜力：是否有3秒钩子、是否会让用户停留、是否有争议共鸣点
+5. 平台适配：是否适配短视频节奏（<90秒）、是否适合碎片化观看
 
-  const sys=`你是AI短剧导演+运营一体机。你的任务是：根据用户输入的一句话故事和角色锚点，直接输出『可发布的视频结构』。
+第二步：根据评分自动选择最佳爆款结构模板（从以下8个中选1个）：
+反转复仇型、高情绪冲突型、甜宠高密度型、悬疑反转型、逆袭爽文型、契约婚姻型、替身虐恋型、穿越重生型
+
+第三步：按选定模板结构，生成完整产出包。
 
 铁律：
-1. 每个「镜头」含：画面描述 + 即梦prompt + 可灵prompt。不是场景描述，是镜头级拆解。
-2. 每个角色必须复用角色锚点——外貌/穿着/体型在所有镜头中不变。
-3. 同时输出：剪映节奏结构（每段时长+情绪+用途）+ 发布文案（3个标题+5个标签+1条文案）。
-4. 对白简短（≤20字/句），带情绪标注。
-5. 内容健康，不涉政涉黄涉暴。`;
+- 每个镜头含：画面描述 + 即梦prompt + 可灵prompt（不是场景，是镜头级）
+- 所有角色必须保持外貌一致性
+- 对白简短（≤20字），带情绪标注
+- 内容健康，不涉政涉黄涉暴
+- 剪映结构片段命名：爆点/冲突/反转/钩子`;
 
-  const usr=`用户故事：${desc}
-类型：${genre} · 共${epCount}集 · 每集约${shotsPerEp}个镜头
-
-=== 角色锚点（绝对不变） ===${charLock}
-${tmpl}
+  const usr=`故事：${desc}
+类型：${genre} · ${epCount}集 · 每集约${shotsPerEp}个镜头
 
 以JSON输出（不要markdown）：
 {
+  "score":{
+    "total":85,"level":"high",
+    "metrics":[
+      {"name":"情绪强度","value":8.7},{"name":"冲突密度","value":8.2},
+      {"name":"反转强度","value":9.0},{"name":"传播潜力","value":8.1},{"name":"平台适配","value":7.5}
+    ],
+    "verdict":"强烈推荐制作","detail":"情绪密度高、反转强度大，具备爆款基因。建议加大3秒钩子力度"
+  },
+  "matchedTemplate":"反转复仇型",
   "title":"剧名（5-12字，网感强）",
-  "synopsis":"一句话简介",
-  "visualStyle":"视觉风格（10字内）",
-  "episodes":[
-    {"ep":1,"title":"集名","cliffhanger":"结尾钩子（15字内）",
-     "shots":[
-       {"time":"0-3秒","emotion":"情绪（2-4字）","desc":"画面描述（含角色锚点）",
-        "prompt_jimeng":"即梦提示词（中文，镜头+场景+人物+光线+画质，≤50字）",
-        "prompt_keling":"可灵提示词（中文，突出画面动态感，≤50字）",
-        "dialogues":[{"name":"角色名","emotion":"情绪","text":"对白（≤20字）"}]}
-     ]
-    }
-  ],
-  "clipStructure":{"timeline":[{"time":"如0-3秒","label":"用途（爆点/冲突/反转/钩子）","desc":"此段要做什么","bgm":"bgm建议"}],"overallBgm":"全剧bgm建议"},
-  "publish":{"titles":["标题1","标题2","标题3"],"tags":["标签1","标签2","标签3","标签4","标签5"],"copy":"发布文案（30-50字）"},
-  "characters":[{"name":"角色名","role":"定位","visualAnchor":"视觉锚点","behaviorAnchor":"行为锚点","forbidden":"不可变项（如发型/脸型/服饰色系）"}]
+  "synopsis":"简介",
+  "visualStyle":"视觉风格",
+  "episodes":[{"ep":1,"title":"集名","cliffhanger":"钩子",
+    "shots":[{"time":"0-3秒","emotion":"情绪","desc":"画面",
+      "prompt_jimeng":"即梦提示词≤50字","prompt_keling":"可灵提示词≤50字",
+      "dialogues":[{"name":"角色","emotion":"情绪","text":"对白"}]}]
+  }],
+  "characters":[{"name":"","role":"","visualAnchor":"外貌锚点","behaviorAnchor":"行为锚点","forbidden":"不可变项"}],
+  "clipStructure":{"timeline":[{"time":"0-3秒","label":"爆点","desc":"描述","bgm":"BGM"}],"overallBgm":"全剧BGM建议"},
+  "publish":{"titles":["3个标题"],"tags":["5个标签"],"copy":"文案","platform":"推荐平台+时长建议"}
 }`;
-
-  const btn=document.getElementById('genBtnMain');btn.disabled=true;
-  document.getElementById('inputCard').style.display='none';
-  document.getElementById('resultWrap').classList.remove('active');
-  showLoading(true);
 
   let tid;
   try{
     const ctrl=new AbortController();tid=setTimeout(()=>ctrl.abort(),90000);
     const resp=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},body:JSON.stringify({model:'deepseek-v4-pro',messages:[{role:'system',content:sys},{role:'user',content:usr}],max_tokens:16384,temperature:0.85,response_format:{type:'json_object'}}),signal:ctrl.signal});
     clearTimeout(tid);
-    if(!resp.ok){const je=await resp.json().catch(()=>({}));if(resp.status===401)throw new Error('API Key不对，重新设置一下？');if(resp.status===402)throw new Error('余额用完了');throw new Error(je.error?.message||'出了点问题')}
-    const data=await resp.json();let content=data.choices?.[0]?.message?.content;if(!content)throw new Error('AI返回为空');
-    let d;try{d=JSON.parse(content.replace(/```json|```/g,'').trim())}catch{const m=content.match(/\{[\s\S]*\}/);if(m)d=JSON.parse(m[0].replace(/,\s*}/g,'}').replace(/,\s*\]/g,']'));else throw new Error('格式异常')}
-    consumeQuota();lastGenParams={desc,genre,epCount,selectedChars,sys,usr,time:Date.now()};
-    showLoading(false);currentResult=d;renderResult(d,genre,epCount);updateQuotaHint();
-    trackEvent('gen_success',{genre,epCount,chars:selectedChars.length,template:activeTemplate||'none'});
-  }catch(err){
-    clearTimeout(tid);showLoading(false);btn.disabled=false;document.getElementById('inputCard').style.display='block';
-    if(err.name==='AbortError')showError('超时了，试试减少集数');
-    else showError(err.message);trackEvent('gen_error',{error:err.message});
-  }
+    if(!resp.ok){const je=await resp.json().catch(()=>({}));if(resp.status===401)throw new Error('API Key不对');if(resp.status===402)throw new Error('余额用完');throw new Error(je.error?.message||'出错了')}
+    const data=await resp.json();let ct=data.choices?.[0]?.message?.content;if(!ct)throw new Error('空');
+    let d;try{d=JSON.parse(ct.replace(/```json|```/g,'').trim())}catch{const m=ct.match(/\{[\s\S]*\}/);if(m)d=JSON.parse(m[0].replace(/,\s*}/g,'}').replace(/,\s*\]/g,']'));else throw new Error('格式')}
+    cQ();lg={desc,genre,epCount,sys,usr,time:Date.now()};sL(false);cr=d;render(d,genre,epCount);uQH();
+    te('gen_ok',{genre,epCount,score:d.score?.total||0,tmpl:d.matchedTemplate||''});
+  }catch(err){clearTimeout(tid);sL(false);btn.disabled=false;document.getElementById('inputCard').style.display='block';if(err.name==='AbortError')sE('超时，试试减少集数');else sE(err.message);te('gen_err',{error:err.message})}
 }
 
 // ==================== Render ====================
-function renderResult(d,genre,epCount){
+function render(d,genre,epCount){
+  // Score
+  const sc=d.score||{},lvl=sc.level||'mid';
+  const metrics=sc.metrics||[{name:'情绪强度',value:5},{name:'冲突密度',value:5},{name:'反转强度',value:5},{name:'传播潜力',value:5},{name:'平台适配',value:5}];
+  document.getElementById('scoreSection').innerHTML=`<div class="score-card">
+    <div class="score-main">
+      <div class="score-circle ${lvl}"><div class="score-num">${sc.total||'—'}</div><div class="score-label">爆款指数</div></div>
+      <div class="score-verdict"><div class="score-verdict-title ${lvl}">${sc.verdict||'评估完成'}</div><div class="score-verdict-desc">${sc.detail||'—'}</div></div>
+    </div>
+    <div class="score-metrics">${metrics.map(m=>`<div class="metric-item"><div class="metric-bar"><div class="metric-fill ${(m.value||0)>=8?'high':(m.value||0)>=6?'mid':'low'}" style="width:${(m.value||0)*10}%"></div></div><div class="metric-name">${m.name}</div><div class="metric-val">${(m.value||0).toFixed(1)}</div></div>`).join('')}</div>
+    ${d.matchedTemplate?`<div class="template-match" style="display:block">🎯 自动匹配爆款模板：<strong>${d.matchedTemplate}</strong></div>`:''}
+  </div>`;
+
   document.getElementById('dramaTitle').textContent=d.title||'未命名';
   document.getElementById('genreBadge').textContent=genre;
   document.getElementById('epBadge').textContent=epCount+'集';
   document.getElementById('synopsisText').textContent=(d.synopsis||'')+(d.visualStyle?' · '+d.visualStyle:'');
 
-  // A: Shots
+  // Shots
   const tabs=document.getElementById('epTabs'),contents=document.getElementById('epContents');
   tabs.innerHTML='';contents.innerHTML='';
   (d.episodes||[]).forEach((ep,i)=>{
-    const tab=document.createElement('div');tab.className='ep-tab'+(i===0?' active':'');tab.textContent='第'+ep.ep+'集';tab.onclick=()=>switchEp(i);tabs.appendChild(tab);
-    const wrap=document.createElement('div');wrap.className='ep-content'+(i===0?' active':'');wrap.id='ep-'+i;
-    if(ep.cliffhanger)wrap.innerHTML+=`<div style="font-size:12px;color:var(--gl);margin-bottom:10px;padding:6px 10px;background:rgba(212,164,74,0.05);border-radius:6px">🎬 钩子：${ep.cliffhanger}</div>`;
-    wrap.innerHTML+=`<div class="shot-list">${(ep.shots||[]).map((sh,si)=>`<div class="shot-card"><div><div class="shot-meta"><span class="shot-num">${String(si+1).padStart(2,'0')}</span><span class="shot-time">${sh.time||''}</span><span class="shot-emotion">${sh.emotion||''}</span></div><div class="shot-desc">${sh.desc||''}</div><div class="shot-prompts">${sh.prompt_jimeng?`<div class="shot-prompt jimeng">🎬 即梦：${sh.prompt_jimeng}</div>`:''}${sh.prompt_keling?`<div class="shot-prompt keling">🌊 可灵：${sh.prompt_keling}</div>`:''}</div>${(sh.dialogues||[]).length?`<div style="margin-top:6px;font-size:11px;color:rgba(240,235,224,0.5);line-height:1.6">${sh.dialogues.map(dl=>`${dl.name}(${dl.emotion||''})："${dl.text}"`).join(' · ')}</div>`:''}</div><div class="shot-copy"><button class="shot-copy-btn" onclick="copyShot(this,${ep.ep},${si+1})" title="复制此镜头">📋</button></div></div>`).join('')}</div>`;
-    contents.appendChild(wrap);
+    const tab=document.createElement('div');tab.className='ep-tab'+(i===0?' active':'');tab.textContent='第'+ep.ep+'集';tab.onclick=()=>swEp(i);tabs.appendChild(tab);
+    const w=document.createElement('div');w.className='ep-content'+(i===0?' active':'');w.id='ep-'+i;
+    if(ep.cliffhanger)w.innerHTML+=`<div style="font-size:12px;color:var(--gl);margin-bottom:10px;padding:6px 10px;background:rgba(212,164,74,0.05);border-radius:6px">🎬 钩子：${ep.cliffhanger}</div>`;
+    w.innerHTML+=`<div class="shot-list">${(ep.shots||[]).map((sh,si)=>`<div class="shot-card"><div><div class="shot-meta"><span class="shot-num">${String(si+1).padStart(2,'0')}</span><span class="shot-time">${sh.time||''}</span><span class="shot-emotion">${sh.emotion||''}</span></div><div class="shot-desc">${sh.desc||''}</div><div class="shot-prompts">${sh.prompt_jimeng?`<div class="shot-prompt jimeng">🎬 即梦：${sh.prompt_jimeng}</div>`:''}${sh.prompt_keling?`<div class="shot-prompt keling">🌊 可灵：${sh.prompt_keling}</div>`:''}</div>${(sh.dialogues||[]).length?`<div style="margin-top:4px;font-size:10px;color:rgba(240,235,224,0.45);line-height:1.5">${sh.dialogues.map(dl=>`${dl.name}(${dl.emotion||''})："${dl.text}"`).join(' · ')}</div>`:''}</div><button class="shot-copy-btn" onclick="cpS(this,${ep.ep},${si+1})" title="复制">📋</button></div>`).join('')}</div>`;
+    contents.appendChild(w);
   });
 
-  // B: Characters
-  const cc=document.getElementById('charCards');
-  cc.innerHTML=(d.characters||[]).map(c=>`<div class="char-card"><div class="char-card-name">${c.name}（${c.role||''}）</div><div><div class="char-card-label">视觉锚点</div><div class="char-card-text">${c.visualAnchor||'—'}</div></div><div><div class="char-card-label">行为锚点</div><div class="char-card-text">${c.behaviorAnchor||'—'}</div></div><div><div class="char-card-label">不可变项</div><div class="char-card-text" style="color:var(--red)">${c.forbidden||'发型/脸型/服饰色系'}</div></div></div>`).join('');
+  // Characters
+  document.getElementById('charCards').innerHTML=(d.characters||[]).map(c=>`<div class="char-card"><div class="char-card-name">${c.name}（${c.role||''}）</div><div><div class="char-card-label">视觉锚点</div><div class="char-card-text">${c.visualAnchor||'—'}</div></div><div><div class="char-card-label">行为锚点</div><div class="char-card-text">${c.behaviorAnchor||'—'}</div></div><div><div class="char-card-label">不可变项</div><div class="char-card-text" style="color:var(--red)">${c.forbidden||'发型/脸型/服饰色系'}</div></div></div>`).join('');
 
-  // C: Clip
-  const cs=d.clipStructure||{};const cl=document.getElementById('clipStructure');
-  cl.innerHTML=`<div class="clip-structure">${(cs.timeline||[]).map(t=>`<div class="clip-row"><span class="clip-time">${t.time||''}</span><span class="clip-desc"><strong>${t.label||''}</strong>：${t.desc||''}</span></div>`).join('')}<div class="clip-bgm">🎵 推荐BGM：${cs.overallBgm||'根据情绪自动匹配'}</div></div>`;
+  // Clip
+  const cs=d.clipStructure||{};document.getElementById('clipStructure').innerHTML=`<div class="clip-structure">${(cs.timeline||[]).map(t=>`<div class="clip-row"><span class="clip-time">${t.time||''}</span><span class="clip-desc"><strong>${t.label||''}</strong>：${t.desc||''}</span></div>`).join('')}<div class="clip-bgm">🎵 推荐BGM：${cs.overallBgm||'根据情绪自动匹配'}</div></div>`;
 
-  // D: Publish
-  const pb=d.publish||{};document.getElementById('publishBlock').innerHTML=`<div class="publish-block">${(pb.titles||[]).length?`<div class="publish-row"><strong>📝 标题方案</strong>${pb.titles.map((t,i)=>`<span>${i+1}) `+t+`</span><br>`).join('')}</div>`:''}<div class="publish-row"><strong>🏷 标签</strong><span>${(pb.tags||[]).join(' · ')}</span></div><div class="publish-row"><strong>📱 发布文案</strong><span>${pb.copy||'根据剧情自由发挥'}</span></div></div>`;
+  // Publish
+  const pb=d.publish||{};document.getElementById('publishBlock').innerHTML=`<div class="publish-block">${(pb.titles||[]).length?`<div class="publish-row"><strong>📝 标题方案</strong>${pb.titles.map((t,i)=>`<span>${i+1}) ${t}</span><br>`).join('')}</div>`:''}<div class="publish-row"><strong>🏷 标签</strong><span>${(pb.tags||[]).join(' · ')}</span></div><div class="publish-row"><strong>📱 发布文案</strong><span>${pb.copy||'根据剧情优化'}</span></div>${pb.platform?`<div class="publish-platform"><span class="platform-tip">📌 ${pb.platform}</span></div>`:''}</div>`;
 
-  // Watermark
-  const canRetry=lastGenParams&&(Date.now()-lastGenParams.time<RETRY_WINDOW);
+  const canRetry=lg&&(Date.now()-lg.time<RW);
   document.getElementById('retryBtn').style.display=canRetry?'inline-flex':'none';
   document.getElementById('retryHint').style.display=canRetry?'block':'none';
-
   document.getElementById('resultWrap').classList.add('active');
   document.getElementById('genBtnMain').disabled=false;document.getElementById('inputCard').style.display='block';
   document.getElementById('resultWrap').scrollIntoView({behavior:'smooth'});
 }
 
-function switchEp(i){
-  document.querySelectorAll('#epTabs .ep-tab').forEach((t,idx)=>t.classList.toggle('active',idx===i));
-  document.querySelectorAll('#epContents .ep-content').forEach((c,idx)=>c.classList.toggle('active',idx===i));
-}
+function swEp(i){document.querySelectorAll('#epTabs .ep-tab').forEach((t,idx)=>t.classList.toggle('active',idx===i));document.querySelectorAll('#epContents .ep-content').forEach((c,idx)=>c.classList.toggle('active',idx===i))}
 function resetForm(){document.getElementById('resultWrap').classList.remove('active');document.getElementById('genBtnMain').disabled=false;window.scrollTo({top:0,behavior:'smooth'})}
 
-// ==================== Copy ====================
-function copyShot(btn,ep,shot){
-  const card=btn.closest('.shot-card');const prompts=card.querySelectorAll('.shot-prompt');const desc=card.querySelector('.shot-desc');const dialogues=card.querySelectorAll('[style*="margin-top:6px"]');
-  let t=`第${ep}集 · 镜头${shot}\n${desc?desc.textContent:''}\n`;
-  prompts.forEach(p=>{t+=p.textContent+'\n'});
-  dialogues.forEach(d=>{t+=d.textContent+'\n'});
-  navigator.clipboard.writeText(t).then(()=>{btn.textContent='✓';setTimeout(()=>btn.textContent='📋',1500);showToast('已复制镜头'+shot)});
-}
-function copyAllResult(){
-  if(!currentResult)return;const d=currentResult;
-  let t=`【${d.title}】\n${d.synopsis||''}\n\n`;
-  (d.episodes||[]).forEach(ep=>{t+=`\n第${ep.ep}集《${ep.title}》\n`;(ep.shots||[]).forEach((sh,si)=>{t+=`\n镜头${si+1}(${sh.time||''}):${sh.emotion||''}\n${sh.desc||''}\n即梦：${sh.prompt_jimeng||''}\n可灵：${sh.prompt_keling||''}\n`;(sh.dialogues||[]).forEach(dl=>{t+=`${dl.name}(${dl.emotion||''})："${dl.text}"\n`})})});
-  const pb=d.publish||{};
-  t+=`\n--- 发布模板 ---\n标题：${(pb.titles||[]).join(' / ')}\n标签：${(pb.tags||[]).join(' ')}\n文案：${pb.copy||''}\n`;
-  t+='\n—— 由剧引AI生成 ——';
-  navigator.clipboard.writeText(t).then(()=>{const b=document.getElementById('copyBtn');b.textContent='✓ 已复制';b.classList.add('copied');setTimeout(()=>{b.textContent='📋 全部复制';b.classList.remove('copied')},1500);showToast('已复制到剪贴板')});
-}
+function cpS(btn,ep,shot){const card=btn.closest('.shot-card');const desc=card.querySelector('.shot-desc');const prompts=card.querySelectorAll('.shot-prompt');let t=`第${ep}集·镜头${shot}\n${desc?desc.textContent:''}\n`;prompts.forEach(p=>{t+=p.textContent+'\n'});navigator.clipboard.writeText(t).then(()=>{btn.textContent='✓';setTimeout(()=>btn.textContent='📋',1200);st('已复制 '+shot)})}
+function copyAllResult(){if(!cr)return;const d=cr;let t=`【${d.title}】爆款指数：${(d.score||{}).total||'—'}/100\n${d.synopsis||''}\n\n`;(d.episodes||[]).forEach(ep=>{t+=`\n第${ep.ep}集《${ep.title}》\n`;(ep.shots||[]).forEach((sh,si)=>{t+=`\n镜头${si+1}(${sh.time||''}):${sh.emotion||''}\n${sh.desc||''}\n即梦：${sh.prompt_jimeng||''}\n可灵：${sh.prompt_keling||''}\n`;(sh.dialogues||[]).forEach(dl=>{t+=`${dl.name}(${dl.emotion||''})："${dl.text}"\n`})})});const pb=d.publish||{};t+=`\n--- 发布 ---\n标题：${(pb.titles||[]).join(' / ')}\n标签：${(pb.tags||[]).join(' ')}\n文案：${pb.copy||''}\n`;t+='\n—— 由剧引AI生成 ——';navigator.clipboard.writeText(t).then(()=>{const b=document.getElementById('copyBtn');b.textContent='✓ 已复制';b.classList.add('copied');setTimeout(()=>{b.textContent='📋 全部复制';b.classList.remove('copied')},1500);st('已复制 ✓')})}
 
-// ==================== Retry ====================
-async function retryGenerate(){
-  if(!lastGenParams||Date.now()-lastGenParams.time>RETRY_WINDOW){showToast('免费重试已过期');return}
-  const p=lastGenParams,apiKey=getApiKey();if(!apiKey){showError('请设置API Key');return}
-  const btn=document.getElementById('retryBtn');btn.disabled=true;btn.textContent='⏳';
-  document.getElementById('resultWrap').classList.remove('active');showLoading(true);
-  let tid;
-  try{
-    const ctrl=new AbortController();tid=setTimeout(()=>ctrl.abort(),90000);
-    const resp=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},body:JSON.stringify({model:'deepseek-v4-pro',messages:[{role:'system',content:p.sys},{role:'user',content:p.usr}],max_tokens:16384,temperature:0.85+Math.random()*0.1,response_format:{type:'json_object'}}),signal:ctrl.signal});
-    clearTimeout(tid);if(!resp.ok)throw new Error('重试失败');
-    const data=await resp.json();let ct=data.choices?.[0]?.message?.content;if(!ct)throw new Error('空');
-    let d;try{d=JSON.parse(ct.replace(/```json|```/g,'').trim())}catch{const m=ct.match(/\{[\s\S]*\}/);if(m)d=JSON.parse(m[0].replace(/,\s*}/g,'}').replace(/,\s*\]/g,']'));else throw new Error('格式')}
-    lastGenParams.time=Date.now();showLoading(false);currentResult=d;renderResult(d,p.genre,p.epCount);trackEvent('retry_success',{});
-  }catch(e){clearTimeout(tid);showLoading(false);btn.disabled=false;showError('重试失败：'+(e.message||'未知'))}
-}
+async function retryGenerate(){if(!lg||Date.now()-lg.time>RW){st('免费重试已过期');return}const p=lg,apiKey=gK();if(!apiKey){sE('请设置API Key');return}const btn=document.getElementById('retryBtn');btn.disabled=true;btn.textContent='⏳';document.getElementById('resultWrap').classList.remove('active');sL(true);let tid;try{const ctrl=new AbortController();tid=setTimeout(()=>ctrl.abort(),90000);const resp=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},body:JSON.stringify({model:'deepseek-v4-pro',messages:[{role:'system',content:p.sys},{role:'user',content:p.usr}],max_tokens:16384,temperature:0.85+Math.random()*0.1,response_format:{type:'json_object'}}),signal:ctrl.signal});clearTimeout(tid);if(!resp.ok)throw new Error('失败');const data=await resp.json();let ct=data.choices?.[0]?.message?.content;if(!ct)throw new Error('空');let d;try{d=JSON.parse(ct.replace(/```json|```/g,'').trim())}catch{const m=ct.match(/\{[\s\S]*\}/);if(m)d=JSON.parse(m[0].replace(/,\s*}/g,'}').replace(/,\s*\]/g,']'));else throw new Error('格式')}lg.time=Date.now();sL(false);cr=d;render(d,p.genre,p.epCount);te('retry_ok',{})}catch(e){clearTimeout(tid);sL(false);btn.disabled=false;sE('重试失败：'+(e.message||'?'));
+  te('retry_err',{})}}
 
-// ==================== Tracking ====================
-function trackEvent(ev,data){try{const r=JSON.parse(localStorage.getItem(ANALYTICS_KEY)||'[]');r.push({event:ev,data:data||{},time:new Date().toISOString()});if(r.length>500)r.splice(0,r.length-500);localStorage.setItem(ANALYTICS_KEY,JSON.stringify(r))}catch(e){}}
+function te(ev,data){try{const r=JSON.parse(localStorage.getItem(AK)||'[]');r.push({event:ev,data:data||{},time:new Date().toISOString()});if(r.length>500)r.splice(0,r.length-500);localStorage.setItem(AK,JSON.stringify(r))}catch(e){}}
 </script>
 </body>
 </html>
