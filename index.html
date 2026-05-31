@@ -217,6 +217,25 @@ header{display:flex;align-items:center;justify-content:space-between;padding:20p
 .film-tech-grid .ft-val{color:rgba(240,235,224,0.4)}
 .film-prompt{background:rgba(96,144,184,0.04);border-left:2px solid rgba(96,144,184,0.4);padding:8px 12px;margin-top:8px;font-size:10px;color:rgba(180,200,220,0.5);line-height:1.6}
 .film-ref{display:inline-block;margin:2px;padding:2px 10px;border-radius:100px;background:rgba(96,144,184,0.06);border:1px solid rgba(96,144,184,0.15);font-size:9px;color:rgba(180,200,220,0.5)}
+
+/* v4 爆款结构 */
+.viral-card{background:linear-gradient(135deg,rgba(212,164,74,0.08),rgba(184,64,74,0.04));border:1px solid var(--bd);border-radius:12px;padding:18px 20px;margin-bottom:14px}
+.viral-card strong{color:var(--gold);display:block;font-size:10px;letter-spacing:2px;margin-bottom:8px}
+.viral-hook{background:rgba(184,64,74,0.12);border-left:3px solid var(--red);border-radius:0 8px 8px 0;padding:10px 14px;margin-bottom:10px;font-size:12px;line-height:1.7}
+.viral-curve{display:flex;gap:4px;margin:8px 0;overflow:hidden;border-radius:6px}
+.viral-stage{flex:1;text-align:center;padding:8px 4px;font-size:9px;border-radius:4px;line-height:1.4}
+.viral-stage.op{background:rgba(184,64,74,0.25);color:#e07b8a}
+.viral-stage.cf{background:rgba(184,64,74,0.18);color:rgba(224,140,150,0.8)}
+.viral-stage.rv{background:rgba(212,164,74,0.18);color:var(--gl)}
+.viral-stage.bl{background:rgba(212,164,74,0.25);color:var(--gold)}
+.viral-stage.rs{background:rgba(92,184,120,0.15);color:var(--green)}
+.viral-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.viral-tag{padding:2px 8px;border-radius:100px;font-size:9px}
+.viral-tag.hot{background:rgba(184,64,74,0.2);color:#e07b8a;border:1px solid rgba(184,64,74,0.3)}
+.viral-tag.remix{background:rgba(96,144,184,0.12);color:var(--blue);border:1px solid rgba(96,144,184,0.2)}
+.viral-tag.cover{background:rgba(212,164,74,0.15);color:var(--gold);border:1px solid rgba(212,164,74,0.2)}
+.viral-tag.social{background:rgba(92,184,120,0.12);color:var(--green);border:1px solid rgba(92,184,120,0.2)}
+.shot-markers{display:flex;gap:6px;margin-top:4px;flex-wrap:wrap}
 .data-feedback strong{color:var(--blue);font-size:11px;display:block;margin-bottom:8px}
 .data-feedback p{font-size:10px;color:var(--gray);margin-bottom:10px;line-height:1.6}
 .fb-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
@@ -346,6 +365,7 @@ footer .brand{font-family:'NF',serif;color:rgba(212,164,74,0.35);font-size:12px}
     <div class="synopsis" id="synopsisText"></div>
 
     <div class="module-title">🎬 镜头级生成</div>
+    <div id="viralAnalysis"></div>
     <div class="ep-tabs" id="epTabs"></div>
     <div id="epContents"></div>
 
@@ -564,34 +584,80 @@ async function generateShort(desc){
   document.getElementById('inputCard').style.display='none';document.getElementById('resultWrap').classList.remove('active');
   document.getElementById('productionContent').classList.remove('active');sL(true);
 
-  const sys=`你是短剧一键成片引擎。用户输入故事，你直接输出完整的制作包。
+  const sys=`你是短剧爆款结构引擎。你不是在写剧本——你在设计"让人停下来的内容结构"。
 
-硬性约束（缺字段会导致输出不完整）：
-- visualStyle：必须输出（如：都市言情/古装权谋/悬疑惊悚）
-- 每集 cliffhanger：必须输出，不能为空
-- 每个镜头 prompt_jimeng 和 prompt_keling 必须都输出
-- characters 数组每个角色必须有 visualAnchor 和 forbidden
+═══ 爆款结构引擎 ═══
+你必须完成三层分析，缺一不可：
 
-内部评估（不展示给用户，只用于提高生成质量）：
-- 情绪张力、冲突密度、反转设计、传播适配、制作可行性（各0-10）
+【第一层：前3秒爆点】
+短剧的前3秒决定生死。你必须设计：
+- openingType：冲突开场 / 情绪反转 / 信息钩子（三选一）
+- openingDesc：第一镜的视觉描述，必须是"看了就停不下来"的画面
+- openingHook：一句话封面钩子（≤10字，如"她掏出答案的那一刻"）
 
-核心输出（必须完整）：
-每集恰好${shotsPerEp}个镜头，每镜约8秒；含即梦/可灵prompt；角色一致；对白≤20字带情绪；健康`;
+【第二层：情绪曲线控制】
+每集严格遵循五段式：压迫→冲突→反转→爆发→收束
+- emotionCurve：5个阶段，每个标注描述+对应镜头编号
+- peakShot：整集情绪最高点的镜头编号（必须标注）
+- coverShot：最适合做封面的镜头编号
+- firstFiveShot：最必须剪进前5秒的镜头编号
 
-  const usr=`故事：${desc}\n${epCount}集 · 每集${durMin}分钟 · 每集${shotsPerEp}个镜头（每镜约8秒）\n\nJSON：{
-  "title":"剧名","synopsis":"简介","visualStyle":"视觉风格",
-  "episodes":[{"ep":1,"title":"集名","cliffhanger":"钩子",
-    "shots":[{"time":"0-8秒","emotion":"情绪","desc":"画面","prompt_jimeng":"即梦","prompt_keling":"可灵",
-      "dialogues":[{"name":"角色","emotion":"情绪","text":"对白"}]}]
+【第三层：传播节点设计】
+每个镜头标注传播属性（至少3个镜头有标签）：
+- isOpening：是否开场钩子镜
+- isCover：是否适合做封面
+- isRemixable：是否适合二创
+- isDiscussable：是否适合评论区讨论
+- viralLabel：传播标签（🔥前3秒必留 / 📸封面级 / ✂️二创素材 / 💬讨论引爆 / 🎯情绪巅峰）
+
+══════════════════
+
+硬性约束：
+- visualStyle / cliffhanger / prompt_jimeng / prompt_keling / characters.visualAnchor / characters.forbidden 必须全部输出
+- 每集恰好${shotsPerEp}个镜头
+- 对白≤20字，带情绪标注
+- 角色视觉锚点贯穿全片`;
+
+  const usr=`故事：${desc}
+${epCount}集 · 每集${durMin}分钟 · 每集${shotsPerEp}个镜头（每镜约8秒）
+
+输出JSON（完整、每项必填）：
+{
+  "title":"剧名（≤8字）",
+  "synopsis":"简介（≤80字）",
+  "visualStyle":"视觉风格",
+  "openingHook":"一句话封面钩子（≤10字）",
+  "openingType":"冲突开场|情绪反转|信息钩子",
+  "openingDesc":"前3秒爆点画面描述",
+  "emotionCurve":[
+    {"stage":"压迫","desc":"","shotIndex":1},
+    {"stage":"冲突","desc":"","shotIndex":2},
+    {"stage":"反转","desc":"","shotIndex":3},
+    {"stage":"爆发","desc":"","shotIndex":4},
+    {"stage":"收束","desc":"","shotIndex":5}
+  ],
+  "peakShot":3,
+  "coverShot":2,
+  "firstFiveShot":1,
+  "episodes":[{"ep":1,"title":"集名","cliffhanger":"悬念钩子",
+    "shots":[{
+      "time":"0-8秒","emotion":"情绪标签",
+      "desc":"画面描述",
+      "prompt_jimeng":"即梦prompt",
+      "prompt_keling":"可灵prompt",
+      "isOpening":true,"isCover":false,"isRemixable":false,"isDiscussable":false,
+      "viralLabel":"🔥前3秒必留",
+      "dialogues":[{"name":"角色","emotion":"情绪","text":"对白≤20字"}]
+    }]
   }],
-  "characters":[{"name":"","role":"","visualAnchor":"外貌","behaviorAnchor":"行为","forbidden":"不可变"}],
+  "characters":[{"name":"角色","role":"身份","visualAnchor":"视觉锚点","behaviorAnchor":"行为锚点","forbidden":"不可变"}],
   "clipStructure":{"timeline":[{"time":"0-25%","label":"冲突钩子","desc":"","bgm":""},{"time":"25-50%","label":"推进","desc":"","bgm":""},{"time":"50-75%","label":"反转","desc":"","bgm":""},{"time":"75-100%","label":"悬念","desc":"","bgm":""}],"overallBgm":"BGM"},
-  "publish":{"titles":["3标题"],"tags":["5标签"],"copy":"文案","platform":"推荐平台+时长"}
+  "publish":{"titles":["标题1","标题2","标题3"],"tags":["标签"],"copy":"推广文案","platform":"推荐平台"}
 }`;
 
   let tid;try{
-    const ctrl=new AbortController();tid=setTimeout(()=>ctrl.abort(),90000);
-    const r=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+k},body:JSON.stringify({model:'deepseek-v4-pro',messages:[{role:'system',content:sys},{role:'user',content:usr}],max_tokens:16384,temperature:0.85,response_format:{type:'json_object'}}),signal:ctrl.signal});
+    const ctrl=new AbortController();tid=setTimeout(()=>ctrl.abort(),120000);
+    const r=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+k},body:JSON.stringify({model:'deepseek-v4-pro',messages:[{role:'system',content:sys},{role:'user',content:usr}],max_tokens:24576,temperature:0.82,response_format:{type:'json_object'}}),signal:ctrl.signal});
     clearTimeout(tid);
     if(!r.ok){const je=await r.json().catch(()=>({}));if(r.status===401)throw new Error('API Key 无效或已过期，<a href="#" onclick="oS()">点此重新设置</a>');if(r.status===402)throw new Error('DeepSeek 余额不足，<a href="https://platform.deepseek.com/top_up" target="_blank">点此充值</a>');throw new Error(je.error?.message||'出错')}
     const d=await r.json();let ct=d.choices?.[0]?.message?.content;if(!ct)throw new Error('空');
@@ -728,6 +794,13 @@ function sanitizeShort(d){
   d.title=d.title||'未命名';
   d.synopsis=d.synopsis||'';
   d.visualStyle=d.visualStyle||'通用';
+  d.openingHook=d.openingHook||'';
+  d.openingType=d.openingType||'冲突开场';
+  d.openingDesc=d.openingDesc||'';
+  d.emotionCurve=d.emotionCurve||[{stage:'压迫',desc:'',shotIndex:1},{stage:'冲突',desc:'',shotIndex:2},{stage:'反转',desc:'',shotIndex:3},{stage:'爆发',desc:'',shotIndex:4},{stage:'收束',desc:'',shotIndex:5}];
+  d.peakShot=d.peakShot||d.emotionCurve[2].shotIndex;
+  d.coverShot=d.coverShot||d.emotionCurve[0].shotIndex;
+  d.firstFiveShot=d.firstFiveShot||1;
   if(!d.episodes||!d.episodes.length)d.episodes=[{ep:1,title:'',cliffhanger:'',shots:[]}];
   d.episodes.forEach(ep=>{
     ep.title=ep.title||'';
@@ -739,6 +812,11 @@ function sanitizeShort(d){
       sh.prompt_jimeng=sh.prompt_jimeng||'cinematic short drama shot';
       sh.prompt_keling=sh.prompt_keling||'cinematic short drama shot, 16:9';
       if(!sh.dialogues)sh.dialogues=[];
+      if(typeof sh.isOpening!=='boolean')sh.isOpening=false;
+      if(typeof sh.isCover!=='boolean')sh.isCover=false;
+      if(typeof sh.isRemixable!=='boolean')sh.isRemixable=false;
+      if(typeof sh.isDiscussable!=='boolean')sh.isDiscussable=false;
+      sh.viralLabel=sh.viralLabel||'';
     });
   });
   if(!d.characters||!d.characters.length)d.characters=[{name:'主角',role:'',visualAnchor:'发型/服饰/色系',forbidden:'不可变'}];
@@ -833,12 +911,34 @@ function renderProduction(d,epCount,durMin){
   document.getElementById('consistencyBadge').textContent=d.visualStyle||'';
   document.getElementById('synopsisText').textContent=d.synopsis||'';
 
+  // v4 爆款结构分析
+  const ec=(d.emotionCurve||[]);
+  const stages=['压迫','冲突','反转','爆发','收束'];
+  const stageCls=['op','cf','rv','bl','rs'];
+  const sy=document.getElementById('synopsisText');
+  let viralHTML='';
+  if(d.openingHook||d.openingDesc){
+    viralHTML+='<div class="viral-card"><strong>🌋 爆款结构分析</strong>';
+    if(d.openingHook)viralHTML+='<div class="viral-hook"><span style="color:var(--red);font-size:10px;letter-spacing:2px;display:block;margin-bottom:2px">🔥 前3秒爆点 · '+escape(d.openingType||'')+'</span>'+escape(d.openingDesc||'')+'<div style="margin-top:4px;font-size:10px;color:var(--gold)">封面钩子："'+escape(d.openingHook)+'"</div></div>';
+    viralHTML+='<div style="font-size:10px;color:var(--gold);letter-spacing:1px;margin-bottom:4px">📈 情绪曲线</div><div class="viral-curve">';
+    ec.forEach((s,i)=>{
+      const cls=stageCls[i]||'';
+      viralHTML+='<div class="viral-stage '+cls+'"><div>'+stages[i]+'</div><div style="font-size:7px;opacity:0.6">镜#'+s.shotIndex+'</div></div>';
+    });
+    viralHTML+='</div>';
+    viralHTML+='<div style="margin-top:8px;font-size:10px;display:flex;gap:12px;flex-wrap:wrap;color:rgba(240,235,224,0.5)"><span>🎯 巅峰：镜#'+d.peakShot+'</span><span>📸 封面：镜#'+d.coverShot+'</span><span>🎬 前5秒：镜#'+d.firstFiveShot+'</span></div>';
+    viralHTML+='</div>';
+  }
+
+  // Insert viral analysis before ep-tabs
+  document.getElementById('viralAnalysis').innerHTML=viralHTML;
+
   const tabs=document.getElementById('epTabs'),contents=document.getElementById('epContents');tabs.innerHTML='';contents.innerHTML='';
   (d.episodes||[]).forEach((ep,i)=>{
     const tab=document.createElement('div');tab.className='ep-tab'+(i===0?' active':'');tab.textContent='第'+ep.ep+'集';tab.onclick=()=>swEp(i);tabs.appendChild(tab);
     const w=document.createElement('div');w.className='ep-content'+(i===0?' active':'');w.id='ep-'+i;
     if(ep.cliffhanger)w.innerHTML+=`<div style="font-size:12px;color:var(--gl);margin-bottom:10px;padding:6px 10px;background:rgba(212,164,74,0.05);border-radius:6px">🎬 钩子：${ep.cliffhanger}</div>`;
-    w.innerHTML+=`<div class="shot-list">${(ep.shots||[]).map((sh,si)=>`<div class="shot-card"><div><div class="shot-meta"><span class="shot-num">${String(si+1).padStart(2,'0')}</span><span class="shot-time">${sh.time||''}</span><span class="shot-emotion">${sh.emotion||''}</span></div><div class="shot-desc">${sh.desc||''}</div><div class="shot-prompts">${sh.prompt_jimeng?`<div class="shot-prompt jimeng">🎬 即梦：${sh.prompt_jimeng}</div>`:''}${sh.prompt_keling?`<div class="shot-prompt keling">🌊 可灵：${sh.prompt_keling}</div>`:''}</div>${(sh.dialogues||[]).length?`<div style="margin-top:4px;font-size:10px;color:rgba(240,235,224,0.45)">${sh.dialogues.map(dl=>`${dl.name}(${dl.emotion||''})："${dl.text}"`).join(' · ')}</div>`:''}</div><button class="shot-copy-btn" onclick="cpS(this,${ep.ep},${si+1})">📋</button></div>`).join('')}</div>`;
+    w.innerHTML+=`<div class="shot-list">${(ep.shots||[]).map((sh,si)=>`<div class="shot-card"><div><div class="shot-meta"><span class="shot-num">${String(si+1).padStart(2,'0')}</span><span class="shot-time">${sh.time||''}</span><span class="shot-emotion">${sh.emotion||''}</span>${sh.viralLabel?`<span class="viral-tag ${sh.isOpening?'hot':sh.isCover?'cover':sh.isRemixable?'remix':sh.isDiscussable?'social':''}">${sh.viralLabel}</span>`:''}</div><div class="shot-desc">${sh.desc||''}</div><div class="shot-prompts">${sh.prompt_jimeng?`<div class="shot-prompt jimeng">🎬 即梦：${sh.prompt_jimeng}</div>`:''}${sh.prompt_keling?`<div class="shot-prompt keling">🌊 可灵：${sh.prompt_keling}</div>`:''}</div>${(sh.dialogues||[]).length?`<div style="margin-top:4px;font-size:10px;color:rgba(240,235,224,0.45)">${sh.dialogues.map(dl=>`${dl.name}(${dl.emotion||''})："${dl.text}"`).join(' · ')}</div>`:''}</div><button class="shot-copy-btn" onclick="cpS(this,${ep.ep},${si+1})">📋</button></div>`).join('')}</div>`;
     contents.appendChild(w);
   });
   document.getElementById('charCards').innerHTML=(d.characters||[]).map(c=>`<div class="char-card"><div class="char-card-name">${c.name}（${c.role||''}）</div><div><div class="char-label">视觉锚点</div><div class="char-text">${c.visualAnchor||'—'}</div></div><div><div class="char-label">行为锚点</div><div class="char-text">${c.behaviorAnchor||'—'}</div></div><div><div class="char-label">不可变</div><div class="char-text" style="color:var(--red)">${c.forbidden||'发型/脸型/服饰色系'}</div></div></div>`).join('');
