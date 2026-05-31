@@ -68,6 +68,8 @@ header{display:flex;align-items:center;justify-content:space-between;padding:20p
 .gen-btn{width:100%;margin-top:4px;padding:16px;background:linear-gradient(135deg,var(--gold),var(--gl));border:none;border-radius:10px;color:var(--ink);font-family:'NF',serif;font-size:16px;font-weight:700;letter-spacing:4px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
 .gen-btn:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(212,164,74,0.35)}
 .gen-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+.demo-btn{width:100%;margin-top:6px;padding:12px;background:transparent;border:1px dashed rgba(96,144,184,0.3);border-radius:10px;color:var(--blue);font-family:'NS',sans-serif;font-size:12px;letter-spacing:2px;cursor:pointer;transition:all .2s}
+.demo-btn:hover{border-color:var(--blue);background:rgba(96,144,184,0.06)}
 .shimmer{position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent);transform:translateX(-100%);animation:shimmer 2s infinite}
 @keyframes shimmer{100%{transform:translateX(100%)}}
 .quota-hint{text-align:center;margin-top:8px;font-size:10px;color:var(--gray)}
@@ -310,6 +312,7 @@ footer .brand{font-family:'NF',serif;color:rgba(212,164,74,0.35);font-size:12px}
     <div class="mode-tab film" onclick="swM('film',this)" id="modeFilm"><span class="mode-icon">🎥</span>电影模式<span class="mode-hint">导演级 · 电影感</span></div>
   </div>
   <button class="gen-btn" id="genBtnMain" onclick="generate()"><span class="shimmer"></span>🎬 生成短剧制作包</button>
+  <button class="demo-btn" onclick="showDemo()">🎥 看演示 · 原子朋克废土风</button>
   <div class="quota-hint" id="quotaHint">免费生成，结果带水印 · 去水印 ¥6</div>
   <div class="error-box" id="errorBox"></div>
 </div>
@@ -447,6 +450,77 @@ function rI(){
   chips.forEach((c,i)=>{if(pick[i]){c.textContent=pick[i][0];c.style.animation='none';c.offsetHeight;c.style.animation=''}});
   document.getElementById('storyInput').value=pick[0]?.[1]||'';
 }
+
+// ===== Demo模式：预烘焙原子朋克废土风成品 =====
+function showDemo(){
+  document.getElementById('inputCard').style.display='none';
+  document.getElementById('resultWrap').classList.remove('active');
+  document.getElementById('productionContent').classList.remove('active');
+  const d={
+    title:'废土牛仔',
+    synopsis:'核战后的废土，一个机器牛仔骑着机械鸵鸟穿越荒漠，发现最后一台能发声的点唱机。但一群变异僵尸正从地平线涌来。',
+    visualStyle:'原子朋克废土 · 复古科幻 · 沙尘美学',
+    directorReference:['乔治·米勒','罗伯特·罗德里格兹','原子朋克'],
+    theme:'最后的浪漫在毁灭中燃烧',
+    emotionArc:'荒凉孤寂→悲壮自由',
+    episodes:[{ep:1,title:'最后的点唱机',shots:[
+      {time:'00:00-00:09',emotion:'荒芜',desc:'沙暴中，一个锈迹斑斑的机器人剪影骑着鸵鸟缓慢移动。远处地平线上，废弃的导弹井像墓碑一样矗立。',
+       camera_movement:'航拍俯冲→缓慢跟拍',lens:'广角35mm',composition:'三分法 · 地平线压低位 · 主体极小化',lighting:'自然光 · 逆光剪影 · 沙尘漫射',intention:'建立末世孤独感',
+       prompt_cinematic:'cinematic wide shot, apocalyptic wasteland desert, a rusty robot cowboy riding a mechanical ostrich in silhouette, sandstorm atmosphere, abandoned missile silos on horizon, golden hour backlight, dust particles floating, Sergio Leone western framing, 2.39:1 anamorphic, hyperrealistic, 8K',
+       dialogues:[]},
+      {time:'00:09-00:18',emotion:'惊喜',desc:'机器牛仔停下，蹲下捡起一块还亮着微弱蓝光的电子元件。镜头推向他的光学镜头，蓝光映照在磨损的金属眼眶里。',
+       camera_movement:'手持摇晃→变焦推近',lens:'微距 → 长焦85mm',composition:'对焦元件 → 移焦到机器人脸部',lighting:'底光 · 蓝色点光源 · 周围阴影',intention:'发现希望火种',
+       prompt_cinematic:'macro shot of a rusty robot hand picking up a glowing blue electronic component in desert sand, rack focus to the robot face, blue light reflecting in worn optical lens, dark surroundings, intimate scifi mood, Blade Runner 2049 color palette, 2.39:1',
+       dialogues:[{name:'牛仔','emotion':'低语','text':'还亮着。还有电。'}]},
+      {time:'00:18-00:28',emotion:'追踪',desc:'机器牛仔用那块元件激活了一张破旧的全息地图。一个坐标在100公里外闪烁，标注着"电台"。鸵鸟不安地刨地。',
+       camera_movement:'手持 → 缓缓升起俯拍',lens:'标准50mm → 广角',composition:'过肩拍摄全息地图 · 鸵鸟入框暗示不安',lighting:'全息蓝光 + 自然光 · 地面热浪扭曲',intention:'建立任务目标',
+       prompt_cinematic:'over-the-shoulder shot, robot cowboy activating a holographic map in desert, blue projection showing a distant radio station marker, mechanical ostrich shuffling nervously in background, heat haze distortion, sci-fi western, Dune-inspired, 2.39:1',
+       dialogues:[{name:'牛仔','emotion':'平静','text':'不远。天黑前到。'}]},
+      {time:'00:28-00:37',emotion:'危机',desc:'风停了。鸵鸟突然仰头，发出金属嘶鸣。镜头摇向地平线——十几个佝偻的影子从沙丘后面爬出来。',
+       camera_movement:'斯坦尼康横摇 → 急停',lens:'长焦200mm压缩空间',composition:'前景机器人背脊紧张 → 后景僵尸群缓慢逼近',lighting:'逆光剪影 · 沙尘将落 · 红色预警色调',intention:'突然降临的恐惧',
+       prompt_cinematic:'steadicam pan, mechanical ostrich screeching alert, then whip pan to reveal a dozen zombie silhouettes emerging over dune ridge, long telephoto lens compressing distance, blood-red horizon, dust settling ominously, The Walking Dead meets Mad Max, 2.39:1, tension',
+       dialogues:[]},
+      {time:'00:37-00:48',emotion:'战斗',desc:'机器牛仔掏出一把改装的激光左轮。第一枪打穿领头僵尸的膝盖，碎骨纷飞。鸵鸟后蹄踹飞第二只，机器零件散落一地。',
+       camera_movement:'手持晃动 · 快速跟拍 · 慢动作子弹轨迹',lens:'广角24mm近距离冲击',composition:'紧凑三段式：枪击→踹飞→零件散落的特写',lighting:'枪口闪光照明 · 逆光剪影 · 高速慢镜',intention:'暴力美学的能量释放',
+       prompt_cinematic:'dynamic handheld action shot, robot cowboy drawing a customized laser revolver shooting zombie knee exploding rusty gears, mechanical ostrich kicking another zombie sending debris flying, gun muzzle flash lighting, slow motion bullet trajectory, splatter effects, John Wick meets steampunk, 2.39:1',
+       dialogues:[{name:'牛仔','emotion':'冷酷','text':'一把老骨头，还挺好使。'}]},
+      {time:'00:48-00:58',emotion:'突围',desc:'牛仔策鸵鸟冲出包围圈。身后僵尸群紧紧追赶，镜头从正面拍摄——一张张腐烂的脸在风沙中逼近。鸵鸟纵身一跃跳过峡谷裂缝。',
+       camera_movement:'正面跟拍后退 · 鸵鸟一跃时镜头升起',lens:'广角28mm · 拉升时切航拍',composition:'引导线——峡谷裂缝横向切割画面',lighting:'侧逆光 · 僵尸背光成剪影 · 牛仔正面亮',intention:'千钧一发的逃离',
+       prompt_cinematic:'front tracking shot running backward, robot cowboy on ostrich galloping toward camera chased by zombie horde, ostrich leaping over canyon crack in slow motion, dust explosion, side backlight making zombie silhouettes, hero lit from front, 1917 style continuous shot feel, 2.39:1',
+       dialogues:[]},
+      {time:'00:58-01:08',emotion:'抵达',desc:'天色渐暗。一座锈蚀的无线电塔在夕阳下孤独矗立。塔下有间小屋，窗户透出暖黄色的光——这人类文明最后的光。',
+       camera_movement:'航拍下降 → 推进 → 停在小窗前',lens:'广角→标准→长焦 推近窗户',composition:'金字塔构图：塔顶→小屋→光源形成三角',lighting:'魔幻时刻 · 紫橙渐变天空 · 小屋暖黄窗光 · 塔锈冷蓝',intention:'希望的视觉锚点',
+       prompt_cinematic:'drone shot descending toward a rusty radio tower at magic hour, small cabin with warm yellow window glow at base, purple-orange gradient sky, the last light of civilization, ethereal beauty in desolation, Terrence Malick golden hour, 2.39:1, masterpiece',
+       dialogues:[]},
+      {time:'01:08-01:20',emotion:'高潮',desc:'推开门。一台1950年代的点唱机静静立在屋子中央。牛仔走近，用颤抖的机械手按下播放键。灰尘从喇叭里震落——《I Don\'t Want to Set the World on Fire》响起。',
+       camera_movement:'跟拍进门 → 轨道绕点唱机360° → 推近按下的手指',lens:'标准35mm · 绕行用斯坦尼康',composition:'中心对称——点唱机是绝对的视觉中心 · 手指入框打破平衡',lighting:'窗外残阳 · 点唱机内部荧光 · 灰尘在光束中漂浮',intention:'找回人性最后的温度',
+       prompt_cinematic:'dolly shot pushing through cabin door revealing a vintage 1950s jukebox in center of room, steadicam 360 orbit around the jukebox, close up of a rusty robot finger pressing play button, dust particles dancing in sunset light beam through window, fluorescent tube glow from inside jukebox, nostalgic, poetic, Wong Kar-wai meets Fallout, 2.39:1',
+       dialogues:[{name:'牛仔','emotion':'颤抖','text':'唱吧。唱完这一首。'}]},
+      {time:'01:20-01:30',emotion:'终局',desc:'屋外，僵尸群已围成圈。牛仔拿出最后一块电池插进胸口，走到门外——蓝光爆开，镜头拉远，整个小屋被白光吞没，像一颗坠落地球的星星。',
+       camera_movement:'出门手持后拉 → 蓝光亮起时航拍急速上升',lens:'广角16mm → 航拍',composition:'圆形包围→中心炸裂→俯瞰蘑菇云',lighting:'暗→蓝光刺眼→纯白收场→回到沙暴灰调',intention:'牺牲的升华——浪漫至死',
+       prompt_cinematic:'robot cowboy walking out cabin door surrounded by zombie horde in circular formation, inserting last battery into chest, blue light explosion, drone shot rapidly ascending, cabin swallowed by white light like a falling star, mushroom cloud silhouette against desert night, poetic destruction, Zack Snyder meets Terrence Malick, 2.39:1, epic finale',
+       dialogues:[{name:'牛仔','emotion':'平静','text':'一首歌的时间。够了。'}]}
+    ]}],
+    characters:[
+      {name:'牛仔',role:'主角 · 战斗型机器人',visualAnchor:'锈红色金属外壳 · 右眼镜头破损露出蓝光 · 左臂焊接痕迹 · 披风是焦痕帆布',forbidden:'壳色不可变 · 鸵鸟不可换 · 左轮不可丢'},
+      {name:'鸵鸟',role:'坐骑 · 机械鸵鸟',visualAnchor:'黄铜关节 · 脖子有三道焊接疤 · 背部驮着皮革鞍',forbidden:'焊接疤位置不变 · 步态独特'}
+    ],
+    rhythmDesign:{
+      opening:'极慢——荒漠行走建立孤独，仅3镜从荒芜到发现',
+      midpoint:'加速——僵尸突现，连续3镜战斗/追击，手持晃动强调混乱',
+      climax:'停——进门后镜头减速，360°环绕点唱机，音乐起时全片唯一静止',
+      resolution:'升——蓝光爆炸后航拍急速上升，纯白收尾，留下废墟上的沙尘'
+    },
+    publish:{titles:['3000元手搓爱死机：一个机器牛仔为何让好莱坞都在找他','一个人 用AI 做出了今年最浪漫的末世短片','当机器人在废土上按下最后一首歌的播放键'],tags:['#原子朋克','#AI电影','#废土美学','#国产爱死机','#末日浪漫'],copy:'核战后，一个机器牛仔在荒漠里捡到最后一块电池。他找到了一台还能播放的点唱机，按下播放键的瞬间，整个废土都在听。3分钟，一首歌的时间，一个机器人最后的浪漫。',platform:'B站 · YouTube · X · TikTok · 抖音'}
+  };
+  cr=d;cr._mode='film';
+  renderFilm(d);
+  document.getElementById('resultWrap').classList.add('active');
+  document.getElementById('resultWrap').scrollIntoView({behavior:'smooth'});
+  document.getElementById('inputCard').style.display='block';
+  st('这是电影模式输出的样子 🎥');
+}
+
 function sE(m){const e=document.getElementById('errorBox');e.innerHTML=m;e.classList.add('active')}
 function hE(){document.getElementById('errorBox').classList.remove('active')}
 
@@ -531,64 +605,115 @@ async function generateFilm(desc){
 
   const sys=`你是电影导演系统。你不是AI写剧本工具——你是导演思考的延伸。
 
-你必须输出导演级的镜头语言，每个镜头都包含完整的制作信息。
+═══ 硬性约束（违反即失败） ═══
+你输出的JSON中，【每一个镜头】必须包含全部以下6个字段，缺一不可：
+- camera_movement（字符串，不能为空）
+- lens（字符串，不能为空）
+- composition（字符串，不能为空）
+- lighting（字符串，不能为空）
+- intention（字符串，一个动词短语，说明导演意图）
+- prompt_cinematic（英文字符串，>=30个字符，可直接粘贴到AI出图工具）
 
-导演思考框架（内化，不输出原文）：
-1. theme：这个场景的主题是什么
-2. emotion_arc：情绪从哪到哪
-3. pacing：节奏是快是慢
-4. visual_language：用什么视觉语言（现实主义/风格化/手持纪实/唯美主义）
-5. cinematography_rules：整体摄影规则
-6. director_reference：参考哪位导演的风格（王家卫/诺兰/奉俊昊/张艺谋/是枝裕和等）
+另外必须输出：
+- directorReference（数组，至少2个参考导演或风格）
+- theme（字符串）
+- emotionArc（字符串，格式"开头情绪→结尾情绪"）
+- rhythmDesign（对象，含 opening/midpoint/climax/resolution 四个字段，都不能为空）
+- characters（数组，每个含 visualAnchor 和 forbidden）
 
-每个镜头必须包含6要素：
-- camera_movement：摄影机运动（推拉摇移跟升降/手持/斯坦尼康/固定）
-- lens：焦段（广角/长焦/标准/微距/鱼眼）
-- composition：构图（三分法/对称/引导线/框架/俯拍/仰拍）
-- lighting：光线设计（柔光/硬光/逆光/侧光/底光/自然光/霓虹）
-- intention：这个镜头要传达什么（导演意图）
-- prompt_cinematic：可直接用于AI出图的英文cinematic prompt
+══════════════════
 
-输出结构：
-- 每集12-16个镜头
-- 每镜含完整6要素
-- 对白精简，每句≤15字
-- 视觉锚点贯穿全片
-- 风格参考`;
+导演思维框架（内化，不输出原文）：
+1. 确定视觉语言体系：现实主义还是风格化？手持纪实还是唯美构图？
+2. 确定摄影规则：全片统一的色彩、对比度、镜头语言
+3. 每个镜头问：这个画面观众第一眼看到什么？想让他们感受到什么？
 
-  const usr=`故事：${desc}\n\n这是一个导演级制作请求。请输出JSON：{
-  "title":"片名","synopsis":"剧情简介","visualStyle":"视觉风格关键词",
-  "directorReference":["参考导演","风格标签"],
+镜头6要素详解：
+- camera_movement：摄影机如何运动（静态/手持摇晃/斯坦尼康跟拍/轨道推拉/摇臂升降/航拍俯冲/变焦推拉）
+- lens：用什么焦段表达（广角变形压迫感/长焦压缩空间感/标准人眼视角/微距细节/鱼眼畸变）
+- composition：画面组织方式（三分法/中心对称/对角线引导/前景框架/俯拍渺小感/仰拍威严感/负空间留白）
+- lighting：光的设计（硬光锐利阴影/柔光浪漫/逆光剪影/侧光立体/底光恐怖/霓虹赛博朋克/自然光纪实）
+- intention：这一镜的核心目的（建立空间/制造紧张/暗示关系/揭示真相/渲染孤独/引爆情绪）
+- prompt_cinematic：生产级英文prompt，含：主体描述+动作+环境+光线+氛围+画幅+风格参考
+
+节奏设计四段：
+- opening：如何建立世界和悬念（0～25%）
+- midpoint：如何升级冲突或揭示信息（25%～50%）
+- climax：情绪最高点，矛盾爆发（50%～75%）
+- resolution：收束、余味、留白（75%～100%）
+
+输出：1集，8～14个镜头，每镜全部6要素`;
+
+  const usr=`故事：${desc}
+
+导演级制作请求。输出JSON，每个镜头6要素缺一不可：
+{
+  "title":"片名（≤8字）",
+  "synopsis":"剧情简介（≤100字）",
+  "visualStyle":"视觉风格关键词（如：原子朋克废土/赛博霓虹/新现实主义）",
+  "directorReference":["参考导演1","参考导演2","风格标签"],
   "theme":"核心主题",
   "emotionArc":"开头情绪→结尾情绪",
   "episodes":[{"ep":1,"title":"章名",
     "shots":[{
-      "time":"时间码","emotion":"情绪",
+      "time":"时间码","emotion":"情绪标签",
       "desc":"导演层面的画面描述",
-      "camera_movement":"摄影机运动",
-      "lens":"焦段",
-      "composition":"构图方式",
-      "lighting":"光线设计",
-      "intention":"导演意图（一个动词）",
-      "prompt_cinematic":"英文cinematic prompt",
-      "dialogues":[{"name":"角色","emotion":"情绪","text":"对白（≤15字）"}]}]
+      "camera_movement":"摄影机运动（必填）",
+      "lens":"焦段（必填）",
+      "composition":"构图方式（必填）",
+      "lighting":"光线设计（必填）",
+      "intention":"导演意图（必填）",
+      "prompt_cinematic":"英文cinematic prompt（必填，≥30字符）",
+      "dialogues":[{"name":"角色名","emotion":"情绪","text":"对白≤15字"}]
+    }]
   }],
-  "characters":[{"name":"","role":"","visualAnchor":"视觉锚点","forbidden":"不可变特征"}],
+  "characters":[{"name":"角色名","role":"身份","visualAnchor":"视觉锚点","forbidden":"不可变特征"}],
   "rhythmDesign":{"opening":"开场节奏","midpoint":"中段节奏","climax":"高潮节奏","resolution":"收尾节奏"},
-  "publish":{"titles":[""],"tags":[""],"copy":"","platform":""}
+  "publish":{"titles":["标题1","标题2","标题3"],"tags":["标签1","标签2"],"copy":"推广文案","platform":"推荐平台"}
 }`;
 
   let tid;try{
     const ctrl=new AbortController();tid=setTimeout(()=>ctrl.abort(),120000);
-    const r=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+k},body:JSON.stringify({model:'deepseek-v4-pro',messages:[{role:'system',content:sys},{role:'user',content:usr}],max_tokens:24576,temperature:0.8,response_format:{type:'json_object'}}),signal:ctrl.signal});
+    const r=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+k},body:JSON.stringify({model:'deepseek-v4-pro',messages:[{role:'system',content:sys},{role:'user',content:usr}],max_tokens:32768,temperature:0.75,response_format:{type:'json_object'}}),signal:ctrl.signal});
     clearTimeout(tid);
     if(!r.ok){const je=await r.json().catch(()=>({}));if(r.status===401)throw new Error('API Key 无效或已过期，<a href="#" onclick="oS()">点此重新设置</a>');if(r.status===402)throw new Error('DeepSeek 余额不足，<a href="https://platform.deepseek.com/top_up" target="_blank">点此充值</a>');throw new Error(je.error?.message||'出错')}
     const d=await r.json();let ct=d.choices?.[0]?.message?.content;if(!ct)throw new Error('空');
     let pd;try{pd=JSON.parse(ct.replace(/```json|```/g,'').trim())}catch{const m=ct.match(/\{[\s\S]*\}/);if(m)pd=JSON.parse(m[0].replace(/,\s*}/g,'}').replace(/,\s*\]/g,']'));else throw new Error('格式')}
+    pd=sanitizeFilm(pd);
     sL(false);cr=pd;cr._mode='film';renderFilm(pd);document.getElementById('resultWrap').classList.add('active');
     document.getElementById('genBtnMain').disabled=false;document.getElementById('inputCard').style.display='block';
     document.getElementById('resultWrap').scrollIntoView({behavior:'smooth'});
   }catch(err){clearTimeout(tid);sL(false);btn.disabled=false;document.getElementById('inputCard').style.display='block';if(err.name==='AbortError')sE('超时，请减少复杂度后重试');else sE(err.message)}
+}
+
+// ===== 电影数据清洗：补齐缺失字段 =====
+function sanitizeFilm(d){
+  d.title=d.title||'未命名';
+  d.synopsis=d.synopsis||'';
+  d.visualStyle=d.visualStyle||'';
+  d.directorReference=d.directorReference||[];
+  d.theme=d.theme||'';
+  d.emotionArc=d.emotionArc||'';
+  if(!d.episodes||!d.episodes.length)d.episodes=[{ep:1,title:'',shots:[]}];
+  d.episodes.forEach(ep=>{
+    ep.title=ep.title||'';
+    (ep.shots||[]).forEach(sh=>{
+      sh.time=sh.time||'';
+      sh.emotion=sh.emotion||'';
+      sh.desc=sh.desc||'';
+      sh.camera_movement=sh.camera_movement||'固定';
+      sh.lens=sh.lens||'标准';
+      sh.composition=sh.composition||'三分法';
+      sh.lighting=sh.lighting||'自然光';
+      sh.intention=sh.intention||'叙述推进';
+      sh.prompt_cinematic=sh.prompt_cinematic||'';
+      if(!sh.dialogues)sh.dialogues=[];
+    });
+  });
+  d.characters=d.characters||[];
+  d.rhythmDesign=d.rhythmDesign||{opening:'',midpoint:'',climax:'',resolution:''};
+  d.publish=d.publish||{titles:[],tags:[],copy:'',platform:''};
+  return d;
 }
 
 // ===== 电影模式渲染 =====
@@ -617,18 +742,17 @@ function renderFilm(d){
     html+='<div class="module-title">🎥 第'+ep.ep+'章 · '+escape(ep.title||'')+'</div>';
     (ep.shots||[]).forEach((sh,si)=>{
       html+='<div class="film-shot-card">';
-      html+='<div class="film-shot-num">'+(si+1)+'</div>';
-      html+='<div class="film-shot-desc"><strong style="color:var(--gl)">'+escape(sh.time||'')+'</strong> · '+escape(sh.emotion||'')+'<br>'+escape(sh.desc||'')+'</div>';
+      html+='<div class="film-shot-num">#'+(si+1)+'</div>';
+      html+='<div class="film-shot-desc"><strong style="color:var(--gl)">'+escape(sh.time||'')+'</strong> · <em style="color:rgba(200,160,140,0.6)">'+escape(sh.emotion||'')+'</em><br>'+escape(sh.desc||'')+'</div>';
 
-      if(sh.camera_movement||sh.lens||sh.composition||sh.lighting){
-        html+='<div class="film-tech-grid">';
-        if(sh.camera_movement)html+='<div><span class="ft-label">运动</span><br><span class="ft-val">'+escape(sh.camera_movement)+'</span></div>';
-        if(sh.lens)html+='<div><span class="ft-label">焦段</span><br><span class="ft-val">'+escape(sh.lens)+'</span></div>';
-        if(sh.composition)html+='<div><span class="ft-label">构图</span><br><span class="ft-val">'+escape(sh.composition)+'</span></div>';
-        if(sh.lighting)html+='<div><span class="ft-label">光线</span><br><span class="ft-val">'+escape(sh.lighting)+'</span></div>';
-        if(sh.intention)html+='<div><span class="ft-label">意图</span><br><span class="ft-val">'+escape(sh.intention)+'</span></div>';
-        html+='</div>';
-      }
+      // 永远显示6要素
+      html+='<div class="film-tech-grid">';
+      html+='<div><span class="ft-label">运动</span><br><span class="ft-val">'+escape(sh.camera_movement||'—')+'</span></div>';
+      html+='<div><span class="ft-label">焦段</span><br><span class="ft-val">'+escape(sh.lens||'—')+'</span></div>';
+      html+='<div><span class="ft-label">构图</span><br><span class="ft-val">'+escape(sh.composition||'—')+'</span></div>';
+      html+='<div><span class="ft-label">光线</span><br><span class="ft-val">'+escape(sh.lighting||'—')+'</span></div>';
+      html+='<div><span class="ft-label">意图</span><br><span class="ft-val">'+escape(sh.intention||'—')+'</span></div>';
+      html+='</div>';
 
       if(sh.prompt_cinematic)html+='<div class="film-prompt">🎬 '+escape(sh.prompt_cinematic)+'</div>';
 
@@ -644,16 +768,14 @@ function renderFilm(d){
   }
 
   // 节奏设计
-  if(d.rhythmDesign){
-    const rd=d.rhythmDesign;
-    html+='<div class="module-title">🎭 节奏设计</div>';
-    html+='<div class="film-block"><div class="film-tech-grid">';
-    if(rd.opening)html+='<div><span class="ft-label">开场</span><br><span class="ft-val">'+escape(rd.opening)+'</span></div>';
-    if(rd.midpoint)html+='<div><span class="ft-label">中段</span><br><span class="ft-val">'+escape(rd.midpoint)+'</span></div>';
-    if(rd.climax)html+='<div><span class="ft-label">高潮</span><br><span class="ft-val">'+escape(rd.climax)+'</span></div>';
-    if(rd.resolution)html+='<div><span class="ft-label">收尾</span><br><span class="ft-val">'+escape(rd.resolution)+'</span></div>';
-    html+='</div></div>';
-  }
+  const rd=d.rhythmDesign||{};
+  html+='<div class="module-title">🎭 节奏设计</div>';
+  html+='<div class="film-block"><div class="film-tech-grid">';
+  html+='<div><span class="ft-label">开场</span><br><span class="ft-val">'+escape(rd.opening||'—')+'</span></div>';
+  html+='<div><span class="ft-label">中段</span><br><span class="ft-val">'+escape(rd.midpoint||'—')+'</span></div>';
+  html+='<div><span class="ft-label">高潮</span><br><span class="ft-val">'+escape(rd.climax||'—')+'</span></div>';
+  html+='<div><span class="ft-label">收尾</span><br><span class="ft-val">'+escape(rd.resolution||'—')+'</span></div>';
+  html+='</div></div>';
 
   // 发布
   const pb=d.publish||{};
