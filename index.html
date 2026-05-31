@@ -258,6 +258,10 @@ footer .brand{font-family:'NF',serif;color:rgba(212,164,74,0.35);font-size:12px}
 
 <div class="input-card" id="inputCard">
   <div class="input-group"><label>输入一句短剧故事</label><textarea id="storyInput" placeholder="比如：霸总爱上灰姑娘，先婚后爱甜中带虐。&#10;或者粘贴小说片段、故事梗概……"></textarea></div>
+  <div class="inline-row">
+    <div class="input-group"><label>集数</label><select id="episodes"><option value="1">1集</option><option value="3" selected>3集</option><option value="6">6集</option></select></div>
+    <div class="input-group"><label>每集时长</label><select id="duration"><option value="1">1分钟</option><option value="3" selected>3分钟</option><option value="5">5分钟</option></select></div>
+  </div>
   <button class="gen-btn" id="genBtnMain" onclick="generate()"><span class="shimmer"></span>🎬 生成短剧制作包</button>
   <div class="quota-hint" id="quotaHint">免费生成，结果带水印 · 去水印 ¥6</div>
   <div class="error-box" id="errorBox"></div>
@@ -359,7 +363,7 @@ footer .brand{font-family:'NF',serif;color:rgba(212,164,74,0.35);font-size:12px}
 const SK='juyin_api_key';
 let cr=null;
 
-function init(){uSI();try{const pb=document.getElementById('apiKeyPrompt');if(pb&&!gK())pb.classList.add('active')}catch(e){}if(!localStorage.getItem('juyin_vfinal')){setTimeout(()=>st('👋 输入想法，分析结构潜力'),800);localStorage.setItem('juyin_vfinal','1')}}
+function init(){uSI();try{const pb=document.getElementById('apiKeyPrompt');if(pb&&!gK())pb.classList.add('active')}catch(e){}if(!localStorage.getItem('juyin_vfinal')){setTimeout(()=>st('👋 输入故事，直接生成短剧'),800);localStorage.setItem('juyin_vfinal','1')}}
 init();
 
 function gK(){return localStorage.getItem(SK)||''}
@@ -381,7 +385,12 @@ function sL(s){document.getElementById('loadingState').classList.toggle('active'
 async function generate(){
   hE();const k=gK();if(!k){sE('请先点⚙设置API Key');oS();return}
   const desc=document.getElementById('storyInput').value.trim();if(!desc){sE('至少写一句话故事');return}
-  const genre='通用',epCount=3,shotsPerEp=6;
+  const epCount=parseInt(document.getElementById('episodes').value);
+  const durMin=parseInt(document.getElementById('duration').value);
+  const durSec=durMin*60;
+  const shotsPerEp=Math.ceil(durSec/8); // 每镜约8秒
+  const totalShots=epCount*shotsPerEp;
+  if(totalShots>50){sE(`共${totalShots}个镜头太多，建议减少集数或时长`);return}
   const btn=document.getElementById('genBtnMain');btn.disabled=true;
   document.getElementById('inputCard').style.display='none';document.getElementById('resultWrap').classList.remove('active');
   document.getElementById('productionContent').classList.remove('active');sL(true);
@@ -390,20 +399,18 @@ async function generate(){
 
 内部评估（不展示给用户，只用于提高生成质量）：
 - 情绪张力、冲突密度、反转设计、传播适配、制作可行性（各0-10）
-- 传播潜力总分
-- 匹配参考模板（8种之一）
 
 核心输出（必须完整）：
-每个镜头含即梦/可灵prompt；角色一致；对白≤20字带情绪；健康`;
+每集恰好${shotsPerEp}个镜头，每镜约8秒；含即梦/可灵prompt；角色一致；对白≤20字带情绪；健康`;
 
-  const usr=`故事：${desc}\n类型：${genre} · ${epCount}集 · 每集约${shotsPerEp}镜头\n\nJSON：{
+  const usr=`故事：${desc}\n${epCount}集 · 每集${durMin}分钟 · 每集${shotsPerEp}个镜头（每镜约8秒）\n\nJSON：{
   "title":"剧名","synopsis":"简介","visualStyle":"视觉风格",
   "episodes":[{"ep":1,"title":"集名","cliffhanger":"钩子",
-    "shots":[{"time":"0-3秒","emotion":"情绪","desc":"画面","prompt_jimeng":"即梦","prompt_keling":"可灵",
+    "shots":[{"time":"0-8秒","emotion":"情绪","desc":"画面","prompt_jimeng":"即梦","prompt_keling":"可灵",
       "dialogues":[{"name":"角色","emotion":"情绪","text":"对白"}]}]
   }],
   "characters":[{"name":"","role":"","visualAnchor":"外貌","behaviorAnchor":"行为","forbidden":"不可变"}],
-  "clipStructure":{"timeline":[{"time":"0-3秒","label":"冲突钩子","desc":"","bgm":""},{"time":"3-6秒","label":"推进","desc":"","bgm":""},{"time":"6-9秒","label":"反转","desc":"","bgm":""},{"time":"9-12秒","label":"悬念","desc":"","bgm":""}],"overallBgm":"BGM"},
+  "clipStructure":{"timeline":[{"time":"0-25%","label":"冲突钩子","desc":"","bgm":""},{"time":"25-50%","label":"推进","desc":"","bgm":""},{"time":"50-75%","label":"反转","desc":"","bgm":""},{"time":"75-100%","label":"悬念","desc":"","bgm":""}],"overallBgm":"BGM"},
   "publish":{"titles":["3标题"],"tags":["5标签"],"copy":"文案","platform":"推荐平台+时长"}
 }`;
 
@@ -414,17 +421,18 @@ async function generate(){
     if(!r.ok){const je=await r.json().catch(()=>({}));if(r.status===401)throw new Error('API Key 无效或已过期，<a href="#" onclick="oS()">点此重新设置</a>');if(r.status===402)throw new Error('DeepSeek 余额不足，<a href="https://platform.deepseek.com/top_up" target="_blank">点此充值</a>');throw new Error(je.error?.message||'出错')}
     const d=await r.json();let ct=d.choices?.[0]?.message?.content;if(!ct)throw new Error('空');
     let pd;try{pd=JSON.parse(ct.replace(/```json|```/g,'').trim())}catch{const m=ct.match(/\{[\s\S]*\}/);if(m)pd=JSON.parse(m[0].replace(/,\s*}/g,'}').replace(/,\s*\]/g,']'));else throw new Error('格式')}
-    sL(false);cr=pd;renderProduction(pd);document.getElementById('resultWrap').classList.add('active');
+    sL(false);cr=pd;cr._epCount=epCount;cr._durMin=durMin;renderProduction(pd,epCount,durMin);document.getElementById('resultWrap').classList.add('active');
     document.getElementById('genBtnMain').disabled=false;document.getElementById('inputCard').style.display='block';
     document.getElementById('resultWrap').scrollIntoView({behavior:'smooth'});
   }catch(err){clearTimeout(tid);sL(false);btn.disabled=false;document.getElementById('inputCard').style.display='block';if(err.name==='AbortError')sE('超时，请重试');else sE(err.message)}
 }
 
 // ===== 直接渲染制作包 =====
-function renderProduction(d){
+function renderProduction(d,epCount,durMin){
   document.getElementById('dramaTitle').textContent=d.title||'未命名';
-  document.getElementById('genreBadge').textContent='高清制作包';
-  document.getElementById('epBadge').textContent=d.visualStyle||'';
+  document.getElementById('genreBadge').textContent=epCount+'集';
+  document.getElementById('epBadge').textContent=durMin+'分钟/集';
+  document.getElementById('consistencyBadge').textContent=d.visualStyle||'';
   document.getElementById('synopsisText').textContent=d.synopsis||'';
 
   const tabs=document.getElementById('epTabs'),contents=document.getElementById('epContents');tabs.innerHTML='';contents.innerHTML='';
@@ -446,7 +454,7 @@ function swEp(i){document.querySelectorAll('#epTabs .ep-tab').forEach((t,idx)=>t
 function resetForm(){document.getElementById('resultWrap').classList.remove('active');document.getElementById('productionContent').classList.remove('active');document.getElementById('genBtnMain').disabled=false;window.scrollTo({top:0,behavior:'smooth'})}
 function cpS(btn,ep,shot){const c=btn.closest('.shot-card');let t=`第${ep}集·镜头${shot}\n${c.querySelector('.shot-desc')?.textContent||''}\n`;c.querySelectorAll('.shot-prompt').forEach(p=>{t+=p.textContent+'\n'});navigator.clipboard.writeText(t).then(()=>{btn.textContent='✓';setTimeout(()=>btn.textContent='📋',1200);st('复制镜头')})}
 function copyAllResult(){if(!cr)return;const d=cr;let t=`【${d.title}】\n${d.synopsis||''}\n\n`;(d.episodes||[]).forEach(ep=>{t+=`\n第${ep.ep}集《${ep.title}》\n`;(ep.shots||[]).forEach((sh,si)=>{t+=`\n镜头${si+1}(${sh.time||''})：${sh.emotion||''}\n${sh.desc||''}\n即梦：${sh.prompt_jimeng||''}\n可灵：${sh.prompt_keling||''}\n`})});const pb=d.publish||{};t+=`\n--- 发布 ---\n标题：${(pb.titles||[]).join(' / ')}\n标签：${(pb.tags||[]).join(' ')}\n文案：${pb.copy||''}\n`;t+='\n—— 剧引 · AI生成 ——';navigator.clipboard.writeText(t).then(()=>{const b=document.getElementById('copyBtn');b.textContent='✓';b.classList.add('copied');setTimeout(()=>{b.textContent='📋 复制全部';b.classList.remove('copied')},1500);st('已复制')})}
-async function retryGenerate(){if(!cr)return;const k=gK();if(!k){sE('请设Key');return}const b=document.getElementById('retryBtn');b.disabled=true;b.textContent='⏳';document.getElementById('productionContent').classList.remove('active');sL(true);let tid;try{const ctrl=new AbortController();tid=setTimeout(()=>ctrl.abort(),90000);const r=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+k},body:JSON.stringify({model:'deepseek-v4-pro',messages:[{role:'system',content:'你是短剧一键成片引擎，直接输出制作包JSON。'},{role:'user',content:'重新生成更好的一版。'}],max_tokens:16384,temperature:0.95,response_format:{type:'json_object'}}),signal:ctrl.signal});clearTimeout(tid);if(!r.ok)throw new Error('失败');const d=await r.json();let ct=d.choices?.[0]?.message?.content;if(!ct)throw new Error('空');let pd;try{pd=JSON.parse(ct.replace(/```json|```/g,'').trim())}catch{const m=ct.match(/\{[\s\S]*\}/);if(m)pd=JSON.parse(m[0].replace(/,\s*}/g,'}').replace(/,\s*\]/g,']'));else throw new Error('格式')}sL(false);cr=pd;renderProduction(pd);document.getElementById('resultWrap').classList.add('active');b.disabled=false;document.getElementById('resultWrap').scrollIntoView({behavior:'smooth'})}catch(e){clearTimeout(tid);sL(false);b.disabled=false;sE('重试失败')}}
+async function retryGenerate(){if(!cr)return;const k=gK();if(!k){sE('请设Key');return}const b=document.getElementById('retryBtn');b.disabled=true;b.textContent='⏳';document.getElementById('productionContent').classList.remove('active');sL(true);let tid;try{const ctrl=new AbortController();tid=setTimeout(()=>ctrl.abort(),90000);const r=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+k},body:JSON.stringify({model:'deepseek-v4-pro',messages:[{role:'system',content:'你是短剧一键成片引擎，直接输出制作包JSON。'},{role:'user',content:'重新生成更好的一版。'}],max_tokens:16384,temperature:0.95,response_format:{type:'json_object'}}),signal:ctrl.signal});clearTimeout(tid);if(!r.ok)throw new Error('失败');const d=await r.json();let ct=d.choices?.[0]?.message?.content;if(!ct)throw new Error('空');let pd;try{pd=JSON.parse(ct.replace(/```json|```/g,'').trim())}catch{const m=ct.match(/\{[\s\S]*\}/);if(m)pd=JSON.parse(m[0].replace(/,\s*}/g,'}').replace(/,\s*\]/g,']'));else throw new Error('格式')}sL(false);cr=pd;cr._epCount=cr._epCount||3;cr._durMin=cr._durMin||3;renderProduction(pd,cr._epCount,cr._durMin);document.getElementById('resultWrap').classList.add('active');b.disabled=false;document.getElementById('resultWrap').scrollIntoView({behavior:'smooth'})}catch(e){clearTimeout(tid);sL(false);b.disabled=false;sE('重试失败')}}
 
 // ===== 数据反馈 =====
 function loadExistingData(title){document.getElementById('fbPlays').value='';document.getElementById('fbCompletion').value='';document.getElementById('evolutionHint').style.display='none'}
