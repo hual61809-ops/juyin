@@ -56,6 +56,15 @@ header{display:flex;align-items:center;justify-content:space-between;padding:20p
 .inspire-chip:hover{border-color:var(--gold);color:var(--gl);background:rgba(212,164,74,0.1)}
 .inspire-random{padding:5px 12px;border-radius:100px;border:1px dashed rgba(96,144,184,0.35);background:rgba(96,144,184,0.06);color:var(--blue);font-size:11px;cursor:pointer;transition:all .15s;white-space:nowrap}
 .inspire-random:hover{border-color:var(--blue);background:rgba(96,144,184,0.12)}
+
+.mode-tabs{display:flex;gap:0;margin-bottom:14px;border-radius:8px;overflow:hidden;border:1px solid var(--bd)}
+.mode-tab{flex:1;padding:10px 0;text-align:center;font-size:12px;cursor:pointer;transition:all .2s;background:rgba(255,255,255,0.02);color:var(--gray);letter-spacing:1px}
+.mode-tab:first-child{border-right:1px solid var(--bd)}
+.mode-tab.active{background:rgba(212,164,74,0.1);color:var(--gold);font-weight:700}
+.mode-tab.film.active{background:rgba(96,144,184,0.1);color:var(--blue)}
+.mode-tab .mode-icon{display:block;font-size:16px;margin-bottom:2px}
+.mode-tab .mode-hint{font-size:9px;opacity:0.5;margin-top:1px}
+
 .gen-btn{width:100%;margin-top:4px;padding:16px;background:linear-gradient(135deg,var(--gold),var(--gl));border:none;border-radius:10px;color:var(--ink);font-family:'NF',serif;font-size:16px;font-weight:700;letter-spacing:4px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
 .gen-btn:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(212,164,74,0.35)}
 .gen-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
@@ -193,6 +202,19 @@ header{display:flex;align-items:center;justify-content:space-between;padding:20p
 .pub-row span{color:rgba(240,235,224,0.6)}
 
 .data-feedback{background:rgba(96,144,184,0.06);border:1px solid rgba(96,144,184,0.2);border-radius:10px;padding:16px 18px;margin-top:14px}
+
+/* Film mode */
+.film-block{background:var(--bg2);border:1px solid rgba(96,144,184,0.12);border-left:3px solid var(--blue);border-radius:4px 10px 10px 4px;padding:16px 18px;margin-bottom:14px}
+.film-block strong{color:var(--blue);display:block;font-size:10px;letter-spacing:2px;margin-bottom:6px}
+.film-block p{font-size:11px;color:rgba(240,235,224,0.55);line-height:1.8;margin:0}
+.film-shot-card{background:var(--bg2);border:1px solid rgba(96,144,184,0.1);border-radius:10px;padding:16px 18px;margin-bottom:8px}
+.film-shot-num{font-family:'NF',serif;font-size:14px;font-weight:900;color:rgba(96,144,184,0.25);margin-bottom:6px}
+.film-shot-desc{font-size:12px;color:rgba(240,235,224,0.6);line-height:1.7;margin-bottom:8px}
+.film-tech-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;font-size:10px}
+.film-tech-grid .ft-label{color:var(--blue);opacity:0.6}
+.film-tech-grid .ft-val{color:rgba(240,235,224,0.4)}
+.film-prompt{background:rgba(96,144,184,0.04);border-left:2px solid rgba(96,144,184,0.4);padding:8px 12px;margin-top:8px;font-size:10px;color:rgba(180,200,220,0.5);line-height:1.6}
+.film-ref{display:inline-block;margin:2px;padding:2px 10px;border-radius:100px;background:rgba(96,144,184,0.06);border:1px solid rgba(96,144,184,0.15);font-size:9px;color:rgba(180,200,220,0.5)}
 .data-feedback strong{color:var(--blue);font-size:11px;display:block;margin-bottom:8px}
 .data-feedback p{font-size:10px;color:var(--gray);margin-bottom:10px;line-height:1.6}
 .fb-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
@@ -283,6 +305,10 @@ footer .brand{font-family:'NF',serif;color:rgba(212,164,74,0.35);font-size:12px}
     <div class="input-group"><label>集数</label><select id="episodes"><option value="1">1集</option><option value="3" selected>3集</option><option value="6">6集</option></select></div>
     <div class="input-group"><label>每集时长</label><select id="duration"><option value="1">1分钟</option><option value="3" selected>3分钟</option><option value="5">5分钟</option></select></div>
   </div>
+  <div class="mode-tabs">
+    <div class="mode-tab active" onclick="swM('short',this)" id="modeShort"><span class="mode-icon">🎬</span>短剧模式<span class="mode-hint">快节奏 · 可拍摄</span></div>
+    <div class="mode-tab film" onclick="swM('film',this)" id="modeFilm"><span class="mode-icon">🎥</span>电影模式<span class="mode-hint">导演级 · 电影感</span></div>
+  </div>
   <button class="gen-btn" id="genBtnMain" onclick="generate()"><span class="shimmer"></span>🎬 生成短剧制作包</button>
   <div class="quota-hint" id="quotaHint">免费生成，结果带水印 · 去水印 ¥6</div>
   <div class="error-box" id="errorBox"></div>
@@ -291,7 +317,8 @@ footer .brand{font-family:'NF',serif;color:rgba(212,164,74,0.35);font-size:12px}
 <div class="pricing-row">
   <div class="pricing-card"><div class="pricing-name">免费</div><div class="pricing-price" style="font-size:17px">¥0</div><div class="pricing-desc"><span>完整制作包</span><span>带水印</span></div></div>
   <div class="pricing-card highlight"><div class="pricing-name">去水印 ⭐</div><div class="pricing-price">¥6</div><div class="pricing-unit">/次</div><div class="pricing-desc"><span>去除水印</span><span>高清输出</span></div></div>
-  <div class="pricing-card pro"><div class="pricing-name">无限版</div><div class="pricing-price">¥39</div><div class="pricing-unit">/月</div><div class="pricing-desc"><span>无限生成</span><span>无水印</span></div></div>
+  <div class="pricing-card pro"><div class="pricing-name">无限版</div><div class="pricing-price">¥39</div><div class="pricing-unit">/月</div><div class="pricing-desc"><span>无限短剧</span><span>模板库</span></div></div>
+  <div class="pricing-card" style="border-color:rgba(96,144,184,0.3);background:rgba(96,144,184,0.04)"><div class="pricing-name">电影模式</div><div class="pricing-price" style="color:var(--blue)">¥99</div><div class="pricing-unit">/月</div><div class="pricing-desc"><span>导演级输出</span><span>镜头6要素</span></div></div>
 </div>
 
 <div class="loading" id="loadingState">
@@ -382,7 +409,7 @@ footer .brand{font-family:'NF',serif;color:rgba(212,164,74,0.35);font-size:12px}
 
 <script>
 const SK='juyin_api_key';
-let cr=null;
+let cr=null,curMode='short';
 
 function init(){uSI();try{const pb=document.getElementById('apiKeyPrompt');if(pb&&!gK())pb.classList.add('active')}catch(e){}if(!localStorage.getItem('juyin_vfinal')){setTimeout(()=>st('👋 输入故事，直接生成短剧'),800);localStorage.setItem('juyin_vfinal','1')}}
 init();
@@ -423,13 +450,36 @@ function rI(){
 function sE(m){const e=document.getElementById('errorBox');e.innerHTML=m;e.classList.add('active')}
 function hE(){document.getElementById('errorBox').classList.remove('active')}
 
+function swM(m,el){
+  curMode=m;
+  document.querySelectorAll('.mode-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  const btn=document.getElementById('genBtnMain');
+  const hint=document.getElementById('quotaHint');
+  document.getElementById('episodes').parentElement.parentElement.style.display=m==='short'?'':'none';
+  if(m==='film'){
+    btn.innerHTML='<span class="shimmer"></span>🎥 生成导演级制作包';
+    hint.textContent='免费预览，完整输出 · ¥99/月解锁';
+  } else {
+    btn.innerHTML='<span class="shimmer"></span>🎬 生成短剧制作包';
+    hint.textContent='免费生成，结果带水印 · 去水印 ¥6';
+  }
+}
+
 const LS=['拆解镜头脚本…','设计角色外观…','匹配BGM节奏…','编写AI提示词…','生成剪映结构…','准备发布文案…'];
+const LS_F=['分析导演意图…','设计镜头调度…','构建视觉语言…','确定摄影规则…','计算情绪节奏…','生成电影级prompt…'];
 let li;
-function sL(s){document.getElementById('loadingState').classList.toggle('active',s);if(s){let i=0;document.getElementById('loadingStep').textContent=LS[0];li=setInterval(()=>{i=(i+1)%LS.length;document.getElementById('loadingStep').textContent=LS[i]},1200)}else{clearInterval(li)}}
+function sL(s,mode){document.getElementById('loadingState').classList.toggle('active',s);if(s){let i=0;const steps=mode==='film'?LS_F:LS;document.getElementById('loadingStep').textContent=steps[0];document.querySelector('.loading-text').textContent=mode==='film'?'正在生成导演级制作包':'正在生成短剧制作包';li=setInterval(()=>{i=(i+1)%steps.length;document.getElementById('loadingStep').textContent=steps[i]},1500)}else{clearInterval(li)}}
 
 async function generate(){
   hE();const k=gK();if(!k){sE('请先点⚙设置API Key');oS();return}
   const desc=document.getElementById('storyInput').value.trim();if(!desc){sE('至少写一句话故事');return}
+  if(curMode==='film')return generateFilm(desc);
+  return generateShort(desc);
+}
+
+async function generateShort(desc){
+  const k=gK();
   const epCount=parseInt(document.getElementById('episodes').value);
   const durMin=parseInt(document.getElementById('duration').value);
   const durSec=durMin*60;
@@ -472,7 +522,156 @@ async function generate(){
   }catch(err){clearTimeout(tid);sL(false);btn.disabled=false;document.getElementById('inputCard').style.display='block';if(err.name==='AbortError')sE('超时，请重试');else sE(err.message)}
 }
 
-// ===== 直接渲染制作包 =====
+// ===== 电影模式生成引擎 =====
+async function generateFilm(desc){
+  const k=gK();
+  const btn=document.getElementById('genBtnMain');btn.disabled=true;
+  document.getElementById('inputCard').style.display='none';document.getElementById('resultWrap').classList.remove('active');
+  document.getElementById('productionContent').classList.remove('active');sL(true,'film');
+
+  const sys=`你是电影导演系统。你不是AI写剧本工具——你是导演思考的延伸。
+
+你必须输出导演级的镜头语言，每个镜头都包含完整的制作信息。
+
+导演思考框架（内化，不输出原文）：
+1. theme：这个场景的主题是什么
+2. emotion_arc：情绪从哪到哪
+3. pacing：节奏是快是慢
+4. visual_language：用什么视觉语言（现实主义/风格化/手持纪实/唯美主义）
+5. cinematography_rules：整体摄影规则
+6. director_reference：参考哪位导演的风格（王家卫/诺兰/奉俊昊/张艺谋/是枝裕和等）
+
+每个镜头必须包含6要素：
+- camera_movement：摄影机运动（推拉摇移跟升降/手持/斯坦尼康/固定）
+- lens：焦段（广角/长焦/标准/微距/鱼眼）
+- composition：构图（三分法/对称/引导线/框架/俯拍/仰拍）
+- lighting：光线设计（柔光/硬光/逆光/侧光/底光/自然光/霓虹）
+- intention：这个镜头要传达什么（导演意图）
+- prompt_cinematic：可直接用于AI出图的英文cinematic prompt
+
+输出结构：
+- 每集12-16个镜头
+- 每镜含完整6要素
+- 对白精简，每句≤15字
+- 视觉锚点贯穿全片
+- 风格参考`;
+
+  const usr=`故事：${desc}\n\n这是一个导演级制作请求。请输出JSON：{
+  "title":"片名","synopsis":"剧情简介","visualStyle":"视觉风格关键词",
+  "directorReference":["参考导演","风格标签"],
+  "theme":"核心主题",
+  "emotionArc":"开头情绪→结尾情绪",
+  "episodes":[{"ep":1,"title":"章名",
+    "shots":[{
+      "time":"时间码","emotion":"情绪",
+      "desc":"导演层面的画面描述",
+      "camera_movement":"摄影机运动",
+      "lens":"焦段",
+      "composition":"构图方式",
+      "lighting":"光线设计",
+      "intention":"导演意图（一个动词）",
+      "prompt_cinematic":"英文cinematic prompt",
+      "dialogues":[{"name":"角色","emotion":"情绪","text":"对白（≤15字）"}]}]
+  }],
+  "characters":[{"name":"","role":"","visualAnchor":"视觉锚点","forbidden":"不可变特征"}],
+  "rhythmDesign":{"opening":"开场节奏","midpoint":"中段节奏","climax":"高潮节奏","resolution":"收尾节奏"},
+  "publish":{"titles":[""],"tags":[""],"copy":"","platform":""}
+}`;
+
+  let tid;try{
+    const ctrl=new AbortController();tid=setTimeout(()=>ctrl.abort(),120000);
+    const r=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+k},body:JSON.stringify({model:'deepseek-v4-pro',messages:[{role:'system',content:sys},{role:'user',content:usr}],max_tokens:24576,temperature:0.8,response_format:{type:'json_object'}}),signal:ctrl.signal});
+    clearTimeout(tid);
+    if(!r.ok){const je=await r.json().catch(()=>({}));if(r.status===401)throw new Error('API Key 无效或已过期，<a href="#" onclick="oS()">点此重新设置</a>');if(r.status===402)throw new Error('DeepSeek 余额不足，<a href="https://platform.deepseek.com/top_up" target="_blank">点此充值</a>');throw new Error(je.error?.message||'出错')}
+    const d=await r.json();let ct=d.choices?.[0]?.message?.content;if(!ct)throw new Error('空');
+    let pd;try{pd=JSON.parse(ct.replace(/```json|```/g,'').trim())}catch{const m=ct.match(/\{[\s\S]*\}/);if(m)pd=JSON.parse(m[0].replace(/,\s*}/g,'}').replace(/,\s*\]/g,']'));else throw new Error('格式')}
+    sL(false);cr=pd;cr._mode='film';renderFilm(pd);document.getElementById('resultWrap').classList.add('active');
+    document.getElementById('genBtnMain').disabled=false;document.getElementById('inputCard').style.display='block';
+    document.getElementById('resultWrap').scrollIntoView({behavior:'smooth'});
+  }catch(err){clearTimeout(tid);sL(false);btn.disabled=false;document.getElementById('inputCard').style.display='block';if(err.name==='AbortError')sE('超时，请减少复杂度后重试');else sE(err.message)}
+}
+
+// ===== 电影模式渲染 =====
+function renderFilm(d){
+  // 清空短剧渲染区
+  document.getElementById('productionContent').innerHTML='';
+
+  let html='<div class="header-row"><div class="result-title">'+escape(d.title||'未命名')+'</div>';
+  html+='<div class="result-meta"><span class="badge badge-gold">🎥 电影模式</span>';
+  if(d.visualStyle)html+='<span class="badge badge-green">'+escape(d.visualStyle)+'</span>';
+  html+='</div></div>';
+
+  if(d.synopsis)html+='<div class="synopsis">'+escape(d.synopsis)+'</div>';
+
+  // 导演参考
+  if(d.directorReference||d.theme){
+    html+='<div class="film-block"><strong>🎬 导演参考</strong><p>';
+    if(d.directorReference)html+='参考：'+escape(d.directorReference.join(' · '))+'<br>';
+    if(d.theme)html+='主题：'+escape(d.theme)+'<br>';
+    if(d.emotionArc)html+='情绪弧线：'+escape(d.emotionArc);
+    html+='</p></div>';
+  }
+
+  // 镜-头
+  (d.episodes||[]).forEach((ep,ei)=>{
+    html+='<div class="module-title">🎥 第'+ep.ep+'章 · '+escape(ep.title||'')+'</div>';
+    (ep.shots||[]).forEach((sh,si)=>{
+      html+='<div class="film-shot-card">';
+      html+='<div class="film-shot-num">'+(si+1)+'</div>';
+      html+='<div class="film-shot-desc"><strong style="color:var(--gl)">'+escape(sh.time||'')+'</strong> · '+escape(sh.emotion||'')+'<br>'+escape(sh.desc||'')+'</div>';
+
+      if(sh.camera_movement||sh.lens||sh.composition||sh.lighting){
+        html+='<div class="film-tech-grid">';
+        if(sh.camera_movement)html+='<div><span class="ft-label">运动</span><br><span class="ft-val">'+escape(sh.camera_movement)+'</span></div>';
+        if(sh.lens)html+='<div><span class="ft-label">焦段</span><br><span class="ft-val">'+escape(sh.lens)+'</span></div>';
+        if(sh.composition)html+='<div><span class="ft-label">构图</span><br><span class="ft-val">'+escape(sh.composition)+'</span></div>';
+        if(sh.lighting)html+='<div><span class="ft-label">光线</span><br><span class="ft-val">'+escape(sh.lighting)+'</span></div>';
+        if(sh.intention)html+='<div><span class="ft-label">意图</span><br><span class="ft-val">'+escape(sh.intention)+'</span></div>';
+        html+='</div>';
+      }
+
+      if(sh.prompt_cinematic)html+='<div class="film-prompt">🎬 '+escape(sh.prompt_cinematic)+'</div>';
+
+      if(sh.dialogues&&sh.dialogues.length)html+='<div style="margin-top:4px;font-size:10px;color:rgba(240,235,224,0.35)">'+sh.dialogues.map(dl=>escape(dl.name)+'('+escape(dl.emotion||'')+')："'+escape(dl.text)+'"').join(' · ')+'</div>';
+      html+='</div>';
+    });
+  });
+
+  // 角色卡
+  if(d.characters&&d.characters.length){
+    html+='<div class="module-title">👤 角色</div>';
+    html+=d.characters.map(c=>'<div class="char-card"><div class="char-card-name">'+escape(c.name||'')+'（'+escape(c.role||'')+'）</div><div><div class="char-label">视觉锚点</div><div class="char-text">'+escape(c.visualAnchor||'—')+'</div></div><div><div class="char-label">不可变</div><div class="char-text" style="color:var(--red)">'+escape(c.forbidden||'—')+'</div></div></div>').join('');
+  }
+
+  // 节奏设计
+  if(d.rhythmDesign){
+    const rd=d.rhythmDesign;
+    html+='<div class="module-title">🎭 节奏设计</div>';
+    html+='<div class="film-block"><div class="film-tech-grid">';
+    if(rd.opening)html+='<div><span class="ft-label">开场</span><br><span class="ft-val">'+escape(rd.opening)+'</span></div>';
+    if(rd.midpoint)html+='<div><span class="ft-label">中段</span><br><span class="ft-val">'+escape(rd.midpoint)+'</span></div>';
+    if(rd.climax)html+='<div><span class="ft-label">高潮</span><br><span class="ft-val">'+escape(rd.climax)+'</span></div>';
+    if(rd.resolution)html+='<div><span class="ft-label">收尾</span><br><span class="ft-val">'+escape(rd.resolution)+'</span></div>';
+    html+='</div></div>';
+  }
+
+  // 发布
+  const pb=d.publish||{};
+  html+='<div class="module-title">📱 发布辅助</div>';
+  html+='<div class="publish-block">';
+  if(pb.titles&&pb.titles.length)html+='<div class="pub-row"><strong>📝 标题</strong>'+pb.titles.map((t,i)=>'<span>'+(i+1)+') '+escape(t)+'</span><br>').join('')+'</div>';
+  if(pb.tags&&pb.tags.length)html+='<div class="pub-row"><strong>🏷 标签</strong><span>'+escape(pb.tags.join(' · '))+'</span></div>';
+  if(pb.copy)html+='<div class="pub-row"><strong>📱 文案</strong><span>'+escape(pb.copy)+'</span></div>';
+  if(pb.platform)html+='<div style="padding:6px 10px;background:rgba(96,144,184,0.06);border-radius:6px;font-size:10px;color:var(--blue);margin-top:6px">📌 '+escape(pb.platform)+'</div>';
+  html+='</div>';
+
+  document.getElementById('productionContent').innerHTML=html;
+  document.getElementById('productionContent').classList.add('active');
+}
+
+function escape(s){if(typeof s!=='string')return '';const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+
+// ===== 直接渲染制作包（短剧模式）=====
 function renderProduction(d,epCount,durMin){
   document.getElementById('dramaTitle').textContent=d.title||'未命名';
   document.getElementById('genreBadge').textContent=epCount+'集';
@@ -498,8 +697,8 @@ function renderProduction(d,epCount,durMin){
 function swEp(i){document.querySelectorAll('#epTabs .ep-tab').forEach((t,idx)=>t.classList.toggle('active',idx===i));document.querySelectorAll('#epContents .ep-content').forEach((c,idx)=>c.classList.toggle('active',idx===i))}
 function resetForm(){document.getElementById('resultWrap').classList.remove('active');document.getElementById('productionContent').classList.remove('active');document.getElementById('genBtnMain').disabled=false;window.scrollTo({top:0,behavior:'smooth'})}
 function cpS(btn,ep,shot){const c=btn.closest('.shot-card');let t=`第${ep}集·镜头${shot}\n${c.querySelector('.shot-desc')?.textContent||''}\n`;c.querySelectorAll('.shot-prompt').forEach(p=>{t+=p.textContent+'\n'});navigator.clipboard.writeText(t).then(()=>{btn.textContent='✓';setTimeout(()=>btn.textContent='📋',1200);st('复制镜头')})}
-function copyAllResult(){if(!cr)return;const d=cr;let t=`【${d.title}】\n${d.synopsis||''}\n\n`;(d.episodes||[]).forEach(ep=>{t+=`\n第${ep.ep}集《${ep.title}》\n`;(ep.shots||[]).forEach((sh,si)=>{t+=`\n镜头${si+1}(${sh.time||''})：${sh.emotion||''}\n${sh.desc||''}\n即梦：${sh.prompt_jimeng||''}\n可灵：${sh.prompt_keling||''}\n`})});const pb=d.publish||{};t+=`\n--- 发布 ---\n标题：${(pb.titles||[]).join(' / ')}\n标签：${(pb.tags||[]).join(' ')}\n文案：${pb.copy||''}\n`;t+='\n—— 剧引 · AI生成 ——';navigator.clipboard.writeText(t).then(()=>{const b=document.getElementById('copyBtn');b.textContent='✓';b.classList.add('copied');setTimeout(()=>{b.textContent='📋 复制全部';b.classList.remove('copied')},1500);st('已复制')})}
-async function retryGenerate(){if(!cr)return;const k=gK();if(!k){sE('请设Key');return}const b=document.getElementById('retryBtn');b.disabled=true;b.textContent='⏳';document.getElementById('productionContent').classList.remove('active');sL(true);let tid;try{const ctrl=new AbortController();tid=setTimeout(()=>ctrl.abort(),90000);const r=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+k},body:JSON.stringify({model:'deepseek-v4-pro',messages:[{role:'system',content:'你是短剧一键成片引擎，直接输出制作包JSON。'},{role:'user',content:'重新生成更好的一版。'}],max_tokens:16384,temperature:0.95,response_format:{type:'json_object'}}),signal:ctrl.signal});clearTimeout(tid);if(!r.ok)throw new Error('失败');const d=await r.json();let ct=d.choices?.[0]?.message?.content;if(!ct)throw new Error('空');let pd;try{pd=JSON.parse(ct.replace(/```json|```/g,'').trim())}catch{const m=ct.match(/\{[\s\S]*\}/);if(m)pd=JSON.parse(m[0].replace(/,\s*}/g,'}').replace(/,\s*\]/g,']'));else throw new Error('格式')}sL(false);cr=pd;cr._epCount=cr._epCount||3;cr._durMin=cr._durMin||3;renderProduction(pd,cr._epCount,cr._durMin);document.getElementById('resultWrap').classList.add('active');b.disabled=false;document.getElementById('resultWrap').scrollIntoView({behavior:'smooth'})}catch(e){clearTimeout(tid);sL(false);b.disabled=false;sE('重试失败')}}
+function copyAllResult(){if(!cr)return;const d=cr;if(cr._mode==='film'){let t=`【${d.title}】· 电影模式\n${d.synopsis||''}\n\n`;if(d.directorReference)t+=`导演参考：${(d.directorReference||[]).join(' · ')}\n`;if(d.theme)t+=`主题：${d.theme}\n`;if(d.emotionArc)t+=`情绪弧：${d.emotionArc}\n`;(d.episodes||[]).forEach(ep=>{t+=`\n第${ep.ep}章《${ep.title||''}》\n`;(ep.shots||[]).forEach((sh,si)=>{t+=`\n镜头${si+1}(${sh.time||''})：${sh.emotion||''}\n${sh.desc||''}\n运动：${sh.camera_movement||'—'} | 焦段：${sh.lens||'—'} | 构图：${sh.composition||'—'}\n光线：${sh.lighting||'—'} | 意图：${sh.intention||'—'}\nCinematic：${sh.prompt_cinematic||''}\n`})});const pb=d.publish||{};t+=`\n--- 发布 ---\n标题：${(pb.titles||[]).join(' / ')}\n标签：${(pb.tags||[]).join(' ')}\n`;t+='\n—— 剧引 · 电影模式 ——';navigator.clipboard.writeText(t).then(()=>{const b=document.getElementById('copyBtn');b.textContent='✓';b.classList.add('copied');setTimeout(()=>{b.textContent='📋 复制全部';b.classList.remove('copied')},1500);st('已复制')})}else{let t=`【${d.title}】\n${d.synopsis||''}\n\n`;(d.episodes||[]).forEach(ep=>{t+=`\n第${ep.ep}集《${ep.title}》\n`;(ep.shots||[]).forEach((sh,si)=>{t+=`\n镜头${si+1}(${sh.time||''})：${sh.emotion||''}\n${sh.desc||''}\n即梦：${sh.prompt_jimeng||''}\n可灵：${sh.prompt_keling||''}\n`})});const pb=d.publish||{};t+=`\n--- 发布 ---\n标题：${(pb.titles||[]).join(' / ')}\n标签：${(pb.tags||[]).join(' ')}\n文案：${pb.copy||''}\n`;t+='\n—— 剧引 · AI生成 ——';navigator.clipboard.writeText(t).then(()=>{const b=document.getElementById('copyBtn');b.textContent='✓';b.classList.add('copied');setTimeout(()=>{b.textContent='📋 复制全部';b.classList.remove('copied')},1500);st('已复制')})}}
+async function retryGenerate(){if(!cr)return;const k=gK();if(!k){sE('请设Key');return}const b=document.getElementById('retryBtn');b.disabled=true;b.textContent='⏳';document.getElementById('productionContent').classList.remove('active');const isFilm=cr._mode==='film';sL(true,isFilm?'film':'');let tid;try{const ctrl=new AbortController();tid=setTimeout(()=>ctrl.abort(),isFilm?120000:90000);const sys=isFilm?'你是电影导演系统，输出导演级制作包JSON。':'你是短剧一键成片引擎，直接输出制作包JSON。';const r=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+k},body:JSON.stringify({model:'deepseek-v4-pro',messages:[{role:'system',content:sys},{role:'user',content:'重新生成更好的一版。'}],max_tokens:isFilm?24576:16384,temperature:0.95,response_format:{type:'json_object'}}),signal:ctrl.signal});clearTimeout(tid);if(!r.ok)throw new Error('失败');const d=await r.json();let ct=d.choices?.[0]?.message?.content;if(!ct)throw new Error('空');let pd;try{pd=JSON.parse(ct.replace(/```json|```/g,'').trim())}catch{const m=ct.match(/\{[\s\S]*\}/);if(m)pd=JSON.parse(m[0].replace(/,\s*}/g,'}').replace(/,\s*\]/g,']'));else throw new Error('格式')}sL(false);cr=pd;if(isFilm){cr._mode='film';renderFilm(pd)}else{cr._epCount=cr._epCount||3;cr._durMin=cr._durMin||3;renderProduction(pd,cr._epCount,cr._durMin)}document.getElementById('resultWrap').classList.add('active');b.disabled=false;document.getElementById('resultWrap').scrollIntoView({behavior:'smooth'})}catch(e){clearTimeout(tid);sL(false);b.disabled=false;sE('重试失败')}}
 
 // ===== 数据反馈 =====
 function loadExistingData(title){document.getElementById('fbPlays').value='';document.getElementById('fbCompletion').value='';document.getElementById('evolutionHint').style.display='none'}
