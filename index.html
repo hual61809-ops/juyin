@@ -236,6 +236,16 @@ header{display:flex;align-items:center;justify-content:space-between;padding:20p
 .viral-tag.cover{background:rgba(212,164,74,0.15);color:var(--gold);border:1px solid rgba(212,164,74,0.2)}
 .viral-tag.social{background:rgba(92,184,120,0.12);color:var(--green);border:1px solid rgba(92,184,120,0.2)}
 .shot-markers{display:flex;gap:6px;margin-top:4px;flex-wrap:wrap}
+
+.history-panel{display:none;margin-bottom:14px;background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:12px 16px}
+.history-panel.active{display:block}
+.history-panel .hist-title{font-size:10px;letter-spacing:2px;color:var(--gold);margin-bottom:8px}
+.history-item{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:11px;cursor:pointer;transition:all .15s}
+.history-item:hover{color:var(--gold)}
+.history-item:last-child{border-bottom:none}
+.history-item .hi-title{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.history-item .hi-time{font-size:9px;color:var(--gray);margin-left:8px;flex-shrink:0}
+.history-item .hi-del{padding:2px 6px;margin-left:6px;border-radius:4px;border:none;background:rgba(184,64,74,0.1);color:rgba(200,120,130,0.6);font-size:9px;cursor:pointer}
 .data-feedback strong{color:var(--blue);font-size:11px;display:block;margin-bottom:8px}
 .data-feedback p{font-size:10px;color:var(--gray);margin-bottom:10px;line-height:1.6}
 .fb-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
@@ -354,6 +364,12 @@ footer .brand{font-family:'NF',serif;color:rgba(212,164,74,0.35);font-size:12px}
     <button class="btn-sm" onclick="copyAllResult()" id="copyBtn">📋 复制全部</button>
     <button class="btn-sm" onclick="retryGenerate()" id="retryBtn" style="display:none">🔄 免费重试</button>
     <button class="btn-sm" onclick="resetForm()">↺ 重新生成</button>
+    <button class="btn-sm" onclick="tH()" id="histBtn">📜 历史</button>
+  </div>
+
+  <div class="history-panel" id="historyPanel">
+    <div class="hist-title">📜 生成历史</div>
+    <div id="historyList"></div>
   </div>
 
   <!-- 制作方案内容 -->
@@ -434,7 +450,7 @@ footer .brand{font-family:'NF',serif;color:rgba(212,164,74,0.35);font-size:12px}
 const SK='juyin_api_key';
 let cr=null,curMode='short';
 
-function init(){uSI();try{const pb=document.getElementById('apiKeyPrompt');if(pb&&!gK())pb.classList.add('active')}catch(e){}if(!localStorage.getItem('juyin_vfinal')){setTimeout(()=>st('👋 输入故事，直接生成短剧'),800);localStorage.setItem('juyin_vfinal','1')}}
+function init(){uSI();uH();try{const pb=document.getElementById('apiKeyPrompt');if(pb&&!gK())pb.classList.add('active')}catch(e){}if(!localStorage.getItem('juyin_vfinal')){setTimeout(()=>st('👋 输入故事，直接生成短剧'),800);localStorage.setItem('juyin_vfinal','1')}}
 init();
 
 function gK(){return localStorage.getItem(SK)||''}
@@ -664,6 +680,7 @@ ${epCount}集 · 每集${durMin}分钟 · 每集${shotsPerEp}个镜头（每镜�
     let pd;try{pd=JSON.parse(ct.replace(/```json|```/g,'').trim())}catch{const m=ct.match(/\{[\s\S]*\}/);if(m)pd=JSON.parse(m[0].replace(/,\s*}/g,'}').replace(/,\s*\]/g,']'));else throw new Error('格式')}
     pd=sanitizeShort(pd);
     sL(false);cr=pd;cr._epCount=epCount;cr._durMin=durMin;renderProduction(pd,epCount,durMin);document.getElementById('resultWrap').classList.add('active');
+    svH(pd,desc);
     document.getElementById('genBtnMain').disabled=false;document.getElementById('inputCard').style.display='block';
     document.getElementById('resultWrap').scrollIntoView({behavior:'smooth'});
   }catch(err){clearTimeout(tid);sL(false);btn.disabled=false;document.getElementById('inputCard').style.display='block';if(err.name==='AbortError')sE('超时，请重试');else sE(err.message)}
@@ -754,6 +771,7 @@ async function generateFilm(desc){
     let pd;try{pd=JSON.parse(ct.replace(/```json|```/g,'').trim())}catch{const m=ct.match(/\{[\s\S]*\}/);if(m)pd=JSON.parse(m[0].replace(/,\s*}/g,'}').replace(/,\s*\]/g,']'));else throw new Error('格式')}
     pd=sanitizeFilm(pd);
     sL(false);cr=pd;cr._mode='film';renderFilm(pd);document.getElementById('resultWrap').classList.add('active');
+    svH(pd,desc);
     document.getElementById('genBtnMain').disabled=false;document.getElementById('inputCard').style.display='block';
     document.getElementById('resultWrap').scrollIntoView({behavior:'smooth'});
   }catch(err){clearTimeout(tid);sL(false);btn.disabled=false;document.getElementById('inputCard').style.display='block';if(err.name==='AbortError')sE('超时，请减少复杂度后重试');else sE(err.message)}
@@ -950,6 +968,48 @@ function renderProduction(d,epCount,durMin){
 
 function swEp(i){document.querySelectorAll('#epTabs .ep-tab').forEach((t,idx)=>t.classList.toggle('active',idx===i));document.querySelectorAll('#epContents .ep-content').forEach((c,idx)=>c.classList.toggle('active',idx===i))}
 function resetForm(){document.getElementById('resultWrap').classList.remove('active');document.getElementById('productionContent').classList.remove('active');document.getElementById('genBtnMain').disabled=false;window.scrollTo({top:0,behavior:'smooth'})}
+
+// ===== 历史记录 =====
+const HK='juyin_history';
+function svH(d,desc){
+  let h=[];try{h=JSON.parse(localStorage.getItem(HK)||'[]')}catch(e){}
+  h.unshift({title:d.title||'未命名',desc:(desc||'').slice(0,60),data:d,time:Date.now()});
+  if(h.length>30)h=h.slice(0,30);
+  try{localStorage.setItem(HK,JSON.stringify(h))}catch(e){}
+  uH();
+}
+function uH(){
+  const btn=document.getElementById('histBtn');
+  let h=[];try{h=JSON.parse(localStorage.getItem(HK)||'[]')}catch(e){}
+  btn.textContent='📜 历史'+(h.length?' ('+h.length+')':'');
+}
+function tH(){
+  const p=document.getElementById('historyPanel');
+  p.classList.toggle('active');
+  if(p.classList.contains('active'))rH();
+}
+function rH(){
+  const el=document.getElementById('historyList');
+  let h=[];try{h=JSON.parse(localStorage.getItem(HK)||'[]')}catch(e){}
+  if(!h.length){el.innerHTML='<div style="font-size:10px;color:var(--gray);padding:4px 0">还没有历史记录</div>';return}
+  el.innerHTML=h.map((e,i)=>`<div class="history-item" onclick="rHr(${i})"><span class="hi-title">${e.title}</span><span class="hi-time">${new Date(e.time).toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span><span class="hi-del" onclick="event.stopPropagation();dH(${i})">✕</span></div>`).join('');
+}
+function rHr(i){
+  let h=[];try{h=JSON.parse(localStorage.getItem(HK)||'[]')}catch(e){}
+  if(!h[i])return;
+  const d=h[i].data;
+  cr=d;
+  if(d._mode==='film'){renderFilm(d);document.getElementById('resultWrap').classList.add('active')}
+  else{const ec=d._epCount||3,dm=d._durMin||3;renderProduction(d,ec,dm);document.getElementById('resultWrap').classList.add('active')}
+  document.getElementById('historyPanel').classList.remove('active');
+  document.getElementById('resultWrap').scrollIntoView({behavior:'smooth'});
+  st('加载：'+d.title);
+}
+function dH(i){
+  let h=[];try{h=JSON.parse(localStorage.getItem(HK)||'[]')}catch(e){}
+  h.splice(i,1);localStorage.setItem(HK,JSON.stringify(h));
+  rH();uH();
+}
 function cpS(btn,ep,shot){const c=btn.closest('.shot-card');let t=`第${ep}集·镜头${shot}\n${c.querySelector('.shot-desc')?.textContent||''}\n`;c.querySelectorAll('.shot-prompt').forEach(p=>{t+=p.textContent+'\n'});navigator.clipboard.writeText(t).then(()=>{btn.textContent='✓';setTimeout(()=>btn.textContent='📋',1200);st('复制镜头')})}
 function copyAllResult(){if(!cr)return;const d=cr;if(cr._mode==='film'){let t=`【${d.title}】· 电影模式\n${d.synopsis||''}\n\n`;if(d.directorReference)t+=`导演参考：${(d.directorReference||[]).join(' · ')}\n`;if(d.theme)t+=`主题：${d.theme}\n`;if(d.emotionArc)t+=`情绪弧：${d.emotionArc}\n`;(d.episodes||[]).forEach(ep=>{t+=`\n第${ep.ep}章《${ep.title||''}》\n`;(ep.shots||[]).forEach((sh,si)=>{t+=`\n镜头${si+1}(${sh.time||''})：${sh.emotion||''}\n${sh.desc||''}\n运动：${sh.camera_movement||'—'} | 焦段：${sh.lens||'—'} | 构图：${sh.composition||'—'}\n光线：${sh.lighting||'—'} | 意图：${sh.intention||'—'}\nCinematic：${sh.prompt_cinematic||''}\n`})});const pb=d.publish||{};t+=`\n--- 发布 ---\n标题：${(pb.titles||[]).join(' / ')}\n标签：${(pb.tags||[]).join(' ')}\n`;t+='\n—— 剧引 · 电影模式 ——';navigator.clipboard.writeText(t).then(()=>{const b=document.getElementById('copyBtn');b.textContent='✓';b.classList.add('copied');setTimeout(()=>{b.textContent='📋 复制全部';b.classList.remove('copied')},1500);st('已复制')})}else{let t=`【${d.title}】\n${d.synopsis||''}\n\n`;(d.episodes||[]).forEach(ep=>{t+=`\n第${ep.ep}集《${ep.title}》\n`;(ep.shots||[]).forEach((sh,si)=>{t+=`\n镜头${si+1}(${sh.time||''})：${sh.emotion||''}\n${sh.desc||''}\n即梦：${sh.prompt_jimeng||''}\n可灵：${sh.prompt_keling||''}\n`})});const pb=d.publish||{};t+=`\n--- 发布 ---\n标题：${(pb.titles||[]).join(' / ')}\n标签：${(pb.tags||[]).join(' ')}\n文案：${pb.copy||''}\n`;t+='\n—— 剧引 · AI生成 ——';navigator.clipboard.writeText(t).then(()=>{const b=document.getElementById('copyBtn');b.textContent='✓';b.classList.add('copied');setTimeout(()=>{b.textContent='📋 复制全部';b.classList.remove('copied')},1500);st('已复制')})}}
 async function retryGenerate(){if(!cr)return;const k=gK();if(!k){sE('请设Key');return}const b=document.getElementById('retryBtn');b.disabled=true;b.textContent='⏳';document.getElementById('productionContent').classList.remove('active');const isFilm=cr._mode==='film';sL(true,isFilm?'film':'');let tid;try{const ctrl=new AbortController();tid=setTimeout(()=>ctrl.abort(),isFilm?120000:90000);const sys=isFilm?'你是电影导演系统，输出导演级制作包JSON。':'你是短剧一键成片引擎，直接输出制作包JSON。';const r=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+k},body:JSON.stringify({model:'deepseek-v4-pro',messages:[{role:'system',content:sys},{role:'user',content:'重新生成更好的一版。'}],max_tokens:isFilm?24576:16384,temperature:0.95,response_format:{type:'json_object'}}),signal:ctrl.signal});clearTimeout(tid);if(!r.ok)throw new Error('失败');const d=await r.json();let ct=d.choices?.[0]?.message?.content;if(!ct)throw new Error('空');let pd;try{pd=JSON.parse(ct.replace(/```json|```/g,'').trim())}catch{const m=ct.match(/\{[\s\S]*\}/);if(m)pd=JSON.parse(m[0].replace(/,\s*}/g,'}').replace(/,\s*\]/g,']'));else throw new Error('格式')}sL(false);cr=pd;if(isFilm){cr._mode='film';renderFilm(pd)}else{cr._epCount=cr._epCount||3;cr._durMin=cr._durMin||3;renderProduction(pd,cr._epCount,cr._durMin)}document.getElementById('resultWrap').classList.add('active');b.disabled=false;document.getElementById('resultWrap').scrollIntoView({behavior:'smooth'})}catch(e){clearTimeout(tid);sL(false);b.disabled=false;sE('重试失败')}}
