@@ -48,6 +48,11 @@ header{display:flex;align-items:center;justify-content:space-between;padding:20p
 .input-group textarea::placeholder{color:#5a5348}
 .inline-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 
+.inspire-row{display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.inspire-chip{padding:5px 12px;border-radius:100px;border:1px solid rgba(212,164,74,0.2);background:rgba(212,164,74,0.04);color:rgba(240,235,224,0.6);font-size:11px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.inspire-chip:hover{border-color:var(--gold);color:var(--gl);background:rgba(212,164,74,0.1)}
+.inspire-random{padding:5px 12px;border-radius:100px;border:1px dashed rgba(96,144,184,0.35);background:rgba(96,144,184,0.06);color:var(--blue);font-size:11px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.inspire-random:hover{border-color:var(--blue);background:rgba(96,144,184,0.12)}
 .gen-btn{width:100%;margin-top:4px;padding:16px;background:linear-gradient(135deg,var(--gold),var(--gl));border:none;border-radius:10px;color:var(--ink);font-family:'NF',serif;font-size:16px;font-weight:700;letter-spacing:4px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
 .gen-btn:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(212,164,74,0.35)}
 .gen-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
@@ -257,7 +262,19 @@ footer .brand{font-family:'NF',serif;color:rgba(212,164,74,0.35);font-size:12px}
 </section>
 
 <div class="input-card" id="inputCard">
-  <div class="input-group"><label>输入一句短剧故事</label><textarea id="storyInput" placeholder="比如：霸总爱上灰姑娘，先婚后爱甜中带虐。&#10;或者粘贴小说片段、故事梗概……"></textarea></div>
+  <div class="input-group">
+    <label>输入一句短剧故事</label>
+    <div class="inspire-row">
+      <span class="inspire-chip" onclick="sI(this)">霸总甜宠</span>
+      <span class="inspire-chip" onclick="sI(this)">赘婿逆袭</span>
+      <span class="inspire-chip" onclick="sI(this)">穿越复仇</span>
+      <span class="inspire-chip" onclick="sI(this)">重生打脸</span>
+      <span class="inspire-chip" onclick="sI(this)">悬疑惊悚</span>
+      <span class="inspire-chip" onclick="sI(this)">校园青春</span>
+      <button class="inspire-random" onclick="rI()">🎲 换一批</button>
+    </div>
+    <textarea id="storyInput" placeholder="比如：霸总爱上灰姑娘，先婚后爱甜中带虐。&#10;或者粘贴小说片段、故事梗概……"></textarea>
+  </div>
   <div class="inline-row">
     <div class="input-group"><label>集数</label><select id="episodes"><option value="1">1集</option><option value="3" selected>3集</option><option value="6">6集</option></select></div>
     <div class="input-group"><label>每集时长</label><select id="duration"><option value="1">1分钟</option><option value="3" selected>3分钟</option><option value="5">5分钟</option></select></div>
@@ -375,6 +392,30 @@ function clK(){if(!confirm('清除？'))return;localStorage.removeItem(SK);docum
 document.getElementById('settingsModal').addEventListener('click',function(e){if(e.target===this)cS()});
 
 function st(m){const ex=document.querySelector('.toast');if(ex)ex.remove();const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2000)}
+
+// ===== 灵感标签 =====
+const IP=[
+  ['霸总甜宠','霸总隐婚三年，小娇妻带球跑，他疯了似的全球追妻'],
+  ['赘婿逆袭','上门赘婿被全家人看不起，直到仇家跪着叫他战神'],
+  ['穿越复仇','穿越成冷宫弃妃，她一步步复仇，皇上悔到跪着求她回来'],
+  ['重生打脸','重生回到高考当天，前世害她的人还在笑，她掏出答案'],
+  ['悬疑惊悚','搬进新房每晚听到敲墙声，直到她凿开墙壁看到隔壁'],
+  ['校园青春','全校最穷的女生被校霸堵在墙角，她一个电话叫来十辆劳斯莱斯'],
+  ['古装宫斗','入宫选秀被诬陷偷东西，她轻笑一声亮出先帝密旨'],
+  ['都市逆袭','外卖小哥送餐被富二代羞辱，摘下头盔那一刻对方跪了'],
+  ['系统爽文','我被拉进无限游戏，系统说活不过第一关，我反手通关'],
+  ['豪门真假','假千金被赶出豪门那天，真千金跪在门口求她回来继承千亿'],
+  ['修仙逆天','全宗门都笑她是废灵根，直到她一剑劈开九重天'],
+  ['末日求生','丧尸爆发后前男友把我推下车，三个月后他跪在我基地门口'],
+];
+function sI(el){document.getElementById('storyInput').value=IP.find(x=>x[0]===el.textContent)?.[1]||''}
+function rI(){
+  const chips=document.querySelectorAll('.inspire-chip');
+  const pool=IP.filter(x=>![...chips].map(c=>c.textContent).includes(x[0]));
+  const pick=pool.sort(()=>Math.random()-.5).slice(0,6);
+  chips.forEach((c,i)=>{if(pick[i]){c.textContent=pick[i][0];c.style.animation='none';c.offsetHeight;c.style.animation=''}});
+  document.getElementById('storyInput').value=pick[0]?.[1]||'';
+}
 function sE(m){const e=document.getElementById('errorBox');e.innerHTML=m;e.classList.add('active')}
 function hE(){document.getElementById('errorBox').classList.remove('active')}
 
