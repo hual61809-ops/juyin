@@ -566,6 +566,12 @@ async function generateShort(desc){
 
   const sys=`你是短剧一键成片引擎。用户输入故事，你直接输出完整的制作包。
 
+硬性约束（缺字段会导致输出不完整）：
+- visualStyle：必须输出（如：都市言情/古装权谋/悬疑惊悚）
+- 每集 cliffhanger：必须输出，不能为空
+- 每个镜头 prompt_jimeng 和 prompt_keling 必须都输出
+- characters 数组每个角色必须有 visualAnchor 和 forbidden
+
 内部评估（不展示给用户，只用于提高生成质量）：
 - 情绪张力、冲突密度、反转设计、传播适配、制作可行性（各0-10）
 
@@ -590,6 +596,7 @@ async function generateShort(desc){
     if(!r.ok){const je=await r.json().catch(()=>({}));if(r.status===401)throw new Error('API Key 无效或已过期，<a href="#" onclick="oS()">点此重新设置</a>');if(r.status===402)throw new Error('DeepSeek 余额不足，<a href="https://platform.deepseek.com/top_up" target="_blank">点此充值</a>');throw new Error(je.error?.message||'出错')}
     const d=await r.json();let ct=d.choices?.[0]?.message?.content;if(!ct)throw new Error('空');
     let pd;try{pd=JSON.parse(ct.replace(/```json|```/g,'').trim())}catch{const m=ct.match(/\{[\s\S]*\}/);if(m)pd=JSON.parse(m[0].replace(/,\s*}/g,'}').replace(/,\s*\]/g,']'));else throw new Error('格式')}
+    pd=sanitizeShort(pd);
     sL(false);cr=pd;cr._epCount=epCount;cr._durMin=durMin;renderProduction(pd,epCount,durMin);document.getElementById('resultWrap').classList.add('active');
     document.getElementById('genBtnMain').disabled=false;document.getElementById('inputCard').style.display='block';
     document.getElementById('resultWrap').scrollIntoView({behavior:'smooth'});
@@ -712,6 +719,31 @@ function sanitizeFilm(d){
   });
   d.characters=d.characters||[];
   d.rhythmDesign=d.rhythmDesign||{opening:'',midpoint:'',climax:'',resolution:''};
+  d.publish=d.publish||{titles:[],tags:[],copy:'',platform:''};
+  return d;
+}
+
+// ===== 短剧数据清洗 =====
+function sanitizeShort(d){
+  d.title=d.title||'未命名';
+  d.synopsis=d.synopsis||'';
+  d.visualStyle=d.visualStyle||'通用';
+  if(!d.episodes||!d.episodes.length)d.episodes=[{ep:1,title:'',cliffhanger:'',shots:[]}];
+  d.episodes.forEach(ep=>{
+    ep.title=ep.title||'';
+    ep.cliffhanger=ep.cliffhanger||'下一集会怎样？';
+    (ep.shots||[]).forEach(sh=>{
+      sh.time=sh.time||'0-8秒';
+      sh.emotion=sh.emotion||'';
+      sh.desc=sh.desc||'';
+      sh.prompt_jimeng=sh.prompt_jimeng||'cinematic short drama shot';
+      sh.prompt_keling=sh.prompt_keling||'cinematic short drama shot, 16:9';
+      if(!sh.dialogues)sh.dialogues=[];
+    });
+  });
+  if(!d.characters||!d.characters.length)d.characters=[{name:'主角',role:'',visualAnchor:'发型/服饰/色系',forbidden:'不可变'}];
+  d.characters.forEach(c=>{c.visualAnchor=c.visualAnchor||'—';c.forbidden=c.forbidden||'—'});
+  d.clipStructure=d.clipStructure||{timeline:[],overallBgm:'自动'};
   d.publish=d.publish||{titles:[],tags:[],copy:'',platform:''};
   return d;
 }
