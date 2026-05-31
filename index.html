@@ -57,6 +57,21 @@ header{display:flex;align-items:center;justify-content:space-between;padding:20p
 .error-box{display:none;background:rgba(184,64,74,0.08);border:1px solid rgba(184,64,74,0.25);border-radius:8px;padding:10px 14px;font-size:12px;color:#e07b8a;margin-top:10px;line-height:1.5}
 .error-box.active{display:block}
 
+.key-prompt-bar{display:none;background:rgba(96,144,184,0.06);border:1px solid rgba(96,144,184,0.25);border-radius:8px;padding:10px 14px;font-size:11px;color:var(--blue);margin-bottom:12px;line-height:1.5;align-items:center;gap:8px}
+.key-prompt-bar.active{display:flex;flex-wrap:wrap}
+.key-prompt-bar strong{color:var(--gold);font-weight:500}
+.key-prompt-bar a{color:var(--gl);text-decoration:underline;cursor:pointer}
+.key-prompt-bar .prompt-close{background:none;border:none;color:var(--gray);font-size:14px;cursor:pointer;margin-left:auto;padding:0 4px;line-height:1}
+
+.modal .step-list{display:flex;flex-direction:column;gap:10px;margin:10px 0 16px;padding:12px;background:rgba(212,164,74,0.04);border-radius:8px;font-size:12px}
+.modal .step-item{display:flex;align-items:center;gap:8px}
+.modal .step-num{display:inline-flex;width:22px;height:22px;background:var(--gold);color:var(--ink);border-radius:50%;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.modal .step-text strong{color:var(--gl);font-weight:600}
+.modal .step-text a{color:var(--gl);text-decoration:underline}
+.modal .help-note{background:rgba(212,164,74,0.06);padding:8px 12px;border-radius:6px;font-size:10px;color:var(--gray);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.modal .help-note::before{content:'💡'}
+.modal .modal-actions{gap:8px}
+
 .loading{display:none;text-align:center;padding:60px 20px}
 .loading.active{display:block}
 .spinner{width:44px;height:44px;border:2px solid rgba(212,164,74,0.12);border-top-color:var(--gold);border-radius:50%;margin:0 auto 16px;animation:spin .8s linear infinite}
@@ -220,7 +235,7 @@ footer .brand{font-family:'NF',serif;color:rgba(212,164,74,0.35);font-size:12px}
 @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 @keyframes toastOut{from{opacity:1;transform:translateX(-50%) translateY(0)}to{opacity:0;transform:translateX(-50%) translateY(-6px)}}
 
-@media(max-width:500px){.inline-row{grid-template-columns:1fr}.hero h1{font-size:19px}.modules-row{grid-template-columns:1fr;gap:4px}.score-metrics{grid-template-columns:repeat(3,1fr)}.shot-card{grid-template-columns:1fr}.fb-row{flex-direction:column;align-items:flex-start}.pricing-card{min-width:80px}}
+@media(max-width:500px){.inline-row{grid-template-columns:1fr}.hero h1{font-size:19px}.modules-row{grid-template-columns:1fr;gap:4px}.score-metrics{grid-template-columns:repeat(3,1fr)}.shot-card{grid-template-columns:1fr}.fb-row{flex-direction:column;align-items:flex-start}.pricing-card{min-width:80px}.key-prompt-bar{font-size:10px}.modal .step-list{font-size:11px}}
 </style>
 </head>
 <body>
@@ -233,6 +248,11 @@ footer .brand{font-family:'NF',serif;color:rgba(212,164,74,0.35);font-size:12px}
 <section class="hero">
   <div class="hero-tag">✦ 短剧内容结构决策系统</div>
   <h1>不是在预测爆款。是在<span class="a">分析结构、辅助决策、记录进步</span>。</h1>
+  <div class="key-prompt-bar" id="apiKeyPrompt">
+    <strong>⚡ 需要 DeepSeek API Key 才能分析</strong>
+    新手？ <a onclick="oS()">点这里 3 步设置</a>
+    <button class="prompt-close" onclick="document.getElementById('apiKeyPrompt').classList.remove('active')">×</button>
+  </div>
   <p>输入你的想法 → 系统评估结构潜力 → 生成可执行制作方案 → 记录每一次创作</p>
 </section>
 
@@ -334,8 +354,26 @@ footer .brand{font-family:'NF',serif;color:rgba(212,164,74,0.35);font-size:12px}
   <div class="modal">
     <h3>⚙ API Key</h3>
     <p>DeepSeek 引擎，一次 <strong style="color:var(--gl)">1-5分钱</strong>。Key 只存你的浏览器。</p>
-    <div class="modal-steps"><span>①</span> <a href="https://platform.deepseek.com/api_keys" target="_blank" style="color:var(--gl)">platform.deepseek.com</a> 注册<br><span>②</span> 创建 Key · 复制<br><span>③</span> 贴到下面</div>
-    <div class="modal-tip">充 10 块用上千次。</div>
+    <div class="step-list">
+      <div class="step-item">
+        <span class="step-num">1</span>
+        <div class="step-text">
+          <strong>免费注册</strong> DeepSeek 账号<br>
+          <a href="https://platform.deepseek.com/api_keys" target="_blank">platform.deepseek.com</a>
+        </div>
+      </div>
+      <div class="step-item">
+        <span class="step-num">2</span>
+        <div class="step-text">
+          <strong>创建 API Key</strong> 并复制
+        </div>
+      </div>
+      <div class="step-item">
+        <span class="step-num">3</span>
+        <div class="step-text">粘贴到下方输入框并保存</div>
+      </div>
+    </div>
+    <div class="help-note">不需要任何技术背景，跟着步骤就能完成。充 10 块用上千次。</div>
     <input type="password" id="apiKeyInput" placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxx">
     <div class="modal-actions"><button class="modal-btn danger" onclick="clK()">清除</button><button class="modal-btn secondary" onclick="cS()">取消</button><button class="modal-btn primary" onclick="sK()">保存</button></div>
   </div>
@@ -345,14 +383,14 @@ footer .brand{font-family:'NF',serif;color:rgba(212,164,74,0.35);font-size:12px}
 const SK='juyin_api_key',UK='juyin_usage',DK='juyin_data',HK2='juyin_struct_hist',AK='juyin_analytics',DL=5,RW=120000;
 let cr=null,lg=null,unlocked=false;
 
-function init(){uSI();uQH();if(!localStorage.getItem('juyin_vfinal')){setTimeout(()=>st('👋 输入想法，分析结构潜力'),800);localStorage.setItem('juyin_vfinal','1')}}
+function init(){uSI();uQH();try{const pb=document.getElementById('apiKeyPrompt');if(pb&&!gK())pb.classList.add('active')}catch(e){}if(!localStorage.getItem('juyin_vfinal')){setTimeout(()=>st('👋 输入想法，分析结构潜力'),800);localStorage.setItem('juyin_vfinal','1')}}
 init();
 
 function gK(){return localStorage.getItem(SK)||''}
 function uSI(){document.getElementById('settingsBtn').classList.toggle('has-key',!!gK())}
 function oS(){document.getElementById('apiKeyInput').value=gK();document.getElementById('settingsModal').classList.add('active')}
 function cS(){document.getElementById('settingsModal').classList.remove('active')}
-function sK(){const k=document.getElementById('apiKeyInput').value.trim();if(!k||!k.startsWith('sk-')){st('格式：sk-开头');return}localStorage.setItem(SK,k);uSI();cS();st('已保存')}
+function sK(){const k=document.getElementById('apiKeyInput').value.trim();if(!k||!k.startsWith('sk-')){st('格式：sk-开头');return}localStorage.setItem(SK,k);uSI();cS();st('已保存');try{const pb=document.getElementById('apiKeyPrompt');if(pb)pb.classList.remove('active')}catch(e){}}
 function clK(){if(!confirm('清除？'))return;localStorage.removeItem(SK);document.getElementById('apiKeyInput').value='';uSI();st('已清除')}
 document.getElementById('settingsModal').addEventListener('click',function(e){if(e.target===this)cS()});
 
@@ -422,7 +460,7 @@ async function generate(){
     const ctrl=new AbortController();tid=setTimeout(()=>ctrl.abort(),90000);
     const r=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+k},body:JSON.stringify({model:'deepseek-v4-pro',messages:[{role:'system',content:sys},{role:'user',content:usr}],max_tokens:16384,temperature:0.85,response_format:{type:'json_object'}}),signal:ctrl.signal});
     clearTimeout(tid);
-    if(!r.ok){const je=await r.json().catch(()=>({}));if(r.status===401)throw new Error('API Key不对');if(r.status===402)throw new Error('余额用完');throw new Error(je.error?.message||'出错')}
+    if(!r.ok){const je=await r.json().catch(()=>({}));if(r.status===401)throw new Error('API Key 无效或已过期，<a href="#" onclick="oS()">点此重新设置</a>');if(r.status===402)throw new Error('DeepSeek 余额不足，<a href="https://platform.deepseek.com/top_up" target="_blank">点此充值</a>');throw new Error(je.error?.message||'出错')}
     const d=await r.json();let ct=d.choices?.[0]?.message?.content;if(!ct)throw new Error('空');
     let pd;try{pd=JSON.parse(ct.replace(/```json|```/g,'').trim())}catch{const m=ct.match(/\{[\s\S]*\}/);if(m)pd=JSON.parse(m[0].replace(/,\s*}/g,'}').replace(/,\s*\]/g,']'));else throw new Error('格式')}
     cQ();lg={desc,genre,epCount,sys,usr,time:Date.now()};sL(false);cr=pd;saveStructureHistory(pd);renderAnalysis(pd);uQH();te('gen_ok',{genre,epCount,score:pd.score?.total||0});
