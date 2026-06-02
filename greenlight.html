@@ -235,82 +235,123 @@ async function run(){
   document.getElementById('resultWrap').classList.remove('show');document.getElementById('outputArea').innerHTML='';
   showLoading(true);
 
-  const sys=`你是 GREENLIGHT SYSTEM — 一个世界级的影视工业绿灯评审引擎。
+  const sys=`你是 GREENLIGHT SYSTEM — 影视工业绿灯评审引擎。
 
-你不是AI聊天助手。你是对标好莱坞制片厂评审委员会的结构化评估系统。
+你不是AI。你是Netflix内容评审机制 + 好莱坞制片厂greenlight系统 + 短剧爆款结构判断引擎的集合体。
 
-═══ 输出规则 ═══
+═══ 核心原则 ═══
 1. 输出严格JSON，字段不能缺
-2. 中文内容，英文标签（如行业惯例）
-3. 评分基于叙事结构，不是个人审美
-4. 诊断必须具体，禁止"节奏有点慢"
-5. 最终决定必须明确：GREENLIGHT / HOLD / REWRITE
+2. 中文内容，英文标签（行业惯例）
+3. 评分基于叙事结构——不是个人审美，不是文笔
+4. 诊断必须具体到结构级，禁止"节奏有点慢"
+5. 最终裁定必须是一句话结构性原因，不能含糊
 
 ═══ 评估框架 ═══
 
-【GREENLIGHT SCORECARD】
-- logline：一句话商业电影概念（中文，≤30字）
+【GREENLIGHT DECISION — 最终裁决】
+这是唯一回答"拍不拍"的模块。放在最前面。
+- status：GREENLIGHT | HOLD | REJECT
+- confidence：High | Medium | Low
+- oneLineVerdict：一句话行业裁定（≤20字英文）
+- reason：结构性原因——叙事驱动力/角色主动性/冲突升级系统
+
+【INDUSTRY SCORECARD — 工业评分】
+- logline：一句话电影概念（中文，≤25字）
 - genre：类型
-- format：Short Drama | Film | Series | Ad
-- commercial：商业价值 0–100
-- emotional：情绪冲击 0–100
-- retention：留存率潜力 0–100
-- viral：传播潜力 0–100
-- feasibility：制作可行性 0–100
-- status：GREENLIGHT (avg≥75) | HOLD (avg 55–74) | REWRITE (avg<55)
+- format：Short Drama | Film | Series
+- scores：commercial/retention/emotional/viral/feasibility 各0-100
+- weightedIndex：加权综合指数0-100
+- category：A（绿灯强）/ B（有条件）/ C（拒稿需重写）
 
-【STRUCTURE DIAGNOSIS】
-- act1_hook：开场钩子强度 + 问题
-- act1_problem：第一幕的具体问题
-- act2_conflict：第二幕冲突强度 + 问题
-- act2_midpoint：是否缺中段反转
-- act3_payoff：第三幕收束质量
-- breakdown：3条结构级核心问题（每条≤20字）
-- verdict：结构判定文字
+【STRUCTURE FAILURE ANALYSIS — 结构失效检测】
+- act1_hookStrength：LOW/MID/HIGH
+- act1_criticalIssue：第一幕致命问题
+- act2_escalation：升级强度 insufficient/moderate/strong
+- act2_hasMidpoint：YES/NO
+- act2_failurePoint：第二幕失效点
+- act3_payoffStrength：weak/moderate/strong
+- act3_emotionalClosure：incomplete/acceptable/strong
+- coreFailures：3条核心系统级失效
 
-【RETENTION MODEL】
-- hook_3s：前3秒钩子强度 LOW/MID/HIGH
-- drop_risk：1-3分钟流失风险 LOW/MID/HIGH
-- emotions：好奇/恐惧/紧迫 各 LOW/MID/HIGH
+【RETENTION MODEL — 留存模型】
+- hook3s：LOW/MID/HIGH
+- dropRisk：LOW/MID/HIGH
+- curiosity/fear/urgency：LOW/MID/HIGH
 - gaps：3个传播缺口
-- summary：留存判定
+- summary：一句话留存判定
 
-【REWRITE BLUEPRINT】
-- core_transformation：从什么故事变为什么故事
-- inciting_event：新激励事件
-- midpoint_reversal：新中段反转
-- pressures：时间/道德/生存压力
-- rewritten_story：完整新故事（≤150字）
-- upgrades：3条升级说明
+【REWRITE BLUEPRINT — 工业重写方案】
+- coreTransformation：从X变Y
+- requiredIncitingEvent：必须制造不可逆紧张
+- requiredMidpointReversal：必须翻转信息/权力/动机
+- requiredPressureSystem：时间/道德/生存 至少含2
+- rewrittenStory：完整新故事（≤150字）
+- keyImprovements：3条改进
 
-【CINEMATIC TRANSLATION】
-- opening_shot：开场镜（类型+运动+目的）
-- key_shots：4个关键镜（各含类型/运动/目的）
-- intent：导演意图声明
+【CINEMATIC EXECUTION — 镜头执行】
+- opening_0_3s：开场0-3秒——视觉或认知冲击
+- middle_sequence：中段反转或升级镜头
+- final_sequence：终局情绪或道德崩塌镜头
+- directorialRule：每个镜头服务叙事升级，不是美学
 
-【FINAL DECISION】
-- status：GREENLIT / HOLD / REWRITE
-- reason：核心原因
-- requirements：3条达成绿灯的条件
-- recommendation：最终建议`;
+【FINAL VERDICT — 最终结论】
+- status：GREENLIGHT/HOLD/REJECT
+- why：一句话结构性原因
+- recommendation：Ready / Needs rewrite / Not suitable
+- risk：retention risk / structure failure / weak escalation`;
 
   const usr=`故事：${story}
 
-输出JSON（全部字段必填）：
+输出JSON（全部字段必填，缺字段=系统故障）：
 {
-  "logline":"","genre":"","format":"",
-  "scores":{"commercial":0,"emotional":0,"retention":0,"viral":0,"feasibility":0,"avg":0},
-  "status":"GREENLIGHT|HOLD|REWRITE",
-  "structure":{"act1_hook":"","act1_problem":"","act2_conflict":"","act2_midpoint":"","act3_payoff":"","breakdown":["","",""],"verdict":""},
-  "retention":{"hook_3s":"LOW","drop_risk":"HIGH","emotions":{"curiosity":"","fear":"","urgency":""},"gaps":["","",""],"summary":""},
-  "rewrite":{"core_transformation":"","inciting_event":"","midpoint_reversal":"","pressures":"","rewritten_story":"","upgrades":["","",""]},
-  "cinematic":{"opening_shot":"","key_shots":["","","",""],"intent":""},
-  "decision":{"status":"REWRITE","reason":"","requirements":["","",""],"recommendation":""}
+  "status":"GREENLIGHT|HOLD|REJECT",
+  "confidence":"High|Medium|Low",
+  "oneLineVerdict":"",
+  "decisionReason":"",
+  "logline":"","genre":"","format":"Short Drama",
+  "scores":{"commercial":0,"retention":0,"emotional":0,"viral":0,"feasibility":0},
+  "weightedIndex":0,
+  "category":"B",
+  "structure":{
+    "act1_hookStrength":"MID",
+    "act1_criticalIssue":"",
+    "act2_escalation":"insufficient",
+    "act2_hasMidpoint":"NO",
+    "act2_failurePoint":"",
+    "act3_payoffStrength":"weak",
+    "act3_emotionalClosure":"incomplete",
+    "coreFailures":["","",""]
+  },
+  "retention":{
+    "hook3s":"LOW","dropRisk":"HIGH",
+    "curiosity":"MEDIUM","fear":"LOW","urgency":"LOW",
+    "gaps":["","",""],"summary":""
+  },
+  "rewrite":{
+    "coreTransformation":"",
+    "requiredIncitingEvent":"",
+    "requiredMidpointReversal":"",
+    "requiredPressureSystem":"",
+    "rewrittenStory":"",
+    "keyImprovements":["","",""]
+  },
+  "cinematic":{
+    "opening_0_3s":"",
+    "middle_sequence":"",
+    "final_sequence":"",
+    "directorialRule":""
+  },
+  "decision":{
+    "status":"REJECT",
+    "why":"",
+    "recommendation":"Needs structural rewrite",
+    "risk":"structural failure risk"
+  }
 }`;
 
   try{
     const ctrl=new AbortController();const tid=setTimeout(()=>ctrl.abort(),120000);
-    const r=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify({model:'deepseek-v4-pro',messages:[{role:'system',content:sys},{role:'user',content:usr}],max_tokens:12288,temperature:.65,response_format:{type:'json_object'}}),signal:ctrl.signal});
+    const r=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify({model:'deepseek-v4-pro',messages:[{role:'system',content:sys},{role:'user',content:usr}],max_tokens:16384,temperature:.65,response_format:{type:'json_object'}}),signal:ctrl.signal});
     clearTimeout(tid);
     if(!r.ok){const je=await r.json().catch(()=>({}));if(r.status===401)throw new Error('Key 无效 · <span style="color:var(--gold);cursor:pointer;text-decoration:underline" onclick="openKey()">重设</span>');if(r.status===402)throw new Error('余额不足 · <a href="https://platform.deepseek.com/top_up" target="_blank" style="color:var(--gold)">充值</a>');throw new Error(je.error?.message||'失败')}
     const d=await r.json();let ct=d.choices?.[0]?.message?.content;if(!ct)throw new Error('空');
@@ -322,16 +363,23 @@ async function run(){
 }
 
 function sanitize(d){
+  d.status=d.status||'HOLD';d.confidence=d.confidence||'Medium';
+  d.oneLineVerdict=d.oneLineVerdict||'';d.decisionReason=d.decisionReason||'';
   d.logline=d.logline||'';d.genre=d.genre||'';d.format=d.format||'Short Drama';
   if(!d.scores)d.scores={};const s=d.scores;
-  s.commercial=clamp(s.commercial||50);s.emotional=clamp(s.emotional||50);s.retention=clamp(s.retention||50);s.viral=clamp(s.viral||50);s.feasibility=clamp(s.feasibility||50);
-  s.avg=Math.round((s.commercial+s.emotional+s.retention+s.viral+s.feasibility)/5);
-  d.status=d.status||(s.avg>=75?'GREENLIGHT':s.avg>=55?'HOLD':'REWRITE');
-  if(!d.structure)d.structure={};const st=d.structure;st.breakdown=st.breakdown||['','',''];st.verdict=st.verdict||'';
-  if(!d.retention)d.retention={};const rt=d.retention;rt.gaps=rt.gaps||['','',''];if(!rt.emotions)rt.emotions={};
-  if(!d.rewrite)d.rewrite={};const rw=d.rewrite;rw.upgrades=rw.upgrades||['','',''];
-  if(!d.cinematic)d.cinematic={};const cn=d.cinematic;cn.key_shots=cn.key_shots||['','','',''];
-  if(!d.decision)d.decision={};const dc=d.decision;dc.requirements=dc.requirements||['','',''];dc.status=dc.status||d.status;
+  s.commercial=clamp(s.commercial||50);s.retention=clamp(s.retention||50);s.emotional=clamp(s.emotional||50);s.viral=clamp(s.viral||50);s.feasibility=clamp(s.feasibility||50);
+  d.weightedIndex=d.weightedIndex||Math.round((s.commercial+s.retention+s.emotional+s.viral+s.feasibility)/5);
+  d.category=d.category||(d.weightedIndex>=75?'A':d.weightedIndex>=55?'B':'C');
+  if(!d.structure)d.structure={};const st=d.structure;
+  st.act1_hookStrength=st.act1_hookStrength||'MID';st.act1_criticalIssue=st.act1_criticalIssue||'';st.act2_escalation=st.act2_escalation||'insufficient';st.act2_hasMidpoint=st.act2_hasMidpoint||'NO';st.act2_failurePoint=st.act2_failurePoint||'';st.act3_payoffStrength=st.act3_payoffStrength||'weak';st.act3_emotionalClosure=st.act3_emotionalClosure||'incomplete';st.coreFailures=st.coreFailures||['','',''];
+  if(!d.retention)d.retention={};const rt=d.retention;
+  rt.hook3s=rt.hook3s||'LOW';rt.dropRisk=rt.dropRisk||'HIGH';rt.curiosity=rt.curiosity||'MEDIUM';rt.fear=rt.fear||'LOW';rt.urgency=rt.urgency||'LOW';rt.gaps=rt.gaps||['','',''];rt.summary=rt.summary||'';
+  if(!d.rewrite)d.rewrite={};const rw=d.rewrite;
+  rw.coreTransformation=rw.coreTransformation||'';rw.requiredIncitingEvent=rw.requiredIncitingEvent||'';rw.requiredMidpointReversal=rw.requiredMidpointReversal||'';rw.requiredPressureSystem=rw.requiredPressureSystem||'';rw.rewrittenStory=rw.rewrittenStory||'';rw.keyImprovements=rw.keyImprovements||['','',''];
+  if(!d.cinematic)d.cinematic={};const cn=d.cinematic;
+  cn.opening_0_3s=cn.opening_0_3s||'';cn.middle_sequence=cn.middle_sequence||'';cn.final_sequence=cn.final_sequence||'';cn.directorialRule=cn.directorialRule||'';
+  if(!d.decision)d.decision={};const dc=d.decision;
+  dc.status=dc.status||d.status;dc.why=dc.why||'';dc.recommendation=dc.recommendation||'Needs structural rewrite';dc.risk=dc.risk||'structural failure risk';
   return d;
 }
 function clamp(v){return Math.max(0,Math.min(100,v))}
@@ -341,77 +389,91 @@ function render(d){
   const s=d.scores;const st=d.structure;const rt=d.retention;const rw=d.rewrite;const cn=d.cinematic;const dc=d.decision;
   const clsV=(v)=>v>=75?'green':v>=55?'amber':'red';
   const clsS=(stat)=>/GREEN/i.test(stat)?'green':/HOLD/i.test(stat)?'amber':'red';
-  const fmt=d.format||'Short Drama';
+  const statusCN={'GREENLIGHT':'绿灯放行','GREENLIT':'绿灯放行','HOLD':'待定','REJECT':'否决','REWRITE':'需重写'};
+  const catLabel={'A':'绿灯级 A','B':'条件级 B','C':'否决级 C'};
 
   let h='';
 
-  // ① SCORECARD
+  // ====== ① GREENLIGHT DECISION (first!) ======
   h+='<div class="module">';
-  h+='<div class="module-hd"><span class="module-num">①</span><span class="module-title green">GREENLIGHT SCORECARD <span style="font-size:9px;letter-spacing:1px;color:var(--muted);font-weight:400">制片厂评分卡</span></span></div>';
+  h+='<div class="module-hd"><span class="module-num">①</span><span class="module-title '+clsS(d.status)+'">GREENLIGHT DECISION <span style="font-size:9px;letter-spacing:1px;color:var(--muted);font-weight:400">裁决</span></span></div>';
+  h+='<div class="final-badge '+clsS(d.status)+'">▶ '+esc(d.status)+' · '+esc(statusCN[d.status]||'')+'</div>';
+  h+='<div style="display:flex;gap:10px;margin-bottom:10px;font-size:10px;color:var(--muted)">';
+  h+='<span>置信度：'+esc(d.confidence||'—')+'</span>';
+  h+='</div>';
+  if(d.oneLineVerdict)h+='<div class="logline" style="font-size:12px;color:rgba(216,212,204,.5)">'+esc(d.oneLineVerdict)+'</div>';
+  if(d.decisionReason)h+='<div class="final-reason">'+esc(d.decisionReason)+'</div>';
+  h+='</div>';
+
+  // ====== ② INDUSTRY SCORECARD ======
+  h+='<div class="module">';
+  h+='<div class="module-hd"><span class="module-num">②</span><span class="module-title green">INDUSTRY SCORECARD <span style="font-size:9px;letter-spacing:1px;color:var(--muted);font-weight:400">工业评分</span></span></div>';
   if(d.logline)h+='<div class="logline">'+esc(d.logline)+'</div>';
-  h+='<div class="meta-row"><span><span class="dot" style="background:var(--gold)"></span>'+esc(d.genre)+'</span><span>FORMAT: '+esc(fmt)+'</span></div>';
+  h+='<div class="meta-row"><span><span class="dot" style="background:var(--gold)"></span>'+esc(d.genre)+'</span><span>'+esc(d.format||'Short Drama')+'</span></div>';
   h+='<div class="score-grid">';
-  h+=si('COMMERCIAL','商业价值',s.commercial);h+=si('EMOTIONAL','情绪冲击',s.emotional);h+=si('RETENTION','观众留存',s.retention);h+=si('VIRAL','传播力',s.viral);h+=si('FEASIBILITY','制作可行性',s.feasibility);
+  h+=si('COMMERCIAL','商业价值',s.commercial);h+=si('RETENTION','观众留存',s.retention);h+=si('EMOTIONAL','情绪强度',s.emotional);h+=si('VIRAL','传播潜力',s.viral);h+=si('FEASIBILITY','制作可行',s.feasibility);
   h+='</div>';
-  const statusCN={'GREENLIGHT':'绿灯放行','GREENLIT':'绿灯放行','HOLD':'待定修改','REWRITE':'需重写'};
-  const stCN=statusCN[d.status]||d.status;
-  h+='<div class="verdict '+clsS(d.status)+'">▶ '+esc(d.status)+' · '+esc(stCN)+' · 综合 '+s.avg+' 分</div>';
-  h+='<div style="text-align:center;font-size:10px;color:var(--muted);margin-top:4px">'+(s.avg>=75?'这个故事可以拍，往下看怎么拍':'这个故事有硬伤，往下看怎么改')+'</div>';
+  h+='<div style="display:flex;justify-content:center;gap:20px;margin-bottom:12px;font-size:11px;color:var(--muted)">';
+  h+='<span>加权指数 <strong style="color:var(--gold)">'+d.weightedIndex+'</strong></span>';
+  h+='<span>类别 <strong style="color:var(--gold)">'+(catLabel[d.category]||d.category)+'</strong></span>';
   h+='</div>';
-
-  // ② STRUCTURE DIAGNOSIS
-  h+='<div class="module">';
-  h+='<div class="module-hd"><span class="module-num">②</span><span class="module-title red">STRUCTURE DIAGNOSIS <span style="font-size:9px;letter-spacing:1px;color:var(--muted);font-weight:400">结构诊断</span></span></div>';
-  h+=actSec('ACT I — SETUP',st.act1_hook,'Hook: '+esc(st.act1_hook||'—'));
-  if(st.act1_problem)h+=actSec('',st.act1_problem,'Issue: '+esc(st.act1_problem));
-  h+=actSec('ACT II — CONFRONTATION',st.act2_conflict,'Conflict: '+esc(st.act2_conflict||'—'));
-  if(st.act2_midpoint)h+=actSec('',st.act2_midpoint,'Midpoint: '+esc(st.act2_midpoint));
-  h+=actSec('ACT III — RESOLUTION',st.act3_payoff,'Payoff: '+esc(st.act3_payoff||'—'));
-  if(st.breakdown.length&&st.breakdown[0]){h+='<div class="breakdown">';st.breakdown.forEach(b=>{if(b)h+='<div class="br-item">▸ '+esc(b)+'</div>'});h+='</div>'}
-  h+='<div class="verdict-line">▶ '+esc(st.verdict||'NOT PRODUCTION-READY')+'</div>';
+  h+='<div style="text-align:center;font-size:10px;color:var(--muted)">'+(d.weightedIndex>=75?'这个故事可以拍，往下看怎么拍':'这个故事有硬伤，往下看怎么改')+'</div>';
   h+='</div>';
 
-  // ③ RETENTION
+  // ====== ③ STRUCTURE FAILURE ANALYSIS ======
   h+='<div class="module">';
-  h+='<div class="module-hd"><span class="module-num">③</span><span class="module-title amber">AUDIENCE RETENTION <span style="font-size:9px;letter-spacing:1px;color:var(--muted);font-weight:400">观众留存模型</span></span></div>';
-  h+=retBar('0–3s Hook','前三秒钩子',rt.hook_3s);
-  h+=retBar('1–3 min Drop Risk','流失风险',rt.drop_risk);
-  h+='<div style="font-size:10px;color:var(--muted);margin-top:8px;letter-spacing:1px">EMOTIONAL CURVE 情绪曲线</div>';
-  h+=retBar('Curiosity','好奇心',rt.emotions?.curiosity);
-  h+=retBar('Fear','恐惧感',rt.emotions?.fear);
-  h+=retBar('Urgency','紧迫感',rt.emotions?.urgency);
-  if(rt.gaps.length&&rt.gaps[0]){h+='<div class="ret-gaps">';rt.gaps.forEach(g=>{if(g)h+='<div class="ret-gap">'+esc(g)+'</div>'});h+='</div>'}
-  h+='<div class="verdict-line" style="color:var(--amber)">▶ '+esc(rt.summary||'Cannot sustain retention')+'</div>';
+  h+='<div class="module-hd"><span class="module-num">③</span><span class="module-title red">STRUCTURE FAILURE <span style="font-size:9px;letter-spacing:1px;color:var(--muted);font-weight:400">结构失效检测</span></span></div>';
+  h+=actLine('ACT I · SETUP','钩子强度',st.act1_hookStrength);
+  if(st.act1_criticalIssue)h+=actLine('','致命问题',st.act1_criticalIssue);
+  h+=actLine('ACT II · CONFRONTATION','升级强度',st.act2_escalation);
+  h+=actLine('','中段反转',(st.act2_hasMidpoint||'NO')+(st.act2_failurePoint?' — '+st.act2_failurePoint:''));
+  h+=actLine('ACT III · RESOLUTION','收束强度',st.act3_payoffStrength);
+  h+=actLine('','情感闭环',st.act3_emotionalClosure);
+  if(st.coreFailures&&st.coreFailures[0]){h+='<div class="verdict-line">▶ 核心系统级失效</div><div class="breakdown">';st.coreFailures.forEach(f=>{if(f)h+='<div class="br-item">▸ '+esc(f)+'</div>'});h+='</div>'}
   h+='</div>';
 
-  // ④ REWRITE
+  // ====== ④ RETENTION MODEL ======
   h+='<div class="module">';
-  h+='<div class="module-hd"><span class="module-num">④</span><span class="module-title gold">REWRITE BLUEPRINT <span style="font-size:9px;letter-spacing:1px;color:var(--muted);font-weight:400">重写方案</span></span></div>';
-  if(rw.core_transformation)h+='<div class="rewrite-engine">'+esc(rw.core_transformation)+'</div>';
-  if(rw.rewritten_story)h+='<div class="rewrite-story">'+esc(rw.rewritten_story)+'</div>';
-  if(rw.inciting_event)h+='<div class="rewrite-item"><strong>Inciting Event</strong> '+esc(rw.inciting_event)+'</div>';
-  if(rw.midpoint_reversal)h+='<div class="rewrite-item"><strong>Midpoint Reversal</strong> '+esc(rw.midpoint_reversal)+'</div>';
-  if(rw.pressures)h+='<div class="rewrite-item"><strong>Pressure System</strong> '+esc(rw.pressures)+'</div>';
-  if(rw.upgrades.length&&rw.upgrades[0]){h+='<div class="upgrade-list">';rw.upgrades.forEach(u=>{if(u)h+='<div class="upgrade-item">'+esc(u)+'</div>'});h+='</div>'}
+  h+='<div class="module-hd"><span class="module-num">④</span><span class="module-title amber">RETENTION MODEL <span style="font-size:9px;letter-spacing:1px;color:var(--muted);font-weight:400">观众留存</span></span></div>';
+  h+=retBar('0–3s Hook','前三秒钩子',rt.hook3s);
+  h+=retBar('1–3min Drop','流失风险',rt.dropRisk);
+  h+='<div style="font-size:10px;color:var(--muted);margin-top:8px;letter-spacing:1px">情绪曲线</div>';
+  h+=retBar('Curiosity','好奇心',rt.curiosity);
+  h+=retBar('Fear','恐惧感',rt.fear);
+  h+=retBar('Urgency','紧迫感',rt.urgency);
+  if(rt.gaps&&rt.gaps[0]){h+='<div class="ret-gaps">';rt.gaps.forEach(g=>{if(g)h+='<div class="ret-gap">'+esc(g)+'</div>'});h+='</div>'}
+  h+='<div class="verdict-line" style="color:var(--amber)">▶ '+esc(rt.summary||'—')+'</div>';
   h+='</div>';
 
-  // ⑤ CINEMATIC
+  // ====== ⑤ REWRITE BLUEPRINT ======
   h+='<div class="module">';
-  h+='<div class="module-hd"><span class="module-num">⑤</span><span class="module-title gold">CINEMATIC TRANSLATION <span style="font-size:9px;letter-spacing:1px;color:var(--muted);font-weight:400">镜头落地</span></span></div>';
-  h+='<div class="cineshots">';
-  if(cn.opening_shot)h+='<div class="cineshot"><strong>OPENING SHOT (0–3s)</strong><span>'+esc(cn.opening_shot)+'</span></div>';
-  cn.key_shots.forEach((ks,i)=>{if(ks)h+='<div class="cineshot"><strong>KEY SHOT '+(i+1)+'</strong><span>'+esc(ks)+'</span></div>'});
-  h+='</div>';
-  if(cn.intent)h+='<div class="director-note">DIRECTORIAL INTENT: '+esc(cn.intent)+'</div>';
+  h+='<div class="module-hd"><span class="module-num">⑤</span><span class="module-title gold">REWRITE BLUEPRINT <span style="font-size:9px;letter-spacing:1px;color:var(--muted);font-weight:400">工业重写</span></span></div>';
+  if(rw.coreTransformation)h+='<div class="rewrite-engine">'+esc(rw.coreTransformation)+'</div>';
+  if(rw.rewrittenStory)h+='<div class="rewrite-story">'+esc(rw.rewrittenStory)+'</div>';
+  if(rw.requiredIncitingEvent)h+='<div class="rewrite-item"><strong>Inciting Event</strong> '+esc(rw.requiredIncitingEvent)+'</div>';
+  if(rw.requiredMidpointReversal)h+='<div class="rewrite-item"><strong>Midpoint Reversal</strong> '+esc(rw.requiredMidpointReversal)+'</div>';
+  if(rw.requiredPressureSystem)h+='<div class="rewrite-item"><strong>Pressure System</strong> '+esc(rw.requiredPressureSystem)+'</div>';
+  if(rw.keyImprovements&&rw.keyImprovements[0]){h+='<div class="upgrade-list">';rw.keyImprovements.forEach(u=>{if(u)h+='<div class="upgrade-item">'+esc(u)+'</div>'});h+='</div>'}
   h+='</div>';
 
-  // ⑥ DECISION
+  // ====== ⑥ CINEMATIC EXECUTION ======
   h+='<div class="module">';
-  h+='<div class="module-hd"><span class="module-num">⑥</span><span class="module-title '+clsS(dc.status)+'">GREENLIGHT DECISION <span style="font-size:9px;letter-spacing:1px;color:var(--muted);font-weight:400">最终裁定</span></span></div>';
+  h+='<div class="module-hd"><span class="module-num">⑥</span><span class="module-title gold">CINEMATIC EXECUTION <span style="font-size:9px;letter-spacing:1px;color:var(--muted);font-weight:400">镜头执行</span></span></div>';
+  if(cn.opening_0_3s)h+='<div class="cineshot"><strong>OPENING 0–3s</strong><span>'+esc(cn.opening_0_3s)+'</span></div>';
+  if(cn.middle_sequence)h+='<div class="cineshot"><strong>MIDDLE SEQUENCE</strong><span>'+esc(cn.middle_sequence)+'</span></div>';
+  if(cn.final_sequence)h+='<div class="cineshot"><strong>FINAL SEQUENCE</strong><span>'+esc(cn.final_sequence)+'</span></div>';
+  if(cn.directorialRule)h+='<div class="director-note">DIRECTORIAL RULE: '+esc(cn.directorialRule)+'</div>';
+  h+='</div>';
+
+  // ====== ⑦ FINAL VERDICT ======
+  h+='<div class="module">';
+  h+='<div class="module-hd"><span class="module-num">⑦</span><span class="module-title '+clsS(dc.status)+'">FINAL VERDICT <span style="font-size:9px;letter-spacing:1px;color:var(--muted);font-weight:400">最终结论</span></span></div>';
   h+='<div class="final-badge '+clsS(dc.status)+'">▶ '+esc(dc.status)+' · '+esc(statusCN[dc.status]||'')+'</div>';
-  if(dc.reason)h+='<div class="final-reason">'+esc(dc.reason)+'</div>';
-  if(dc.requirements.length&&dc.requirements[0]){h+='<ul class="final-reqs">';dc.requirements.forEach(r=>{if(r)h+='<li>'+esc(r)+'</li>'});h+='</ul>'}
-  if(dc.recommendation)h+='<div class="final-recs">'+esc(dc.recommendation)+'</div>';
+  if(dc.why)h+='<div class="final-reason"><strong>WHY</strong> '+esc(dc.why)+'</div>';
+  h+='<div style="display:flex;gap:12px;margin:10px 0;font-size:11px">';
+  h+='<span style="color:var(--muted)">建议：<strong style="color:var(--gold)">'+esc(dc.recommendation||'—')+'</strong></span>';
+  h+='</div>';
+  h+='<div style="font-size:10px;color:'+(/GREEN/i.test(dc.status)?'var(--green)':'var(--red)')+'">风险：'+esc(dc.risk||'—')+'</div>';
   h+='</div>';
 
   document.getElementById('outputArea').innerHTML=h;
@@ -419,10 +481,10 @@ function render(d){
 
 function si(label,cn,val){return'<div class="score-item"><div class="score-val '+clsV(val)+'">'+val+'</div><div class="score-lbl">'+label+'</div><div style="font-size:8px;color:rgba(102,96,88,.3)">'+cn+'</div></div>'}
 function clsV(v){return v>=75?'green':v>=55?'amber':'red'}
-function actSec(label,content,display){
-  if(!label&&!content)return'';
-  if(!label)return'<div class="diag-act"><div class="act-body">'+esc(display||content)+'</div></div>';
-  return'<div class="diag-act"><div class="act-label">'+esc(label)+'</div><div class="act-body">'+esc(display||content)+'</div></div>'
+function actLine(label,field,val){
+  if(!val)return'';
+  const l=label?'<div class="act-label">'+esc(label)+'</div>':'';
+  return'<div class="diag-act">'+l+'<div class="act-body"><strong style="color:var(--muted);font-size:10px">'+esc(field)+': </strong>'+esc(val)+'</div></div>';
 }
 function retBar(label,cn,val){
   if(!val)return'';
@@ -436,48 +498,42 @@ function runDemo(){
   document.getElementById('inputZone').style.display='none';
   document.getElementById('resultWrap').classList.remove('show');document.getElementById('outputArea').innerHTML='';
   const d={
-    logline:'一个女孩在整理母亲遗物时，发现父亲是连环杀手——而他的下一个目标，是今晚来接她的继母。',
+    status:'GREENLIGHT',confidence:'High',
+    oneLineVerdict:'Production-ready narrative engine with active protagonist.',
+    decisionReason:'Strong premise with built-in moral engine. Clock compression and agency flip transformed a passive premise into an active thriller. Character makes irreversible decisions under escalating pressure.',
+    logline:'女孩发现父亲是连环杀手——而他的下一个目标，是今晚来接她的继母。',
     genre:'Crime Thriller',format:'Short Drama',
-    scores:{commercial:82,emotional:78,retention:85,viral:80,feasibility:75,avg:80},
-    status:'GREENLIGHT',
+    scores:{commercial:82,retention:85,emotional:78,viral:80,feasibility:75},
+    weightedIndex:80,category:'A',
     structure:{
-      act1_hook:'HIGH — 日记第一行"你爸爸是杀人犯"创造了即时的认知冲击',
-      act1_problem:'主角动机滞后于信息揭示，前2个镜头仍处于被动接收状态',
-      act2_conflict:'MID — 外部钟表倒计时构建了有效紧迫感，但缺少中段的权力关系反转',
-      act2_midpoint:'缺失 — 需要她从"逃避真相"翻转为"主动对抗"',
-      act3_payoff:'父亲说"我知道你会来"完成了情感闭环，但缺乏最后一层道德抉择的升华',
-      breakdown:['Protagonist agency: reactive','External pressure: underdeveloped escalation','Midpoint reversal: missing'],
-      verdict:'Narrative engine valid. Requires structural reinforcement.'
+      act1_hookStrength:'HIGH',act1_criticalIssue:'主角动机滞后于信息揭示，前2镜仍被动',
+      act2_escalation:'moderate',act2_hasMidpoint:'NO',act2_failurePoint:'未从逃避翻转为对抗',
+      act3_payoffStrength:'strong',act3_emotionalClosure:'strong',
+      coreFailures:['角色主动性：被动接收信息而非主动行动','外部压力：未构建不可逆的倒计时系统','中段反转缺失：无信息/权力/动机翻转']
     },
     retention:{
-      hook_3s:'HIGH',drop_risk:'LOW',
-      emotions:{curiosity:'HIGH',fear:'MID',urgency:'HIGH'},
-      gaps:['Irreversible decision point missing','Moral dilemma not escalated to breaking point','Secondary antagonist underdeveloped'],
-      summary:'Strong hook, mid-section needs tension loop reinforcement.'
+      hook3s:'HIGH',dropRisk:'LOW',curiosity:'HIGH',fear:'MEDIUM',urgency:'HIGH',
+      gaps:['无不可逆决策点','道德困境升级不足','次级对手未开发'],
+      summary:'前3秒钩子强，中段需强化张力循环'
     },
     rewrite:{
-      core_transformation:'Passive discovery → Active countdown thriller',
-      inciting_event:'她发现父亲此刻正在继母工作的咖啡馆窗外——倒计时从6小时压缩为6分钟',
-      midpoint_reversal:'她决定不报警，而是自己带刀去咖啡馆——从受害者视角翻转为猎手视角',
-      pressures:'Time: 6-minute clock · Moral: blood vs. justice · Survival: father already knows she knows',
-      rewritten_story:'18岁女孩在母亲遗物中发现父亲是连环杀手。追踪他的行踪时，她意识到他此刻正站在继母工作的咖啡馆外。放学前的6分钟，她必须在报警毁掉家庭、沉默看着继母死、或者自己动手之间做出选择。她抓起母亲的旧刀，冲向咖啡馆——但推开门的一瞬间，父亲转过头，对她笑了笑。',
-      upgrades:['Clock compression: 6 hours → 6 minutes','Agency flip: victim → hunter','Moral escalation: abstract dilemma → physical choice']
+      coreTransformation:'被动发现 → 主动倒计时惊悚',
+      requiredIncitingEvent:'她发现父亲此刻正在继母工作的咖啡馆窗外——倒计时从6小时压缩为6分钟',
+      requiredMidpointReversal:'她决定不报警而是带刀前往——从受害者翻转为猎手',
+      requiredPressureSystem:'时间：6分钟倒计时 · 道德：血缘 vs 正义 · 生存：父亲已知她知情',
+      rewrittenStory:'18岁女孩在母亲遗物中发现父亲是连环杀手。追踪他的行踪时发现他正站在继母工作的咖啡馆外。放学前的6分钟，她必须在报警毁家、沉默看继母死、或自己动手之间做选择。她抓起母亲的旧刀冲向咖啡馆——推开门，父亲回头微笑。',
+      keyImprovements:['时间压缩：6小时→6分钟','主体翻转：受害者→猎手','道德升级：抽象困境→物理选择']
     },
     cinematic:{
-      opening_shot:'EXTREME CLOSE-UP · 旧日记本翻开 · 第一行"你爸爸是杀人犯" · SLOW PUSH-IN · COGNITIVE SHOCK',
-      key_shots:[
-        'WIDE SHOT · 她站在窗前看到父亲在对面咖啡馆外 · HOLD 3 SECONDS · DREAD',
-        'HANDHELD CHAOS · 她翻抽屉找刀 · CUTS ON ACTION · URGENCY',
-        'STEADICAM · 她跑过街区 · LONG TAKE · HEARTBEAT RHYTHM',
-        'STATIC WIDE · 咖啡馆门推开 · 父亲回头微笑 · FREEZE TENSION'
-      ],
-      intent:'Every shot must serve escalation. No aesthetic filler.'
+      opening_0_3s:'EXTREME CLOSE-UP · 旧日记本翻开 · 第一行"你爸爸是杀人犯" · SLOW PUSH-IN · 认知冲击',
+      middle_sequence:'HANDHELD CHAOS · 她翻抽屉找刀 · CUTS ON ACTION · 心跳节奏 · 从犹豫到决断的视觉化',
+      final_sequence:'STATIC WIDE · 咖啡馆门推开 · 父亲回头微笑 · HOLD 3秒 · 所有紧张在微笑中凝结',
+      directorialRule:'每个镜头服务叙事升级，无美学填充镜头。开场=认知炸弹，中段=身体行动，结尾=情感冻结。'
     },
     decision:{
-      status:'GREENLIT',
-      reason:'Strong premise with built-in moral engine. Clock compression and agency flip transformed a passive premise into an active thriller.',
-      requirements:['Execute 6-minute countdown structure precisely','Ensure midpoint reversal visually reads as a decision switch','Land the father reveal with maximum visual restraint'],
-      recommendation:'Recommended for production with monitoring on midpoint pacing.'
+      status:'GREENLIGHT',why:'叙事引擎有效，角色主动性强，压力系统完整。',
+      recommendation:'Ready for production with monitoring on midpoint pacing.',
+      risk:'retention risk: midpoint'
     }
   };
   lr=d;render(d);document.getElementById('resultWrap').classList.add('show');
