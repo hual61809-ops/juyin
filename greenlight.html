@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>剧引 · GREENLIGHT SYSTEM</title>
+<meta name="description" content="AI影视工业绿灯评审系统 — 评估一个故事是否值得被拍。">
+<style>
+:root{--bg:#080808;--fg:#d8d4cc;--gold:#c4a44c;--green:#3a9a60;--amber:#c47830;--red:#b04044;--muted:#666058;--card:#0e0e0c;--border:#221e18;--surface:#14120e;--blue:#5878a0;--green-bg:rgba(58,154,96,.06);--green-bd:rgba(58,154,96,.2);--amber-bg:rgba(196,120,48,.06);--amber-bd:rgba(196,120,48,.2);--red-bg:rgba(176,64,68,.06);--red-bd:rgba(176,64,68,.2)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased}
+#app{max-width:780px;margin:0 auto;padding:48px 24px 100px}
+
+.hero{text-align:center;padding:48px 0 20px}
+.hero .tag{display:inline-block;border:1px solid var(--green-bd);color:var(--green);font-size:9px;letter-spacing:3px;padding:4px 16px;border-radius:2px;margin-bottom:12px;text-transform:uppercase}
+.hero h1{font-size:24px;font-weight:700;letter-spacing:2px;margin-bottom:6px}
+.hero h1 em{font-style:normal;color:var(--gold)}
+.hero .sub{font-size:12px;color:var(--muted);letter-spacing:1px}
+
+.input-zone{background:var(--card);border:1px solid var(--border);padding:22px 24px;margin-bottom:12px}
+.input-zone textarea{width:100%;min-height:96px;background:var(--surface);border:1px solid var(--border);padding:14px 16px;color:var(--fg);font-size:14px;font-family:inherit;resize:none;outline:none;line-height:1.8;transition:border .2s}
+.input-zone textarea:focus{border-color:var(--gold)}
+.input-zone textarea::placeholder{color:#403c34}
+.btn-row{display:flex;gap:8px;margin-top:12px}
+.btn{flex:1;padding:13px 0;text-align:center;font-size:13px;font-weight:600;letter-spacing:2px;cursor:pointer;border:none;transition:all .2s;text-transform:uppercase}
+.btn-go{background:linear-gradient(135deg,var(--gold),#cea650);color:var(--bg)}
+.btn-go:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(196,164,76,.25)}
+.btn-go:disabled{opacity:.3;transform:none}
+.btn-demo{background:transparent;border:1px solid var(--border);color:var(--muted)}
+.btn-demo:hover{border-color:var(--gold);color:var(--gold)}
+.key-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.key-row button{background:transparent;border:1px solid var(--border);padding:4px 12px;color:var(--muted);font-size:11px;cursor:pointer;letter-spacing:1px;transition:all .2s}
+.key-row button:hover,.key-row button.on{border-color:var(--gold);color:var(--gold)}
+.key-hint{display:none;text-align:center;font-size:10px;color:var(--blue);padding:8px;background:rgba(88,120,160,.06);margin-bottom:10px}
+.key-hint.show{display:block}
+.key-hint span{color:var(--gold);cursor:pointer;text-decoration:underline}
+
+.loading{display:none;text-align:center;padding:60px 0}
+.loading.show{display:block}
+.ring{width:36px;height:36px;border:2px solid rgba(196,164,76,.08);border-top-color:var(--gold);border-radius:50%;margin:0 auto 14px;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:13px;color:var(--gold);letter-spacing:1px}
+.loading-sub{font-size:10px;color:var(--muted);margin-top:4px}
+
+.result{display:none}
+.result.show{display:block}
+.error{display:none;background:var(--red-bg);border:1px solid var(--red-bd);padding:10px 14px;font-size:11px;color:#d08080;margin-bottom:12px}
+.error.show{display:block}
+.result-top{display:flex;gap:8px;margin-bottom:16px}
+.result-top button{background:transparent;border:1px solid var(--border);padding:5px 14px;color:var(--muted);font-size:11px;cursor:pointer;letter-spacing:1px;transition:all .2s}
+.result-top button:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ===== Modules ===== */
+.module{background:var(--card);border:1px solid var(--border);padding:24px 28px;margin-bottom:10px}
+.module-hd{display:flex;align-items:center;gap:10px;margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.module-num{font-size:10px;color:var(--muted);letter-spacing:2px;min-width:24px}
+.module-title{font-size:11px;letter-spacing:3px;font-weight:600;text-transform:uppercase}
+.module-title.green{color:var(--green)}
+.module-title.red{color:var(--red)}
+.module-title.amber{color:var(--amber)}
+.module-title.gold{color:var(--gold)}
+
+/* Scorecard */
+.logline{font-size:14px;color:var(--gold);margin-bottom:12px;line-height:1.6;font-weight:500}
+.meta-row{display:flex;gap:18px;flex-wrap:wrap;font-size:10px;color:var(--muted);letter-spacing:1px;margin-bottom:16px}
+.meta-row span{display:inline-flex;align-items:center;gap:4px}
+.meta-row .dot{width:6px;height:6px;border-radius:50%}
+.score-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
+.score-item{text-align:center}
+.score-val{font-size:28px;font-weight:800;letter-spacing:-1px}
+.score-val.green{color:var(--green)}
+.score-val.amber{color:var(--amber)}
+.score-val.red{color:var(--red)}
+.score-lbl{font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:2px}
+.verdict{text-align:center;padding:14px;font-size:12px;font-weight:700;letter-spacing:4px;text-transform:uppercase}
+.verdict.green{background:var(--green-bg);border:1px solid var(--green-bd);color:var(--green)}
+.verdict.amber{background:var(--amber-bg);border:1px solid var(--amber-bd);color:var(--amber)}
+.verdict.red{background:var(--red-bg);border:1px solid var(--red-bd);color:var(--red)}
+
+/* Diagnosis */
+.diag-act{margin-bottom:14px}
+.diag-act .act-label{font-size:10px;letter-spacing:2px;color:var(--gold);margin-bottom:4px;font-weight:600}
+.diag-act .act-body{font-size:12px;color:rgba(216,212,204,.5);line-height:1.7;padding:8px 12px;background:var(--surface);border-left:2px solid var(--border)}
+.verdict-line{font-size:11px;font-weight:600;letter-spacing:2px;color:var(--red);padding:10px 0;border-top:1px solid var(--border);margin-top:10px;text-transform:uppercase}
+.breakdown{display:flex;flex-direction:column;gap:4px;margin-top:8px}
+.br-item{font-size:11px;color:rgba(216,212,204,.4);padding:4px 0}
+
+/* Retention */
+.ret-bar-row{margin-bottom:8px}
+.ret-bar-row .rlabel{font-size:10px;color:var(--muted);letter-spacing:1px;margin-bottom:3px;display:flex;justify-content:space-between}
+.ret-bar{height:6px;background:var(--surface);border-radius:3px;overflow:hidden}
+.ret-fill{height:100%;border-radius:3px}
+.ret-fill.low{background:var(--red);width:25%}
+.ret-fill.mid{background:var(--amber);width:55%}
+.ret-fill.high{background:var(--green);width:80%}
+.ret-gaps{margin-top:10px;display:flex;flex-direction:column;gap:3px}
+.ret-gap{font-size:10px;color:rgba(216,212,204,.3);padding:2px 0}
+.ret-gap::before{content:'❌ '}
+
+/* Rewrite */
+.rewrite-story{background:var(--surface);border:1px solid rgba(196,164,76,.1);padding:16px 18px;margin-bottom:14px;font-size:12px;line-height:1.8;color:rgba(216,212,204,.6)}
+.rewrite-engine{font-size:11px;color:var(--gold);letter-spacing:1px;margin-bottom:8px;font-weight:600;text-transform:uppercase}
+.rewrite-item{margin-bottom:6px;padding:8px 12px;background:var(--surface);font-size:11px;color:rgba(216,212,204,.45);border-left:2px solid rgba(196,164,76,.2)}
+.rewrite-item strong{color:var(--gold);font-weight:500}
+.upgrade-list{display:flex;flex-direction:column;gap:3px;margin-top:8px}
+.upgrade-item{font-size:10px;color:rgba(58,154,96,.5);padding:2px 0}
+.upgrade-item::before{content:'+ '}
+
+/* Cinematic */
+.cineshots{display:flex;flex-direction:column;gap:6px}
+.cineshot{padding:10px 14px;background:var(--surface);font-size:11px;line-height:1.7;border-left:2px solid var(--border)}
+.cineshot strong{color:var(--gold);font-weight:500;display:block;font-size:9px;letter-spacing:2px;margin-bottom:2px}
+.cineshot span{color:rgba(216,212,204,.45)}
+.director-note{margin-top:10px;padding:8px 12px;background:rgba(88,120,160,.06);font-size:10px;color:rgba(88,120,160,.5);border-left:2px solid rgba(88,120,160,.2)}
+
+/* Final Decision */
+.final-badge{text-align:center;padding:18px;font-size:14px;font-weight:700;letter-spacing:4px;margin-bottom:12px;text-transform:uppercase}
+.final-badge.green{background:rgba(58,154,96,.08);border:1px solid rgba(58,154,96,.25);color:var(--green)}
+.final-badge.amber{background:rgba(196,120,48,.08);border:1px solid rgba(196,120,48,.25);color:var(--amber)}
+.final-badge.red{background:rgba(176,64,68,.08);border:1px solid rgba(176,64,68,.25);color:var(--red)}
+.final-reason{font-size:11px;color:rgba(216,212,204,.45);line-height:1.8;margin-bottom:10px}
+.final-reqs{font-size:10px;color:var(--muted)}
+.final-reqs li{margin-bottom:3px}
+.final-recs{text-align:center;font-size:12px;font-weight:600;letter-spacing:2px;color:var(--gold);padding:12px;border:1px solid rgba(196,164,76,.15);margin-top:10px;text-transform:uppercase}
+
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);padding:28px;max-width:400px;width:90%}
+.modal h3{font-size:14px;color:var(--gold);letter-spacing:1px;margin-bottom:6px}
+.modal p{font-size:10px;color:var(--muted);line-height:1.7;margin-bottom:12px}
+.modal p a{color:var(--gold)}
+.modal input{width:100%;background:var(--surface);border:1px solid var(--border);padding:10px 14px;color:var(--fg);font-size:12px;outline:none;margin-bottom:8px}
+.modal-actions{display:flex;gap:6px;justify-content:flex-end}
+.mbtn{padding:6px 16px;font-size:10px;cursor:pointer;letter-spacing:1px;border:none}
+.mbtn.go{background:var(--gold);color:var(--bg);font-weight:600}
+.mbtn.cancel{background:transparent;border:1px solid var(--border);color:var(--muted)}
+.mbtn.clear{background:transparent;border:1px solid rgba(176,64,68,.3);color:rgba(200,120,120,.6)}
+
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#1a160e;border:1px solid var(--border);color:var(--gold);padding:8px 20px;font-size:10px;letter-spacing:1px;z-index:200;animation:tIn .3s,tOut .3s 1.7s forwards;pointer-events:none}
+@keyframes tIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+@keyframes tOut{from{opacity:1}to{opacity:0}}
+
+footer{text-align:center;padding:40px 0 20px;font-size:9px;color:rgba(102,96,88,.25);letter-spacing:2px;text-transform:uppercase}
+@media(max-width:520px){.score-grid{grid-template-columns:repeat(3,1fr)}.score-val{font-size:22px}}
+</style>
+</head>
+<body>
+<div id="app">
+
+<div class="hero">
+  <div class="tag">GREENLIGHT SYSTEM</div>
+  <h1>剧引 · <em>AI影视绿灯系统</em></h1>
+  <p class="sub">评估一个故事是否值得被拍 — 制片厂级工业评审</p>
+</div>
+
+<div class="key-row">
+  <div></div>
+  <button id="keyBtn" onclick="openKey()">⚙ KEY</button>
+</div>
+<div class="key-hint" id="keyHint">需要 DeepSeek API Key · <span onclick="openKey()">点此设置</span></div>
+
+<div class="input-zone" id="inputZone">
+  <textarea id="storyInput" placeholder="输入你的故事……例如：一个女孩发现父亲其实是杀手。或粘贴剧本片段。"></textarea>
+  <div class="btn-row">
+    <button class="btn btn-demo" onclick="runDemo()">看演示</button>
+    <button class="btn btn-go" id="goBtn" onclick="run()">▶ GREENLIGHT ASSESSMENT</button>
+  </div>
+</div>
+
+<div class="loading" id="loading">
+  <div class="ring"></div>
+  <div class="loading-text">ANALYZING NARRATIVE STRUCTURE</div>
+  <div class="loading-sub" id="loadingStep">Evaluating story architecture...</div>
+</div>
+
+<div class="error" id="errorBox"></div>
+
+<div class="result" id="resultWrap">
+  <div class="result-top">
+    <button onclick="resetAll()">↺ NEW ASSESSMENT</button>
+  </div>
+  <div id="outputArea"></div>
+</div>
+
+<footer>GREENLIGHT SYSTEM v1 · 剧引</footer>
+
+</div>
+
+<div class="modal-overlay" id="keyModal">
+  <div class="modal">
+    <h3>DEEPSEEK API KEY</h3>
+    <p>每次评估约 3-5 分钱。Key 仅存浏览器。<br><a href="https://platform.deepseek.com/api_keys" target="_blank">获取 Key →</a></p>
+    <input type="password" id="apiKeyInput" placeholder="sk-xxxxxxxxxxxxxxxx">
+    <div class="modal-actions">
+      <button class="mbtn clear" onclick="clearKey()">CLEAR</button>
+      <button class="mbtn cancel" onclick="closeKey()">CANCEL</button>
+      <button class="mbtn go" onclick="saveKey()">SAVE</button>
+    </div>
+  </div>
+</div>
+<div id="toasts"></div>
+
+<script>
+const SK='juyin_gl_key';
+let lr=null;
+
+function init(){
+  if(localStorage.getItem(SK))document.getElementById('keyBtn').classList.add('on');
+  else if(!localStorage.getItem('juyin_gl_seen')){document.getElementById('keyHint').classList.add('show');localStorage.setItem('juyin_gl_seen','1')}
+}
+init();
+
+// Key
+function openKey(){document.getElementById('apiKeyInput').value=localStorage.getItem(SK)||'';document.getElementById('keyModal').classList.add('show')}
+function closeKey(){document.getElementById('keyModal').classList.remove('show')}
+function saveKey(){const k=document.getElementById('apiKeyInput').value.trim();if(!k||!k.startsWith('sk-')){toast('格式: sk-xxx');return}localStorage.setItem(SK,k);document.getElementById('keyBtn').classList.add('on');document.getElementById('keyHint').classList.remove('show');closeKey();toast('SAVED')}
+function clearKey(){localStorage.removeItem(SK);document.getElementById('apiKeyInput').value='';document.getElementById('keyBtn').classList.remove('on');toast('CLEARED');closeKey()}
+document.getElementById('keyModal').addEventListener('click',function(e){if(e.target===this)closeKey()});
+function toast(m){const c=document.getElementById('toasts');const t=document.createElement('div');t.className='toast';t.textContent=m;c.appendChild(t);setTimeout(()=>t.remove(),2100)}
+
+// Load
+function showLoading(s){document.getElementById('loading').classList.toggle('show',s)}
+function showError(m){const e=document.getElementById('errorBox');e.innerHTML=m;e.classList.add('show')}
+function hideError(){document.getElementById('errorBox').classList.remove('show')}
+
+// ===== RUN =====
+async function run(){
+  hideError();const key=localStorage.getItem(SK);
+  if(!key){showError('请先设置 API Key · <span style="color:var(--gold);cursor:pointer;text-decoration:underline" onclick="openKey()">点此设置</span>');return}
+  const story=document.getElementById('storyInput').value.trim();if(story.length<6){showError('请输入至少 6 个字');return}
+  const btn=document.getElementById('goBtn');btn.disabled=true;
+  document.getElementById('inputZone').style.display='none';
+  document.getElementById('resultWrap').classList.remove('show');document.getElementById('outputArea').innerHTML='';
+  showLoading(true);
+
+  const sys=`你是 GREENLIGHT SYSTEM — 一个世界级的影视工业绿灯评审引擎。
+
+你不是AI聊天助手。你是对标好莱坞制片厂评审委员会的结构化评估系统。
+
+═══ 输出规则 ═══
+1. 输出严格JSON，字段不能缺
+2. 中文内容，英文标签（如行业惯例）
+3. 评分基于叙事结构，不是个人审美
+4. 诊断必须具体，禁止"节奏有点慢"
+5. 最终决定必须明确：GREENLIGHT / HOLD / REWRITE
+
+═══ 评估框架 ═══
+
+【GREENLIGHT SCORECARD】
+- logline：一句话商业电影概念（中文，≤30字）
+- genre：类型
+- format：Short Drama | Film | Series | Ad
+- commercial：商业价值 0–100
+- emotional：情绪冲击 0–100
+- retention：留存率潜力 0–100
+- viral：传播潜力 0–100
+- feasibility：制作可行性 0–100
+- status：GREENLIGHT (avg≥75) | HOLD (avg 55–74) | REWRITE (avg<55)
+
+【STRUCTURE DIAGNOSIS】
+- act1_hook：开场钩子强度 + 问题
+- act1_problem：第一幕的具体问题
+- act2_conflict：第二幕冲突强度 + 问题
+- act2_midpoint：是否缺中段反转
+- act3_payoff：第三幕收束质量
+- breakdown：3条结构级核心问题（每条≤20字）
+- verdict：结构判定文字
+
+【RETENTION MODEL】
+- hook_3s：前3秒钩子强度 LOW/MID/HIGH
+- drop_risk：1-3分钟流失风险 LOW/MID/HIGH
+- emotions：好奇/恐惧/紧迫 各 LOW/MID/HIGH
+- gaps：3个传播缺口
+- summary：留存判定
+
+【REWRITE BLUEPRINT】
+- core_transformation：从什么故事变为什么故事
+- inciting_event：新激励事件
+- midpoint_reversal：新中段反转
+- pressures：时间/道德/生存压力
+- rewritten_story：完整新故事（≤150字）
+- upgrades：3条升级说明
+
+【CINEMATIC TRANSLATION】
+- opening_shot：开场镜（类型+运动+目的）
+- key_shots：4个关键镜（各含类型/运动/目的）
+- intent：导演意图声明
+
+【FINAL DECISION】
+- status：GREENLIT / HOLD / REWRITE
+- reason：核心原因
+- requirements：3条达成绿灯的条件
+- recommendation：最终建议`;
+
+  const usr=`故事：${story}
+
+输出JSON（全部字段必填）：
+{
+  "logline":"","genre":"","format":"",
+  "scores":{"commercial":0,"emotional":0,"retention":0,"viral":0,"feasibility":0,"avg":0},
+  "status":"GREENLIGHT|HOLD|REWRITE",
+  "structure":{"act1_hook":"","act1_problem":"","act2_conflict":"","act2_midpoint":"","act3_payoff":"","breakdown":["","",""],"verdict":""},
+  "retention":{"hook_3s":"LOW","drop_risk":"HIGH","emotions":{"curiosity":"","fear":"","urgency":""},"gaps":["","",""],"summary":""},
+  "rewrite":{"core_transformation":"","inciting_event":"","midpoint_reversal":"","pressures":"","rewritten_story":"","upgrades":["","",""]},
+  "cinematic":{"opening_shot":"","key_shots":["","","",""],"intent":""},
+  "decision":{"status":"REWRITE","reason":"","requirements":["","",""],"recommendation":""}
+}`;
+
+  try{
+    const ctrl=new AbortController();const tid=setTimeout(()=>ctrl.abort(),120000);
+    const r=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify({model:'deepseek-v4-pro',messages:[{role:'system',content:sys},{role:'user',content:usr}],max_tokens:12288,temperature:.65,response_format:{type:'json_object'}}),signal:ctrl.signal});
+    clearTimeout(tid);
+    if(!r.ok){const je=await r.json().catch(()=>({}));if(r.status===401)throw new Error('Key 无效 · <span style="color:var(--gold);cursor:pointer;text-decoration:underline" onclick="openKey()">重设</span>');if(r.status===402)throw new Error('余额不足 · <a href="https://platform.deepseek.com/top_up" target="_blank" style="color:var(--gold)">充值</a>');throw new Error(je.error?.message||'失败')}
+    const d=await r.json();let ct=d.choices?.[0]?.message?.content;if(!ct)throw new Error('空');
+    let pd;try{pd=JSON.parse(ct.replace(/```json|```/g,'').trim())}catch{const m=ct.match(/\{[\s\S]*\}/);if(m)pd=JSON.parse(m[0]);else throw new Error('解析')}
+    pd=sanitize(pd);showLoading(false);lr=pd;render(pd);document.getElementById('resultWrap').classList.add('show');
+    document.getElementById('goBtn').disabled=false;document.getElementById('inputZone').style.display='block';
+    document.getElementById('resultWrap').scrollIntoView({behavior:'smooth'})
+  }catch(err){showLoading(false);document.getElementById('goBtn').disabled=false;document.getElementById('inputZone').style.display='block';if(err.name==='AbortError')showError('超时，请缩短故事');else showError(err.message)}
+}
+
+function sanitize(d){
+  d.logline=d.logline||'';d.genre=d.genre||'';d.format=d.format||'Short Drama';
+  if(!d.scores)d.scores={};const s=d.scores;
+  s.commercial=clamp(s.commercial||50);s.emotional=clamp(s.emotional||50);s.retention=clamp(s.retention||50);s.viral=clamp(s.viral||50);s.feasibility=clamp(s.feasibility||50);
+  s.avg=Math.round((s.commercial+s.emotional+s.retention+s.viral+s.feasibility)/5);
+  d.status=d.status||(s.avg>=75?'GREENLIGHT':s.avg>=55?'HOLD':'REWRITE');
+  if(!d.structure)d.structure={};const st=d.structure;st.breakdown=st.breakdown||['','',''];st.verdict=st.verdict||'';
+  if(!d.retention)d.retention={};const rt=d.retention;rt.gaps=rt.gaps||['','',''];if(!rt.emotions)rt.emotions={};
+  if(!d.rewrite)d.rewrite={};const rw=d.rewrite;rw.upgrades=rw.upgrades||['','',''];
+  if(!d.cinematic)d.cinematic={};const cn=d.cinematic;cn.key_shots=cn.key_shots||['','','',''];
+  if(!d.decision)d.decision={};const dc=d.decision;dc.requirements=dc.requirements||['','',''];dc.status=dc.status||d.status;
+  return d;
+}
+function clamp(v){return Math.max(0,Math.min(100,v))}
+
+// ===== RENDER =====
+function render(d){
+  const s=d.scores;const st=d.structure;const rt=d.retention;const rw=d.rewrite;const cn=d.cinematic;const dc=d.decision;
+  const clsV=(v)=>v>=75?'green':v>=55?'amber':'red';
+  const clsS=(stat)=>/GREEN/i.test(stat)?'green':/HOLD/i.test(stat)?'amber':'red';
+  const fmt=d.format||'Short Drama';
+
+  let h='';
+
+  // ① SCORECARD
+  h+='<div class="module">';
+  h+='<div class="module-hd"><span class="module-num">①</span><span class="module-title green">GREENLIGHT SCORECARD</span></div>';
+  if(d.logline)h+='<div class="logline">'+esc(d.logline)+'</div>';
+  h+='<div class="meta-row"><span><span class="dot" style="background:var(--gold)"></span>'+esc(d.genre)+'</span><span>FORMAT: '+esc(fmt)+'</span></div>';
+  h+='<div class="score-grid">';
+  h+=si('COMMERCIAL',s.commercial);h+=si('EMOTIONAL',s.emotional);h+=si('RETENTION',s.retention);h+=si('VIRAL',s.viral);h+=si('FEASIBILITY',s.feasibility);
+  h+='</div>';
+  h+='<div class="verdict '+clsS(d.status)+'">'+esc(d.status)+' · COMPOSITE '+s.avg+'</div>';
+  h+='</div>';
+
+  // ② STRUCTURE DIAGNOSIS
+  h+='<div class="module">';
+  h+='<div class="module-hd"><span class="module-num">②</span><span class="module-title red">STRUCTURE DIAGNOSIS</span></div>';
+  h+=actSec('ACT I — SETUP',st.act1_hook,'Hook: '+esc(st.act1_hook||'—'));
+  if(st.act1_problem)h+=actSec('',st.act1_problem,'Issue: '+esc(st.act1_problem));
+  h+=actSec('ACT II — CONFRONTATION',st.act2_conflict,'Conflict: '+esc(st.act2_conflict||'—'));
+  if(st.act2_midpoint)h+=actSec('',st.act2_midpoint,'Midpoint: '+esc(st.act2_midpoint));
+  h+=actSec('ACT III — RESOLUTION',st.act3_payoff,'Payoff: '+esc(st.act3_payoff||'—'));
+  if(st.breakdown.length&&st.breakdown[0]){h+='<div class="breakdown">';st.breakdown.forEach(b=>{if(b)h+='<div class="br-item">▸ '+esc(b)+'</div>'});h+='</div>'}
+  h+='<div class="verdict-line">▶ '+esc(st.verdict||'NOT PRODUCTION-READY')+'</div>';
+  h+='</div>';
+
+  // ③ RETENTION
+  h+='<div class="module">';
+  h+='<div class="module-hd"><span class="module-num">③</span><span class="module-title amber">AUDIENCE RETENTION MODEL</span></div>';
+  h+=retBar('0–3s Hook',rt.hook_3s);
+  h+=retBar('1–3 min Drop Risk',rt.drop_risk);
+  h+='<div style="font-size:10px;color:var(--muted);margin-top:8px;letter-spacing:1px">EMOTIONAL CURVE</div>';
+  h+=retBar('Curiosity',rt.emotions?.curiosity);
+  h+=retBar('Fear',rt.emotions?.fear);
+  h+=retBar('Urgency',rt.emotions?.urgency);
+  if(rt.gaps.length&&rt.gaps[0]){h+='<div class="ret-gaps">';rt.gaps.forEach(g=>{if(g)h+='<div class="ret-gap">'+esc(g)+'</div>'});h+='</div>'}
+  h+='<div class="verdict-line" style="color:var(--amber)">▶ '+esc(rt.summary||'Cannot sustain retention')+'</div>';
+  h+='</div>';
+
+  // ④ REWRITE
+  h+='<div class="module">';
+  h+='<div class="module-hd"><span class="module-num">④</span><span class="module-title gold">REWRITE BLUEPRINT</span></div>';
+  if(rw.core_transformation)h+='<div class="rewrite-engine">'+esc(rw.core_transformation)+'</div>';
+  if(rw.rewritten_story)h+='<div class="rewrite-story">'+esc(rw.rewritten_story)+'</div>';
+  if(rw.inciting_event)h+='<div class="rewrite-item"><strong>Inciting Event</strong> '+esc(rw.inciting_event)+'</div>';
+  if(rw.midpoint_reversal)h+='<div class="rewrite-item"><strong>Midpoint Reversal</strong> '+esc(rw.midpoint_reversal)+'</div>';
+  if(rw.pressures)h+='<div class="rewrite-item"><strong>Pressure System</strong> '+esc(rw.pressures)+'</div>';
+  if(rw.upgrades.length&&rw.upgrades[0]){h+='<div class="upgrade-list">';rw.upgrades.forEach(u=>{if(u)h+='<div class="upgrade-item">'+esc(u)+'</div>'});h+='</div>'}
+  h+='</div>';
+
+  // ⑤ CINEMATIC
+  h+='<div class="module">';
+  h+='<div class="module-hd"><span class="module-num">⑤</span><span class="module-title gold">CINEMATIC TRANSLATION</span></div>';
+  h+='<div class="cineshots">';
+  if(cn.opening_shot)h+='<div class="cineshot"><strong>OPENING SHOT (0–3s)</strong><span>'+esc(cn.opening_shot)+'</span></div>';
+  cn.key_shots.forEach((ks,i)=>{if(ks)h+='<div class="cineshot"><strong>KEY SHOT '+(i+1)+'</strong><span>'+esc(ks)+'</span></div>'});
+  h+='</div>';
+  if(cn.intent)h+='<div class="director-note">DIRECTORIAL INTENT: '+esc(cn.intent)+'</div>';
+  h+='</div>';
+
+  // ⑥ DECISION
+  h+='<div class="module">';
+  h+='<div class="module-hd"><span class="module-num">⑥</span><span class="module-title '+clsS(dc.status)+'">GREENLIGHT DECISION</span></div>';
+  h+='<div class="final-badge '+clsS(dc.status)+'">▶ '+esc(dc.status)+'</div>';
+  if(dc.reason)h+='<div class="final-reason">'+esc(dc.reason)+'</div>';
+  if(dc.requirements.length&&dc.requirements[0]){h+='<ul class="final-reqs">';dc.requirements.forEach(r=>{if(r)h+='<li>'+esc(r)+'</li>'});h+='</ul>'}
+  if(dc.recommendation)h+='<div class="final-recs">'+esc(dc.recommendation)+'</div>';
+  h+='</div>';
+
+  document.getElementById('outputArea').innerHTML=h;
+}
+
+function si(label,val){return'<div class="score-item"><div class="score-val '+clsV(val)+'">'+val+'</div><div class="score-lbl">'+label+'</div></div>'}
+function clsV(v){return v>=75?'green':v>=55?'amber':'red'}
+function actSec(label,content,display){
+  if(!label&&!content)return'';
+  if(!label)return'<div class="diag-act"><div class="act-body">'+esc(display||content)+'</div></div>';
+  return'<div class="diag-act"><div class="act-label">'+esc(label)+'</div><div class="act-body">'+esc(display||content)+'</div></div>'
+}
+function retBar(label,val){
+  if(!val)return'';
+  const lv=/LOW/i.test(val)?'low':/HIGH/i.test(val)?'high':'mid';
+  return'<div class="ret-bar-row"><div class="rlabel"><span>'+esc(label)+'</span><span style="color:var(--'+(lv==='high'?'green':lv==='low'?'red':'amber')+')">'+esc(val)+'</span></div><div class="ret-bar"><div class="ret-fill '+lv+'"></div></div></div>'
+}
+function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+
+// ===== DEMO =====
+function runDemo(){
+  document.getElementById('inputZone').style.display='none';
+  document.getElementById('resultWrap').classList.remove('show');document.getElementById('outputArea').innerHTML='';
+  const d={
+    logline:'一个女孩在整理母亲遗物时，发现父亲是连环杀手——而他的下一个目标，是今晚来接她的继母。',
+    genre:'Crime Thriller',format:'Short Drama',
+    scores:{commercial:82,emotional:78,retention:85,viral:80,feasibility:75,avg:80},
+    status:'GREENLIGHT',
+    structure:{
+      act1_hook:'HIGH — 日记第一行"你爸爸是杀人犯"创造了即时的认知冲击',
+      act1_problem:'主角动机滞后于信息揭示，前2个镜头仍处于被动接收状态',
+      act2_conflict:'MID — 外部钟表倒计时构建了有效紧迫感，但缺少中段的权力关系反转',
+      act2_midpoint:'缺失 — 需要她从"逃避真相"翻转为"主动对抗"',
+      act3_payoff:'父亲说"我知道你会来"完成了情感闭环，但缺乏最后一层道德抉择的升华',
+      breakdown:['Protagonist agency: reactive','External pressure: underdeveloped escalation','Midpoint reversal: missing'],
+      verdict:'Narrative engine valid. Requires structural reinforcement.'
+    },
+    retention:{
+      hook_3s:'HIGH',drop_risk:'LOW',
+      emotions:{curiosity:'HIGH',fear:'MID',urgency:'HIGH'},
+      gaps:['Irreversible decision point missing','Moral dilemma not escalated to breaking point','Secondary antagonist underdeveloped'],
+      summary:'Strong hook, mid-section needs tension loop reinforcement.'
+    },
+    rewrite:{
+      core_transformation:'Passive discovery → Active countdown thriller',
+      inciting_event:'她发现父亲此刻正在继母工作的咖啡馆窗外——倒计时从6小时压缩为6分钟',
+      midpoint_reversal:'她决定不报警，而是自己带刀去咖啡馆——从受害者视角翻转为猎手视角',
+      pressures:'Time: 6-minute clock · Moral: blood vs. justice · Survival: father already knows she knows',
+      rewritten_story:'18岁女孩在母亲遗物中发现父亲是连环杀手。追踪他的行踪时，她意识到他此刻正站在继母工作的咖啡馆外。放学前的6分钟，她必须在报警毁掉家庭、沉默看着继母死、或者自己动手之间做出选择。她抓起母亲的旧刀，冲向咖啡馆——但推开门的一瞬间，父亲转过头，对她笑了笑。',
+      upgrades:['Clock compression: 6 hours → 6 minutes','Agency flip: victim → hunter','Moral escalation: abstract dilemma → physical choice']
+    },
+    cinematic:{
+      opening_shot:'EXTREME CLOSE-UP · 旧日记本翻开 · 第一行"你爸爸是杀人犯" · SLOW PUSH-IN · COGNITIVE SHOCK',
+      key_shots:[
+        'WIDE SHOT · 她站在窗前看到父亲在对面咖啡馆外 · HOLD 3 SECONDS · DREAD',
+        'HANDHELD CHAOS · 她翻抽屉找刀 · CUTS ON ACTION · URGENCY',
+        'STEADICAM · 她跑过街区 · LONG TAKE · HEARTBEAT RHYTHM',
+        'STATIC WIDE · 咖啡馆门推开 · 父亲回头微笑 · FREEZE TENSION'
+      ],
+      intent:'Every shot must serve escalation. No aesthetic filler.'
+    },
+    decision:{
+      status:'GREENLIT',
+      reason:'Strong premise with built-in moral engine. Clock compression and agency flip transformed a passive premise into an active thriller.',
+      requirements:['Execute 6-minute countdown structure precisely','Ensure midpoint reversal visually reads as a decision switch','Land the father reveal with maximum visual restraint'],
+      recommendation:'Recommended for production with monitoring on midpoint pacing.'
+    }
+  };
+  lr=d;render(d);document.getElementById('resultWrap').classList.add('show');
+  document.getElementById('inputZone').style.display='block';
+  document.getElementById('resultWrap').scrollIntoView({behavior:'smooth'});
+  toast('DEMO MODE · KEY SETUP FOR LIVE ANALYSIS')
+}
+
+function resetAll(){document.getElementById('resultWrap').classList.remove('show');document.getElementById('outputArea').innerHTML='';window.scrollTo({top:0,behavior:'smooth'})}
+</script>
+</body>
+</html>
