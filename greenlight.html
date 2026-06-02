@@ -150,9 +150,9 @@ footer{text-align:center;padding:40px 0 20px;font-size:9px;color:rgba(102,96,88,
 <div id="app">
 
 <div class="hero">
-  <div class="tag">GREENLIGHT SYSTEM</div>
+  <div class="tag">GREENLIGHT SYSTEM · 绿灯评审</div>
   <h1>剧引 · <em>AI影视绿灯系统</em></h1>
-  <p class="sub">评估一个故事是否值得被拍 — 制片厂级工业评审</p>
+  <p class="sub">输入你的故事，立刻告诉你：能不能火、哪里会掉人、怎么改才能爆</p>
 </div>
 
 <div class="key-row">
@@ -171,8 +171,8 @@ footer{text-align:center;padding:40px 0 20px;font-size:9px;color:rgba(102,96,88,
 
 <div class="loading" id="loading">
   <div class="ring"></div>
-  <div class="loading-text">ANALYZING NARRATIVE STRUCTURE</div>
-  <div class="loading-sub" id="loadingStep">Evaluating story architecture...</div>
+  <div class="loading-text">正在评估你的故事结构</div>
+  <div class="loading-sub" id="loadingStep">分析叙事引擎...</div>
 </div>
 
 <div class="error" id="errorBox"></div>
@@ -184,7 +184,7 @@ footer{text-align:center;padding:40px 0 20px;font-size:9px;color:rgba(102,96,88,
   <div id="outputArea"></div>
 </div>
 
-<footer>GREENLIGHT SYSTEM v1 · 剧引</footer>
+<footer>剧引 GREENLIGHT SYSTEM · 输入故事 → 判断能不能爆</footer>
 
 </div>
 
@@ -347,18 +347,21 @@ function render(d){
 
   // ① SCORECARD
   h+='<div class="module">';
-  h+='<div class="module-hd"><span class="module-num">①</span><span class="module-title green">GREENLIGHT SCORECARD</span></div>';
+  h+='<div class="module-hd"><span class="module-num">①</span><span class="module-title green">GREENLIGHT SCORECARD <span style="font-size:9px;letter-spacing:1px;color:var(--muted);font-weight:400">制片厂评分卡</span></span></div>';
   if(d.logline)h+='<div class="logline">'+esc(d.logline)+'</div>';
   h+='<div class="meta-row"><span><span class="dot" style="background:var(--gold)"></span>'+esc(d.genre)+'</span><span>FORMAT: '+esc(fmt)+'</span></div>';
   h+='<div class="score-grid">';
-  h+=si('COMMERCIAL',s.commercial);h+=si('EMOTIONAL',s.emotional);h+=si('RETENTION',s.retention);h+=si('VIRAL',s.viral);h+=si('FEASIBILITY',s.feasibility);
+  h+=si('COMMERCIAL','商业价值',s.commercial);h+=si('EMOTIONAL','情绪冲击',s.emotional);h+=si('RETENTION','观众留存',s.retention);h+=si('VIRAL','传播力',s.viral);h+=si('FEASIBILITY','制作可行性',s.feasibility);
   h+='</div>';
-  h+='<div class="verdict '+clsS(d.status)+'">'+esc(d.status)+' · COMPOSITE '+s.avg+'</div>';
+  const statusCN={'GREENLIGHT':'绿灯放行','GREENLIT':'绿灯放行','HOLD':'待定修改','REWRITE':'需重写'};
+  const stCN=statusCN[d.status]||d.status;
+  h+='<div class="verdict '+clsS(d.status)+'">▶ '+esc(d.status)+' · '+esc(stCN)+' · 综合 '+s.avg+' 分</div>';
+  h+='<div style="text-align:center;font-size:10px;color:var(--muted);margin-top:4px">'+(s.avg>=75?'这个故事可以拍，往下看怎么拍':'这个故事有硬伤，往下看怎么改')+'</div>';
   h+='</div>';
 
   // ② STRUCTURE DIAGNOSIS
   h+='<div class="module">';
-  h+='<div class="module-hd"><span class="module-num">②</span><span class="module-title red">STRUCTURE DIAGNOSIS</span></div>';
+  h+='<div class="module-hd"><span class="module-num">②</span><span class="module-title red">STRUCTURE DIAGNOSIS <span style="font-size:9px;letter-spacing:1px;color:var(--muted);font-weight:400">结构诊断</span></span></div>';
   h+=actSec('ACT I — SETUP',st.act1_hook,'Hook: '+esc(st.act1_hook||'—'));
   if(st.act1_problem)h+=actSec('',st.act1_problem,'Issue: '+esc(st.act1_problem));
   h+=actSec('ACT II — CONFRONTATION',st.act2_conflict,'Conflict: '+esc(st.act2_conflict||'—'));
@@ -370,20 +373,20 @@ function render(d){
 
   // ③ RETENTION
   h+='<div class="module">';
-  h+='<div class="module-hd"><span class="module-num">③</span><span class="module-title amber">AUDIENCE RETENTION MODEL</span></div>';
-  h+=retBar('0–3s Hook',rt.hook_3s);
-  h+=retBar('1–3 min Drop Risk',rt.drop_risk);
-  h+='<div style="font-size:10px;color:var(--muted);margin-top:8px;letter-spacing:1px">EMOTIONAL CURVE</div>';
-  h+=retBar('Curiosity',rt.emotions?.curiosity);
-  h+=retBar('Fear',rt.emotions?.fear);
-  h+=retBar('Urgency',rt.emotions?.urgency);
+  h+='<div class="module-hd"><span class="module-num">③</span><span class="module-title amber">AUDIENCE RETENTION <span style="font-size:9px;letter-spacing:1px;color:var(--muted);font-weight:400">观众留存模型</span></span></div>';
+  h+=retBar('0–3s Hook','前三秒钩子',rt.hook_3s);
+  h+=retBar('1–3 min Drop Risk','流失风险',rt.drop_risk);
+  h+='<div style="font-size:10px;color:var(--muted);margin-top:8px;letter-spacing:1px">EMOTIONAL CURVE 情绪曲线</div>';
+  h+=retBar('Curiosity','好奇心',rt.emotions?.curiosity);
+  h+=retBar('Fear','恐惧感',rt.emotions?.fear);
+  h+=retBar('Urgency','紧迫感',rt.emotions?.urgency);
   if(rt.gaps.length&&rt.gaps[0]){h+='<div class="ret-gaps">';rt.gaps.forEach(g=>{if(g)h+='<div class="ret-gap">'+esc(g)+'</div>'});h+='</div>'}
   h+='<div class="verdict-line" style="color:var(--amber)">▶ '+esc(rt.summary||'Cannot sustain retention')+'</div>';
   h+='</div>';
 
   // ④ REWRITE
   h+='<div class="module">';
-  h+='<div class="module-hd"><span class="module-num">④</span><span class="module-title gold">REWRITE BLUEPRINT</span></div>';
+  h+='<div class="module-hd"><span class="module-num">④</span><span class="module-title gold">REWRITE BLUEPRINT <span style="font-size:9px;letter-spacing:1px;color:var(--muted);font-weight:400">重写方案</span></span></div>';
   if(rw.core_transformation)h+='<div class="rewrite-engine">'+esc(rw.core_transformation)+'</div>';
   if(rw.rewritten_story)h+='<div class="rewrite-story">'+esc(rw.rewritten_story)+'</div>';
   if(rw.inciting_event)h+='<div class="rewrite-item"><strong>Inciting Event</strong> '+esc(rw.inciting_event)+'</div>';
@@ -394,7 +397,7 @@ function render(d){
 
   // ⑤ CINEMATIC
   h+='<div class="module">';
-  h+='<div class="module-hd"><span class="module-num">⑤</span><span class="module-title gold">CINEMATIC TRANSLATION</span></div>';
+  h+='<div class="module-hd"><span class="module-num">⑤</span><span class="module-title gold">CINEMATIC TRANSLATION <span style="font-size:9px;letter-spacing:1px;color:var(--muted);font-weight:400">镜头落地</span></span></div>';
   h+='<div class="cineshots">';
   if(cn.opening_shot)h+='<div class="cineshot"><strong>OPENING SHOT (0–3s)</strong><span>'+esc(cn.opening_shot)+'</span></div>';
   cn.key_shots.forEach((ks,i)=>{if(ks)h+='<div class="cineshot"><strong>KEY SHOT '+(i+1)+'</strong><span>'+esc(ks)+'</span></div>'});
@@ -404,8 +407,8 @@ function render(d){
 
   // ⑥ DECISION
   h+='<div class="module">';
-  h+='<div class="module-hd"><span class="module-num">⑥</span><span class="module-title '+clsS(dc.status)+'">GREENLIGHT DECISION</span></div>';
-  h+='<div class="final-badge '+clsS(dc.status)+'">▶ '+esc(dc.status)+'</div>';
+  h+='<div class="module-hd"><span class="module-num">⑥</span><span class="module-title '+clsS(dc.status)+'">GREENLIGHT DECISION <span style="font-size:9px;letter-spacing:1px;color:var(--muted);font-weight:400">最终裁定</span></span></div>';
+  h+='<div class="final-badge '+clsS(dc.status)+'">▶ '+esc(dc.status)+' · '+esc(statusCN[dc.status]||'')+'</div>';
   if(dc.reason)h+='<div class="final-reason">'+esc(dc.reason)+'</div>';
   if(dc.requirements.length&&dc.requirements[0]){h+='<ul class="final-reqs">';dc.requirements.forEach(r=>{if(r)h+='<li>'+esc(r)+'</li>'});h+='</ul>'}
   if(dc.recommendation)h+='<div class="final-recs">'+esc(dc.recommendation)+'</div>';
@@ -414,17 +417,17 @@ function render(d){
   document.getElementById('outputArea').innerHTML=h;
 }
 
-function si(label,val){return'<div class="score-item"><div class="score-val '+clsV(val)+'">'+val+'</div><div class="score-lbl">'+label+'</div></div>'}
+function si(label,cn,val){return'<div class="score-item"><div class="score-val '+clsV(val)+'">'+val+'</div><div class="score-lbl">'+label+'</div><div style="font-size:8px;color:rgba(102,96,88,.3)">'+cn+'</div></div>'}
 function clsV(v){return v>=75?'green':v>=55?'amber':'red'}
 function actSec(label,content,display){
   if(!label&&!content)return'';
   if(!label)return'<div class="diag-act"><div class="act-body">'+esc(display||content)+'</div></div>';
   return'<div class="diag-act"><div class="act-label">'+esc(label)+'</div><div class="act-body">'+esc(display||content)+'</div></div>'
 }
-function retBar(label,val){
+function retBar(label,cn,val){
   if(!val)return'';
   const lv=/LOW/i.test(val)?'low':/HIGH/i.test(val)?'high':'mid';
-  return'<div class="ret-bar-row"><div class="rlabel"><span>'+esc(label)+'</span><span style="color:var(--'+(lv==='high'?'green':lv==='low'?'red':'amber')+')">'+esc(val)+'</span></div><div class="ret-bar"><div class="ret-fill '+lv+'"></div></div></div>'
+  return'<div class="ret-bar-row"><div class="rlabel"><span>'+esc(label)+' <span style="font-size:8px;opacity:.5">'+esc(cn)+'</span></span><span style="color:var(--'+(lv==='high'?'green':lv==='low'?'red':'amber')+')">'+esc(val)+'</span></div><div class="ret-bar"><div class="ret-fill '+lv+'"></div></div></div>'
 }
 function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML}
 
@@ -480,7 +483,7 @@ function runDemo(){
   lr=d;render(d);document.getElementById('resultWrap').classList.add('show');
   document.getElementById('inputZone').style.display='block';
   document.getElementById('resultWrap').scrollIntoView({behavior:'smooth'});
-  toast('DEMO MODE · KEY SETUP FOR LIVE ANALYSIS')
+  toast('演示模式 · 设Key后可真实分析')
 }
 
 function resetAll(){document.getElementById('resultWrap').classList.remove('show');document.getElementById('outputArea').innerHTML='';window.scrollTo({top:0,behavior:'smooth'})}
