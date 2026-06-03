@@ -385,8 +385,7 @@ async function callAI(body, timeoutMs) {
 }
 
 function apiUrl(path) { return API_BASE ? API_BASE + path : path; }
-(function(){var v=Date.now();if(!location.search.includes('ts=')&&!document.getElementById('viralAnalysis')){location.href=location.origin+location.pathname+'?ts='+v}})()</script>
-<div id="app">
+(function(){var v=Date.now();if(!location.search.includes('ts=')&&!document.getElementById('viralAnalysis')){location.href=location.origin+location.pathname+'?ts='+v}})()<div id="app">
 <header>
   <div class="logo"><span class="logo-zh">剧引</span><span class="logo-en">Decision OS</span></div>
   <button class="settings-btn" id="settingsBtn" onclick="oS()" title="API Key">⚙</button>
@@ -1117,10 +1116,9 @@ async function retryGenerate(){if(!cr)return;// k removedif(!k){sE('请设Key');
 function loadExistingData(title){document.getElementById('fbPlays').value='';document.getElementById('fbCompletion').value='';document.getElementById('evolutionHint').style.display='none'}
 function saveFeedback(){if(!cr)return;const p=parseInt(document.getElementById('fbPlays').value)||0,c=parseFloat(document.getElementById('fbCompletion').value)||0;if(!p){st('至少填播放量');return}st('数据已记录 · 感谢反馈')}
 function showEvo(entry){}
-</script>
 
-<script src="demo-data.js"></script>
-<script src="extras.js"></script>
+
+
 
 
 <script>
