@@ -297,6 +297,7 @@ footer .brand{font-family:'NF',serif;color:rgba(212,164,74,0.35);font-size:12px}
 @keyframes toastOut{from{opacity:1;transform:translateX(-50%) translateY(0)}to{opacity:0;transform:translateX(-50%) translateY(-6px)}}
 
 @media(max-width:500px){.inline-row{grid-template-columns:1fr}.hero h1{font-size:19px}.modules-row{grid-template-columns:1fr;gap:4px}.score-metrics{grid-template-columns:repeat(3,1fr)}.shot-card{grid-template-columns:1fr}.fb-row{flex-direction:column;align-items:flex-start}.pricing-card{min-width:80px}.key-prompt-bar{font-size:10px}.modal .step-list{font-size:11px}}
+.demo-card{padding:12px 10px;background:rgba(255,255,255,0.03);border:1px solid rgba(212,164,74,0.1);border-radius:8px;text-align:center;cursor:pointer;transition:all .2s}.demo-card:hover{border-color:var(--gold);background:rgba(212,164,74,0.05);transform:translateY(-1px)}.demo-emoji{font-size:22px;margin-bottom:4px}.demo-title{font-size:11px;color:var(--gold);font-weight:500;margin-bottom:2px}.demo-desc{font-size:9px;color:var(--gray);line-height:1.4}
 </style>
 </head>
 <body>
@@ -318,6 +319,7 @@ footer .brand{font-family:'NF',serif;color:rgba(212,164,74,0.35);font-size:12px}
   <p>输入想法 → 直接拿到镜头脚本 · AI绘画提示词 · 剪映结构 · 发布文案</p>
 </section>
 
+<div id="demoSection" style="margin-bottom:14px"><div style="font-size:11px;color:var(--gold);letter-spacing:2px;margin-bottom:8px">🎥 免Key演示 · 点击即看完整制作包</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px"><div class="demo-card" onclick="loadDemo(0)"><div class="demo-emoji">🔥</div><div class="demo-title">重生复仇</div><div class="demo-desc">被渣男害死的女人重回婚礼当天</div></div><div class="demo-card" onclick="loadDemo(1)"><div class="demo-emoji">💔</div><div class="demo-title">先婚后爱</div><div class="demo-desc">契约婚姻里藏着一个惊天秘密</div></div><div class="demo-card" onclick="loadDemo(2)"><div class="demo-emoji">🕯</div><div class="demo-title">悬疑惊悚</div><div class="demo-desc">女儿发现父亲的日记全是杀人记录</div></div></div></div>
 <div class="input-card" id="inputCard">
   <div class="input-group">
     <label>输入一句短剧故事</label>
@@ -1019,5 +1021,75 @@ function loadExistingData(title){document.getElementById('fbPlays').value='';doc
 function saveFeedback(){if(!cr)return;const p=parseInt(document.getElementById('fbPlays').value)||0,c=parseFloat(document.getElementById('fbCompletion').value)||0;if(!p){st('至少填播放量');return}st('数据已记录 · 感谢反馈')}
 function showEvo(entry){}
 </script>
+
+<script>
+// 剧引 Demo 系统 - 免Key演示
+(function(){
+var __D = [{"t":"重回婚礼日","s":"被丈夫和小三害死的女人，在婚礼当天重生。","v":"现代都市·暗黑奢华","ot":"冲突开场","od":"新娘镜中的眼神从温柔变为冰冷——她回来了。","oh":"她的眼神变了","ec":[{"stage":"压迫","desc":"婚礼现场的诡异气氛","si":1},{"stage":"冲突","desc":"与丈夫的暗中对峙","si":3},{"stage":"反转","desc":"曝光丈夫的阴谋","si":5},{"stage":"爆发","desc":"婚礼现场的公开反击","si":7},{"stage":"收束","desc":"转身离开的背影","si":9}],"ps":7,"cs":1,"fs":1,"eps":[[1,"婚礼","她手里握着的不是捧花，是证据。",[["0-8秒","紧张","新娘缓缓走向镜子。镜中的眼神从迷茫变为冰冷坚定。","身着婚纱的女子站在镜前，眼神从温柔瞬间变为冰冷，光线从暖黄转为冷蓝，电影质感，8K","Young bride in wedding dress before mirror, expression shifting gentle to ice-cold, cinematic 8K",[],1,1,0,0,"🔥前3秒必留"],["8-15秒","悬疑","镜头扫过婚礼现场。新娘走出化妆间，目光冷冷扫过人群。","豪华婚礼现场水晶吊灯下宾客举杯浅景深暗藏不安的精致画面","Luxurious wedding chandeliers guests toasting shallow DOF subtle unease cinematic 8K",[["宾客","微笑","真是天造地设的一对"]],0,0,1,0,"✂️二创素材"],["15-22秒","愤怒","丈夫温柔地为另一个女人整理头发。画面闪回前世——然后是她被杀害的那一夜。","新郎为伴娘整理头发新娘在人群后冷冷注视闪回前世背叛与谋杀冷色调对比","Groom fixing bridesmaid hair bride watching coldly flashback betrayal murder stark contrast",[["新娘","冰冷","还是这个动作……一模一样。"]],0,0,1,1,"💬讨论引爆"],["22-30秒","爆发","她走上前拿起麦克风。全场寂静。","新娘手持麦克风站在婚礼舞台中央聚光灯下全场宾客震惊注视戏剧性电影级构图","Bride holding microphone center stage spotlight guests staring shock dramatic cinematography 8K",[["新娘","冷静而致命","感谢大家。在交换戒指之前，我想先给大家看一样东西。"]],0,0,0,1,"🎯情绪巅峰"]]]],"chars":[["林晚","主角/复仇新娘","黑色长发·冷白皮·红唇","微笑时眼神不笑","发型/脸型/红唇色系"],["陆深","丈夫/反派","深灰西装·金丝眼镜","温柔表象下的算计","西装色系/眼镜款式"]],"clip":[[["0:00-0:08","镜面转变","新娘眼神从温柔变冰冷"],["0:08-0:15","婚礼全景","看似完美的婚礼暗藏危机"],["0:15-0:22","发现背叛","丈夫与另一女人的亲密动作"],["0:22-0:30","公开反击","拿起麦克风揭露真相"]],"压抑弦乐渐强→电子节拍爆发"],"pub":[["重回婚礼日，这一次我不做新娘做猎人","她的婚礼上，所有人都是猎物"],["重生复仇","婚礼反击","女强","爽文改编","微短剧"],"婚礼上所有人都在笑。只有她知道这是一出谋杀。重生归来她要做这场戏的导演。","抖音/快手 竖屏短剧"]}];
+
+window.loadDemo = function(idx){
+  var raw = __D[idx];
+  if(!raw) return;
+  
+  // Expand compact format to full format
+  var d = {
+    title: raw.t, synopsis: raw.s, visualStyle: raw.v,
+    openingType: raw.ot, openingDesc: raw.od, openingHook: raw.oh,
+    emotionCurve: raw.ec.map(function(e){return{stage:e.stage,desc:e.desc,shotIndex:e.si}}),
+    peakShot: raw.ps, coverShot: raw.cs, firstFiveShot: raw.fs,
+    episodes: raw.eps.map(function(ep){
+      return {
+        ep: ep[0], title: ep[1], cliffhanger: ep[2],
+        shots: ep[3].map(function(sh){
+          return {
+            time: sh[0], emotion: sh[1], desc: sh[2],
+            prompt_jimeng: sh[3], prompt_keling: sh[4],
+            dialogues: sh[5].map(function(dl){return{name:dl[0],emotion:dl[1],text:dl[2]}}),
+            isOpening: !!sh[6], isCover: !!sh[7], isRemixable: !!sh[8], isDiscussable: !!sh[9],
+            viralLabel: sh[10] || ""
+          };
+        })
+      };
+    }),
+    characters: raw.chars.map(function(ch){
+      return {name:ch[0],role:ch[1],visualAnchor:ch[2],behaviorAnchor:ch[3],forbidden:ch[4]};
+    }),
+    clipStructure: { timeline: raw.clip[0].map(function(tl){
+      return {time:tl[0],label:tl[1],desc:tl[2]};
+    }), overallBgm: raw.clip[1] },
+    publish: { titles: raw.pub[0], tags: raw.pub[1], copy: raw.pub[2], platform: raw.pub[3] },
+    _epCount: 1, _durMin: 1, _mode: "short"
+  };
+  
+  // Use the existing renderProduction function from the page
+  if(typeof cr !== "undefined") { var oldCr = cr; }
+  cr = d;
+  
+  // Hide input, show result
+  var ic = document.getElementById("inputCard");
+  var ds = document.getElementById("demoSection");
+  var rw = document.getElementById("resultWrap");
+  var pc = document.getElementById("productionContent");
+  if(ic) ic.style.display = "none";
+  if(ds) ds.style.display = "none";
+  if(rw) rw.classList.remove("active");
+  if(pc) pc.classList.remove("active");
+  
+  try {
+    renderProduction(d, 1, 1);
+    if(rw) rw.classList.add("active");
+    if(rw) rw.scrollIntoView({behavior:"smooth"});
+    if(typeof st === "function") st("Demo: " + d.title);
+    if(typeof sL === "function") sL(false);
+  } catch(e) {
+    console.error("Demo render error:", e);
+    alert("Demo加载失败，请刷新页面后重试。错误：" + e.message);
+  }
+};
+
+console.log("剧引 Demo 系统已加载，共 " + __D.length + " 个演示案例");
+})();
+</script>
+
 </body>
 </html>
